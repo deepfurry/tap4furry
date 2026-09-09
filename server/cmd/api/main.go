@@ -57,7 +57,11 @@ func run() error {
 		defer capture.Close()
 		mailer = capture
 	}
-	authentication, err := auth.New(pool, mailer, auth.OAuthConfig{Flows: store, Providers: oauthprovider.New(c)})
+	throttle, err := store.AuthThrottle(c.AuthThrottleSecret)
+	if err != nil {
+		return err
+	}
+	authentication, err := auth.NewWithThrottle(pool, mailer, throttle, auth.OAuthConfig{Flows: store, Providers: oauthprovider.New(c)})
 	if err != nil {
 		return err
 	}

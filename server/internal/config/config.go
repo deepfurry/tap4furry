@@ -19,6 +19,9 @@ type Config struct {
 	RiverSchema              string
 	PublicOrigin             string
 	CSRFSecret               string
+	AdminOrigin              string
+	AdminCSRFSecret          string
+	AuthThrottleSecret       string
 	MailMode                 string
 	MailLocalDir             string
 	GoogleOAuth, GitHubOAuth OAuthCredentials
@@ -36,6 +39,8 @@ func (c Config) OAuthCallback(provider string) (string, error) {
 }
 
 const DevelopmentCSRFSecret = "gofurry-development-only-csrf-secret"
+const DevelopmentAdminCSRFSecret = "gofurry-development-only-admin-csrf-secret"
+const DevelopmentAuthThrottleSecret = "gofurry-development-only-auth-throttle-secret"
 
 func Load(service string) (Config, error) {
 	return load(service, os.Getenv)
@@ -55,11 +60,35 @@ func load(service string, env func(string) string) (Config, error) {
 		return Config{}, errors.New("unknown service")
 	}
 	if service == "api" || service == "admin" {
+		c.AuthThrottleSecret = env("AUTH_THROTTLE_SECRET")
+		if c.AuthThrottleSecret == "" && c.Environment != "production" {
+			c.AuthThrottleSecret = DevelopmentAuthThrottleSecret
+		}
+		if len(c.AuthThrottleSecret) < 32 || (c.Environment == "production" && c.AuthThrottleSecret == DevelopmentAuthThrottleSecret) {
+			return Config{}, errors.New("AUTH_THROTTLE_SECRET must contain at least 32 bytes; production requires a private secret")
+		}
 		c.HTTPAddr = env("HTTP_ADDR")
 		_, port, err := net.SplitHostPort(c.HTTPAddr)
 		n, parseErr := strconv.Atoi(port)
 		if err != nil || parseErr != nil || n < 1 || n > 65535 {
 			return Config{}, errors.New("HTTP_ADDR must be host:port with a valid port")
+		}
+	}
+	if service == "admin" {
+		c.AdminOrigin = env("ADMIN_ORIGIN")
+		if c.AdminOrigin == "" && c.Environment == "development" {
+			c.AdminOrigin = "http://localhost:5173"
+		}
+		u, err := url.Parse(c.AdminOrigin)
+		if err != nil || u.Hostname() == "" || u.User != nil || u.Path != "" || u.RawQuery != "" || u.ForceQuery || u.Fragment != "" || u.Opaque != "" || (u.Scheme != "http" && u.Scheme != "https") || (c.Environment == "production" && u.Scheme != "https") {
+			return Config{}, errors.New("ADMIN_ORIGIN must be an exact origin (HTTPS required in production)")
+		}
+		c.AdminCSRFSecret = env("ADMIN_CSRF_SECRET")
+		if c.AdminCSRFSecret == "" && c.Environment != "production" {
+			c.AdminCSRFSecret = DevelopmentAdminCSRFSecret
+		}
+		if len(c.AdminCSRFSecret) < 32 || c.AdminCSRFSecret == env("CSRF_SECRET") || c.AdminCSRFSecret == DevelopmentCSRFSecret || (c.Environment == "production" && c.AdminCSRFSecret == DevelopmentAdminCSRFSecret) {
+			return Config{}, errors.New("ADMIN_CSRF_SECRET requires a separate private secret of at least 32 bytes in production")
 		}
 	}
 	if service == "api" {

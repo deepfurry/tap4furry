@@ -258,8 +258,8 @@ func TestIntegrationHTTPAndPrivacy(t *testing.T) {
 		t.Fatal("admin separation check failed")
 	}
 	response.Body.Close()
-	if response.StatusCode != 404 {
-		t.Fatal("Admin accepted Public identity route")
+	if response.StatusCode != 401 {
+		t.Fatal("Admin accepted a Public session")
 	}
 
 	// Soft-deleted profiles disappear, while their unique handles remain reserved.
@@ -420,11 +420,11 @@ func TestIntegrationSchemaAndPrivileges(t *testing.T) {
 	f := newFixture(t)
 	ctx := t.Context()
 	var tables string
-	if err := f.owner.QueryRow(ctx, `SELECT string_agg(tablename,',' ORDER BY tablename) FROM pg_tables WHERE schemaname='app'`).Scan(&tables); err != nil || tables != "auth_challenges,auth_identities,goose_db_version,password_credentials,security_events,sessions,user_profiles,users" {
+	if err := f.owner.QueryRow(ctx, `SELECT string_agg(tablename,',' ORDER BY tablename) FROM pg_tables WHERE schemaname='app'`).Scan(&tables); err != nil || tables != "auth_challenges,auth_identities,goose_db_version,password_credentials,security_events,sessions,user_profiles,user_roles,users" {
 		t.Fatal("unexpected application schema or future tables")
 	}
 	var version int
-	if err := f.owner.QueryRow(ctx, "SELECT max(version_id) FROM app.goose_db_version WHERE is_applied").Scan(&version); err != nil || version != 4 {
+	if err := f.owner.QueryRow(ctx, "SELECT max(version_id) FROM app.goose_db_version WHERE is_applied").Scan(&version); err != nil || version != 5 {
 		t.Fatal("fresh migration chain failed")
 	}
 	for _, role := range []string{"gfp_api", "gfp_admin", "gfp_worker"} {
@@ -433,8 +433,8 @@ func TestIntegrationSchemaAndPrivileges(t *testing.T) {
 			t.Fatal("runtime owns schema/DDL")
 		}
 	}
-	for _, role := range []string{"gfp_admin", "gfp_worker"} {
-		for _, table := range []string{"users", "user_profiles", "auth_identities", "password_credentials", "sessions", "auth_challenges", "security_events"} {
+	for _, role := range []string{"gfp_worker"} {
+		for _, table := range []string{"users", "user_profiles", "auth_identities", "password_credentials", "sessions", "auth_challenges", "security_events", "user_roles"} {
 			var anyPrivilege bool
 			if err := f.owner.QueryRow(ctx, "SELECT has_any_column_privilege($1,$2,'SELECT,INSERT,UPDATE,REFERENCES') OR has_table_privilege($1,$2,'DELETE,TRUNCATE,TRIGGER')", role, "app."+table).Scan(&anyPrivilege); err != nil || anyPrivilege {
 				t.Fatal("unneeded identity privileges granted")

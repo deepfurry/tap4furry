@@ -19,9 +19,9 @@ Public Profile
 
 Authentication identity is private and separate from public profile identity.
 
-Implemented P0-1A/B/C scope includes local and Google/GitHub authentication, explicit
+Implemented P0-1A/B/C/D scope includes local and Google/GitHub authentication, explicit
 account linking, basic profiles, public sessions, email verification and recovery.
-Admin and abuse controls remain P0-1D work; production deployment is outside this phase.
+P0-1D adds static roles, Admin authentication and abuse controls; production deployment remains outside this phase.
 
 ## OAuth
 
@@ -91,7 +91,7 @@ PostgreSQL is the canonical session store.
 
 ## Lifetimes
 
-Initial configurable defaults:
+Explicit application lifetime constants:
 
 ### Public
 ```text
@@ -139,9 +139,9 @@ unique index permits one outstanding identity/purpose challenge. Reissue first
 invalidates the prior row and observes a 60-second cooldown. Consumption rechecks
 purpose, state, expiry and active account inside the transaction.
 
-Credential-row locking serializes login, challenge issuance/consumption and session
-mutations; password KDFs run outside transactions. Reset/change revoke all public
-sessions and create one replacement atomically. Reset does not set email verified.
+User locking (then credential locking where needed) serializes login, challenge issuance/consumption and session
+mutations; password KDFs run outside transactions. Reset/change revoke all Public/Admin
+sessions and create one Public replacement atomically. Reset does not set email verified.
 Reauthentication verifies the current password, replaces just the current session
 and refreshes `authenticated_at`. Foreign/nonexistent session IDs return the same 404.
 
@@ -177,7 +177,7 @@ Do not challenge Save / Want / Have.
 
 ## Public / Admin Separation
 
-Admin:
+Production deployment target (operator-provided; not a local implementation dependency):
 
 ```text
 Cloudflare Access
@@ -190,6 +190,54 @@ Cloudflare Access
 Cloudflare identity is not GoFurry authorization.
 
 Public sessions are never accepted as Admin sessions.
+
+P0-1D implements password-only Admin login for active, non-deleted accounts with a
+verified email identity, a password credential and a current static role. Moderator
+grants AdminAccess/Moderation, editor grants AdminAccess/Editorial, admin grants all
+of these plus Administration. Multiple roles are additive; no ordinary `user` row
+or dynamic permission tables exist. `/me` returns only ID, email, roles and authentication
+time. Unknown, wrong, unverified, roleless, OAuth-only, disabled or deleted accounts
+share `ADMIN_INVALID_CREDENTIALS`; password verification/dummy work reuses easyhash.
+
+Admin sessions occupy the existing table with `kind=admin` and `auth_method=password`.
+They use 8h absolute/1h idle/5m touch and a separate Strict HttpOnly host cookie.
+Every request checks canonical session/account state and current roles. User locking
+serializes login/reauth with role and password mutations; KDFs run before the lock,
+then credentials and eligibility are re-read before commit. A legacy CAS upgrade
+changes the hash without changing the password epoch. Normal revocations stay
+within their kind; password reset/change revoke every kind and replace only Public.
+
+`ADMIN_ORIGIN` protects unsafe requests. Admin CSRF is base64url HMAC-SHA256 of its
+raw session token using independent `ADMIN_CSRF_SECRET`, retrieved via Admin
+`/auth/csrf` with no-store. Login needs Origin only; authenticated mutations require
+both. Public CSRF, another Admin session's CSRF, and pre-rotation CSRF are rejected.
+Production requires explicit private >=32-byte CSRF/throttle secrets. Password
+hashes and raw session tokens never enter response DTOs or logs. CSRF is returned
+only by its dedicated endpoint and never enters browser storage or logs.
+
+Only owner `adminctl` grants/revokes static roles. A transaction advisory lock before
+the User lock protects the last-active-admin invariant across concurrent operators.
+Role events and final-privileged-role Admin-session revocation commit together.
+Admin runtime has no role mutation privilege or route. Cloudflare identity, if
+provisioned later, cannot replace these GoFurry role checks.
+
+## Auth throttling (P0-1D)
+
+Auth owns a narrow interface; `redisstore` implements atomic EVAL check/record and
+subject clearing. HMAC-SHA256(`AUTH_THROTTLE_SECRET`, operation/dimension/normalized
+subject) keys live under `gfp:auth:limit:`. Subject and global counters have TTLs,
+saturate together and never hold raw emails, IDs, passwords, tokens, OAuth subjects
+or IPs. Forwarded headers are ignored. Completed failure limits are Public login
+10/subject + 500/global per 15m, Admin 5 + 100 per 15m. Registration/reset attempts
+are 3 + 200 per hour. Password change/reauth verification uses 5/User + 500/global
+per 15m; Admin reauth uses 5 + 100. Success clears only the subject failure bucket.
+
+Public local auth fails open on cache outage with redacted warnings; failure events
+are skipped when no healthy bounded counter admitted them. Admin login/reauth fails
+closed; existing PostgreSQL sessions survive a Redis outage. Limited reset remains
+the same 202/body without issuing mail, preserving enumeration resistance. Limits
+are abuse controls, not permanent account lockouts. Production Turnstile/trusted
+proxy decisions and deployment monitoring remain operator gates.
 
 ## Re-authentication
 
@@ -219,6 +267,9 @@ The implemented P0-1B event types are `account_registered`, `login_succeeded`,
 `password_reset_completed`, `password_changed`, `reauthenticated`, `session_revoked`
 and `other_sessions_revoked`. P0-1C adds `oauth_login_succeeded`,
 `oauth_identity_linked`, `oauth_identity_unlinked` and `oauth_reauthenticated`.
+P0-1D adds bounded `login_failed`/`admin_login_failed`, `admin_login_succeeded`,
+`admin_logout`, `admin_reauthenticated`, `admin_session_revoked`,
+`admin_other_sessions_revoked`, and grant/revoke events for moderator/editor/admin.
 The broader list above describes future events.
 `app.security_events` allows only a generated bigint ID, user ID, historical session
 ID, closed event type and timestamp. No metadata/email/IP/user-agent field exists.

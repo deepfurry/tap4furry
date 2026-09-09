@@ -20,3 +20,17 @@ driver checks and container builds. CI does not deploy or publish images in P0-0
 
 `pnpm check` is the cross-platform verification entry point; explicit integration
 and image commands are documented in `docs/development.md`. Record actual results.
+
+P0-1D Admin dev origin is `http://localhost:5173`, proxying to port 8081. Use
+`pnpm adminctl:dev grant-role|revoke-role|list-roles -email ... [-role ...]` with
+prepared migrator input. No HTTP role-management surface exists. Grant only to an
+active verified local password account. Do not remove the last active administrator.
+`pnpm smoke:admin:dev` checks real runtime/owner identities and cleans only its own
+temporary moderator account. Runtime never gets role mutation rights.
+
+`ADMIN_CSRF_SECRET` is separate from Public `CSRF_SECRET`; API/Admin share
+`AUTH_THROTTLE_SECRET`. Production requires explicit private values of at least
+32 bytes; development/test have public defaults. Existing private files stay intact.
+Production Admin requires operator-provided Cloudflare Access with MFA; do not
+provision it during implementation. Human OAuth/Admin sign-off can remain explicitly
+pending after all automated implementation gates pass.

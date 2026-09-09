@@ -8,8 +8,10 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/deepfurry/gofurry-platform/server/internal/auth"
 	"github.com/deepfurry/gofurry-platform/server/internal/config"
 	"github.com/deepfurry/gofurry-platform/server/internal/database"
+	"github.com/deepfurry/gofurry-platform/server/internal/mail"
 	"github.com/deepfurry/gofurry-platform/server/internal/redisstore"
 	platformruntime "github.com/deepfurry/gofurry-platform/server/internal/runtime"
 	"github.com/deepfurry/gofurry-platform/server/internal/transport/admin"
@@ -43,7 +45,15 @@ func run() error {
 	}
 	defer store.Close()
 	checker := health.New(func(ctx context.Context) error { return database.Ready(ctx, pool) }, store.Ping)
-	app := fiber.New(fiber.Config{ReadTimeout: 5 * time.Second, WriteTimeout: 5 * time.Second, IdleTimeout: 30 * time.Second})
-	admin.Register(app, checker)
+	throttle, err := store.AuthThrottle(c.AuthThrottleSecret)
+	if err != nil {
+		return err
+	}
+	authentication, err := auth.NewWithThrottle(pool, mail.Disabled{}, throttle)
+	if err != nil {
+		return err
+	}
+	app := fiber.New(fiber.Config{ReadTimeout: 5 * time.Second, WriteTimeout: 5 * time.Second, IdleTimeout: 30 * time.Second, BodyLimit: 8192})
+	admin.Register(app, checker, admin.Options{Auth: authentication, Environment: c.Environment, AdminOrigin: c.AdminOrigin, CSRFSecret: c.AdminCSRFSecret})
 	return platformruntime.HTTP(ctx, app, c.HTTPAddr, checker, logger)
 }

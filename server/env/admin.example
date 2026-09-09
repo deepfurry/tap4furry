@@ -1,5 +1,8 @@
 APP_ENV=development
 HTTP_ADDR=127.0.0.1:8081
+ADMIN_ORIGIN=http://localhost:5173
+# Development/test may omit ADMIN_CSRF_SECRET and AUTH_THROTTLE_SECRET.
+# Production requires explicit private >=32-byte values. Admin CSRF must differ from Public CSRF.
 DATABASE_URL=postgres://gfp_admin:replace-me@127.0.0.1:5432/gfp_dev?sslmode=disable
 REDIS_URL=redis://gfp_runtime:replace-me@127.0.0.1:6379/0
 REDIS_KEY_PREFIX=gfp:

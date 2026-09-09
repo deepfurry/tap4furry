@@ -2,6 +2,20 @@
 
 ## Unreleased
 
+- Complete P0-1D static moderator/editor/admin roles and operator-only bootstrap,
+  with last-active-admin protection and transactional final-role session revocation.
+- Add independent password-only Admin authentication, current-role authorization,
+  Strict HttpOnly cookies, separate Origin/CSRF, 8h/1h sessions and session controls.
+- Revoke both Public and Admin sessions atomically on password reset/change,
+  retaining exactly one replacement Public session.
+- Add HMAC-private Redis subject/global auth throttles and bounded failure events;
+  Public local auth fails open on cache outage, Admin login/reauth fail closed.
+- Add migration 5 with minimal Admin grants, generated Admin API/client, protected
+  React Admin workspace on port 5173, disposable security/concurrency tests and a
+  real-development Admin smoke with narrowly scoped temporary-fixture cleanup.
+- Document remaining human/provider and production deployment gates; no new
+  dependency, dynamic RBAC, application MFA or product domain is introduced.
+
 - Add P0-1C Google OIDC and GitHub OAuth Web Flow with S256 PKCE, browser-bound
   one-use Redis state and fixed callbacks; provider tokens remain transient.
 - Resolve accounts by verified provider subject, reject email auto-linking, and

@@ -4,7 +4,7 @@ import { root, run } from './process.mjs';
 if (process.env.CI !== 'true' || process.env.GFP_DISPOSABLE_INFRA !== '1') throw new Error('CI integration requires explicitly disposable infrastructure');
 // Endpoints are fixed loopback CI services, never inherited developer URLs.
 const env = { ...process.env, APP_ENV: 'test', CI_POSTGRES_URL: 'postgres://postgres:postgres@127.0.0.1:5432/postgres?sslmode=disable',
-  REDIS_URL: 'redis://gfp_runtime:gfp_ci_only@127.0.0.1:6379/0', REDIS_KEY_PREFIX: 'gfp:', RIVER_SCHEMA: 'river', HTTP_ADDR: '127.0.0.1:8080', PUBLIC_ORIGIN: 'http://localhost:4321' };
+  REDIS_URL: 'redis://gfp_runtime:gfp_ci_only@127.0.0.1:6379/0', REDIS_KEY_PREFIX: 'gfp:', RIVER_SCHEMA: 'river', HTTP_ADDR: '127.0.0.1:8080', PUBLIC_ORIGIN: 'http://localhost:4321', ADMIN_ORIGIN: 'http://localhost:5173' };
 const cwd = join(root, 'server');
 run('go', ['run', './cmd/ci-setup'], { cwd, env });
 function serviceEnv(service) { return { ...env, DATABASE_URL: `postgres://gfp_${service}:gfp_ci_only@127.0.0.1:5432/gfp_ci?sslmode=disable` }; }

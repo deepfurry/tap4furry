@@ -3,6 +3,34 @@ import { test } from 'node:test';
 import * as publicClient from '../../packages/api-client/src/generated/public/client.ts';
 import * as adminClient from '../../packages/api-client/src/generated/admin/client.ts';
 
+test('admin: generated session clients preserve CSRF, cookie options, 204 and rate errors', async t => {
+  const calls = [];
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    calls.push([url, options]);
+    if (url === '/api/auth/login') return new Response(JSON.stringify({ code: 'AUTH_RATE_LIMITED', message: 'Try again later.' }), { status: 429 });
+    return new Response(null, { status: 204 });
+  });
+  const options = { credentials: 'same-origin', headers: new globalThis.Headers({ 'X-CSRF-Token': 'admin-csrf-fixture' }) };
+  const login = await adminClient.login({ email: 'fixture@example.invalid', password: 'a fixture password only' }, options);
+  assert.equal(login.status, 429);
+  assert.equal(login.data.code, 'AUTH_RATE_LIMITED');
+  const reauth = await adminClient.reauthenticate({ password: 'a fixture password only' }, options);
+  assert.equal(reauth.status, 204);
+  assert.equal(reauth.data, undefined);
+  await adminClient.revokeSession('session-fixture', options);
+  await adminClient.revokeOtherSessions(options);
+  const logout = await adminClient.logout(options);
+  assert.equal(logout.status, 204);
+  assert.deepEqual(calls.map(([url, request]) => [url, request.method]), [
+    ['/api/auth/login', 'POST'], ['/api/auth/reauthenticate', 'POST'],
+    ['/api/me/sessions/session-fixture', 'DELETE'], ['/api/me/sessions/revoke-others', 'POST'], ['/api/auth/logout', 'POST'],
+  ]);
+  for (const [, request] of calls) {
+    assert.equal(request.credentials, 'same-origin');
+    assert.equal(new globalThis.Headers(request.headers).get('X-CSRF-Token'), 'admin-csrf-fixture');
+  }
+});
+
 test('public: OAuth owner clients preserve Origin-bound CSRF options and safe errors', async t => {
   const calls = [];
   t.mock.method(globalThis, 'fetch', async (url, options) => {

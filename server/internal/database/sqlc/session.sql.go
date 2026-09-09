@@ -162,18 +162,18 @@ func (q *Queries) ListActivePublicSessions(ctx context.Context, arg ListActivePu
 	return items, nil
 }
 
-const revokeAllPublicSessions = `-- name: RevokeAllPublicSessions :exec
+const revokeAllUserSessions = `-- name: RevokeAllUserSessions :exec
 UPDATE app.sessions SET revoked_at = $1
-WHERE user_id = $2 AND kind = 'public' AND revoked_at IS NULL
+WHERE user_id = $2 AND revoked_at IS NULL
 `
 
-type RevokeAllPublicSessionsParams struct {
+type RevokeAllUserSessionsParams struct {
 	Now    pgtype.Timestamptz
 	UserID pgtype.UUID
 }
 
-func (q *Queries) RevokeAllPublicSessions(ctx context.Context, arg RevokeAllPublicSessionsParams) error {
-	_, err := q.db.Exec(ctx, revokeAllPublicSessions, arg.Now, arg.UserID)
+func (q *Queries) RevokeAllUserSessions(ctx context.Context, arg RevokeAllUserSessionsParams) error {
+	_, err := q.db.Exec(ctx, revokeAllUserSessions, arg.Now, arg.UserID)
 	return err
 }
 

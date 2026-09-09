@@ -1,34 +1,22 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
-import { createRootRoute, createRoute, createRouter, Outlet, RouterProvider } from '@tanstack/react-router';
-import { getReady } from '@gofurry/api-client/admin';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createRootRoute, createRoute, createRouter, Outlet, redirect, RouterProvider } from '@tanstack/react-router';
+import { AdminRequestError, Login, requireAdmin, Workspace } from './Auth';
 import '@gofurry/design/global.scss';
 import './layout.css';
-import styles from './Foundation.module.scss';
 
-function Foundation() {
-  const health = useQuery({
-    queryKey: ['admin', 'health', 'ready'],
-    queryFn: async ({ signal }) => (await getReady({ signal })).data,
-    retry: false,
-  });
-  return <main className="mx-auto flex min-h-screen max-w-3xl flex-col justify-center gap-6 p-6">
-    <section className={`${styles.panel} flex flex-col gap-6 p-6 sm:p-10`} aria-labelledby="title">
-      <span className={styles.phase}>P0-0 · Engineering foundation</span>
-      <h1 id="title">GoFurry Admin</h1>
-      <p>The admin runtime is ready for the next implementation phase.</p>
-      <div className="flex flex-wrap items-center gap-4">
-        <button className={`${styles.button} px-4 py-2`} disabled={health.isFetching} onClick={() => { void health.refetch(); }}>Check API readiness</button>
-        <span role="status">{health.isPending ? 'Checking…' : health.isError ? 'Admin API unavailable' : `Admin API: ${health.data.status}`}</span>
-      </div>
-    </section>
-  </main>;
-}
 const rootRoute = createRootRoute({ component: Outlet });
-const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', component: Foundation });
-const router = createRouter({ routeTree: rootRoute.addChildren([indexRoute]) });
-const queryClient = new QueryClient();
+const indexRoute = createRoute({ getParentRoute: () => rootRoute, path: '/', component: Workspace, beforeLoad: async () => {
+  try { await requireAdmin(); }
+  catch (error) {
+    if (error instanceof AdminRequestError && (error.status === 401 || error.status === 403)) throw redirect({ to: '/login' });
+    throw error;
+  }
+}, errorComponent: () => <main className="p-8"><h1>Admin is unavailable</h1><p>Please try again in a moment.</p><a href="/">Retry</a></main> });
+const loginRoute = createRoute({ getParentRoute: () => rootRoute, path: '/login', component: Login });
+const router = createRouter({ routeTree: rootRoute.addChildren([indexRoute, loginRoute]) });
+const queryClient = new QueryClient({ defaultOptions: { mutations: { gcTime: 0 } } });
 declare module '@tanstack/react-router' { interface Register { router: typeof router } }
 const element = document.getElementById('root');
 if (!element) throw new Error('Missing admin root');

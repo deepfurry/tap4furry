@@ -25,6 +25,7 @@ import (
 	"github.com/deepfurry/gofurry-platform/server/internal/database"
 	"github.com/deepfurry/gofurry-platform/server/internal/identity"
 	"github.com/deepfurry/gofurry-platform/server/internal/mail"
+	"github.com/deepfurry/gofurry-platform/server/internal/redisstore"
 	"github.com/deepfurry/gofurry-platform/server/internal/transport/health"
 	"github.com/deepfurry/gofurry-platform/server/internal/transport/public"
 	"github.com/gofiber/fiber/v3"
@@ -97,7 +98,16 @@ func run() (result error) {
 			result = errors.Join(result, errors.New("smoke capture cleanup failed"))
 		}
 	}()
-	authentication, err := auth.New(api, capture)
+	store, err := redisstore.Open(cfg.RedisURL, cfg.RedisKeyPrefix)
+	if err != nil {
+		return err
+	}
+	defer store.Close()
+	throttle, err := store.AuthThrottle(cfg.AuthThrottleSecret)
+	if err != nil {
+		return err
+	}
+	authentication, err := auth.NewWithThrottle(api, capture, throttle)
 	if err != nil {
 		return err
 	}

@@ -1,9 +1,116 @@
 openapi: 3.0.3
 info:
   title: GoFurry Admin API
-  version: 0.0.0
-  description: P0-0 process liveness and dependency readiness only.
+  version: 0.1.0
+  description: Separate password-only Admin authentication with current static roles. Unsafe requests require exact ADMIN_ORIGIN; session mutations also require an Admin session-bound CSRF header. Auth responses are no-store. Public sessions are never accepted.
 paths:
+  /auth/login:
+    post:
+      operationId: login
+      description: Active, verified local account with moderator, editor or admin role. All ineligible credentials have the same response. Throttle outage fails closed.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/Credentials'}
+      responses:
+        '200': {$ref: '#/components/responses/Authenticated'}
+        '400': {$ref: '#/components/responses/Error'}
+        '401': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
+        '429': {$ref: '#/components/responses/Error'}
+        '503': {$ref: '#/components/responses/Error'}
+        '500': {$ref: '#/components/responses/Error'}
+  /auth/logout:
+    post:
+      operationId: logout
+      security: [{AdminSession: []}]
+      parameters: [{$ref: '#/components/parameters/CSRF'}]
+      responses:
+        '204': {description: Current Admin session revoked and Admin cookie cleared.}
+        '401': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
+        '500': {$ref: '#/components/responses/Error'}
+  /auth/reauthenticate:
+    post:
+      operationId: reauthenticate
+      security: [{AdminSession: []}]
+      parameters: [{$ref: '#/components/parameters/CSRF'}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {$ref: '#/components/schemas/Reauthentication'}
+      responses:
+        '204': {description: Current Admin session replaced; authenticated_at refreshed; Admin cookie rotated.}
+        '400': {$ref: '#/components/responses/Error'}
+        '401': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
+        '429': {$ref: '#/components/responses/Error'}
+        '503': {$ref: '#/components/responses/Error'}
+        '500': {$ref: '#/components/responses/Error'}
+  /auth/csrf:
+    get:
+      operationId: getCsrf
+      security: [{AdminSession: []}]
+      responses:
+        '200':
+          description: In-memory verification token for this Admin session only. Cache-Control no-store.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CsrfToken'}
+        '401': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
+        '500': {$ref: '#/components/responses/Error'}
+  /me:
+    get:
+      operationId: getMe
+      security: [{AdminSession: []}]
+      responses:
+        '200':
+          description: Minimal current Admin account; roles re-read from PostgreSQL.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/AdminMe'}
+        '401': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
+        '500': {$ref: '#/components/responses/Error'}
+  /me/sessions:
+    get:
+      operationId: listSessions
+      security: [{AdminSession: []}]
+      responses:
+        '200':
+          description: Own active Admin sessions only.
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/SessionList'}
+        '401': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
+        '500': {$ref: '#/components/responses/Error'}
+  /me/sessions/{session_id}:
+    delete:
+      operationId: revokeSession
+      security: [{AdminSession: []}]
+      parameters:
+        - {in: path, name: session_id, required: true, schema: {type: string, format: uuid, x-go-type: string}}
+        - {$ref: '#/components/parameters/CSRF'}
+      responses:
+        '204': {description: Own active Admin session revoked; cookie cleared if current.}
+        '401': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
+        '404': {$ref: '#/components/responses/Error'}
+        '500': {$ref: '#/components/responses/Error'}
+  /me/sessions/revoke-others:
+    post:
+      operationId: revokeOtherSessions
+      security: [{AdminSession: []}]
+      parameters: [{$ref: '#/components/parameters/CSRF'}]
+      responses:
+        '204': {description: Other Admin sessions revoked; Public sessions unaffected.}
+        '401': {$ref: '#/components/responses/Error'}
+        '403': {$ref: '#/components/responses/Error'}
+        '500': {$ref: '#/components/responses/Error'}
   /health/live:
     get:
       operationId: getLive
@@ -31,7 +138,95 @@ paths:
               schema:
                 $ref: '#/components/schemas/Ready'
 components:
+  securitySchemes:
+    AdminSession:
+      type: apiKey
+      in: cookie
+      name: __Host-gofurry_admin_session
+      description: Production Secure HttpOnly SameSite Strict host-only cookie, Path /. Local development/test uses gofurry_admin_session without Secure. Absolute lifetime 8h, idle 1h, touch interval 5m.
+  parameters:
+    CSRF:
+      name: X-CSRF-Token
+      in: header
+      required: true
+      schema: {type: string}
+  responses:
+    Authenticated:
+      description: Password verified and independent Admin session committed; HttpOnly Admin cookie set.
+      headers:
+        Set-Cookie:
+          schema: {type: string}
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/AdminMe'}
+    Error:
+      description: Stable safe error without credential, account eligibility or driver details. 503 INTERNAL_ERROR indicates unavailable Admin authentication infrastructure.
+      content:
+        application/json:
+          schema: {$ref: '#/components/schemas/ApiError'}
   schemas:
+    Credentials:
+      type: object
+      additionalProperties: false
+      required: [email, password]
+      properties:
+        email: {type: string, maxLength: 254}
+        password: {type: string, minLength: 15, maxLength: 128, writeOnly: true}
+    Reauthentication:
+      type: object
+      additionalProperties: false
+      required: [password]
+      properties:
+        password: {type: string, minLength: 15, maxLength: 128, writeOnly: true}
+    AdminMe:
+      type: object
+      additionalProperties: false
+      required: [id, email, roles, authenticated_at]
+      properties:
+        id: {type: string, format: uuid, x-go-type: string}
+        email: {type: string}
+        roles:
+          type: array
+          items: {$ref: '#/components/schemas/Role'}
+        authenticated_at: {type: string, format: date-time}
+    Role:
+      type: string
+      enum: [moderator, editor, admin]
+    CsrfToken:
+      type: object
+      additionalProperties: false
+      required: [csrf_token]
+      properties:
+        csrf_token: {type: string}
+    Session:
+      type: object
+      additionalProperties: false
+      required: [id, authenticated_at, created_at, last_seen_at, idle_expires_at, absolute_expires_at, current]
+      properties:
+        id: {type: string, format: uuid, x-go-type: string}
+        authenticated_at: {type: string, format: date-time}
+        created_at: {type: string, format: date-time}
+        last_seen_at: {type: string, format: date-time}
+        idle_expires_at: {type: string, format: date-time}
+        absolute_expires_at: {type: string, format: date-time}
+        current: {type: boolean}
+    SessionList:
+      type: object
+      additionalProperties: false
+      required: [sessions]
+      properties:
+        sessions:
+          type: array
+          items: {$ref: '#/components/schemas/Session'}
+    ApiError:
+      type: object
+      additionalProperties: false
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          enum: [VALIDATION_ERROR, ADMIN_INVALID_CREDENTIALS, ADMIN_UNAUTHENTICATED, ADMIN_FORBIDDEN, ADMIN_SESSION_NOT_FOUND, ORIGIN_FORBIDDEN, CSRF_INVALID, AUTH_RATE_LIMITED, INTERNAL_ERROR]
+        message: {type: string}
     Live:
       type: object
       additionalProperties: false

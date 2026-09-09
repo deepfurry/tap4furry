@@ -145,6 +145,7 @@ export const ApiErrorCode = {
   AUTH_ACCOUNT_LINK_REQUIRED: "AUTH_ACCOUNT_LINK_REQUIRED",
   AUTH_REAUTH_REQUIRED: "AUTH_REAUTH_REQUIRED",
   AUTH_LAST_METHOD: "AUTH_LAST_METHOD",
+  AUTH_RATE_LIMITED: "AUTH_RATE_LIMITED",
   INTERNAL_ERROR: "INTERNAL_ERROR",
 } as const;
 
@@ -692,6 +693,11 @@ export type registerResponse409 = {
   status: 409;
 };
 
+export type registerResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
 export type registerResponse500 = {
   data: ErrorResponse;
   status: 500;
@@ -704,6 +710,7 @@ export type registerResponseError = (
   | registerResponse400
   | registerResponse403
   | registerResponse409
+  | registerResponse429
   | registerResponse500
 ) & {
   headers: Headers;
@@ -779,6 +786,11 @@ export type loginResponse403 = {
   status: 403;
 };
 
+export type loginResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
 export type loginResponse500 = {
   data: ErrorResponse;
   status: 500;
@@ -788,7 +800,11 @@ export type loginResponseSuccess = loginResponse200 & {
   headers: Headers;
 };
 export type loginResponseError = (
-  loginResponse400 | loginResponse401 | loginResponse403 | loginResponse500
+  | loginResponse400
+  | loginResponse401
+  | loginResponse403
+  | loginResponse429
+  | loginResponse500
 ) & {
   headers: Headers;
 };
@@ -1341,7 +1357,7 @@ export const getResetPasswordUrl = () => {
 };
 
 /**
- * Consume challenge, replace password, revoke all public sessions and issue one new session. Does not verify email.
+ * Consume challenge, replace password, revoke all Public and Admin sessions and issue one new Public session. Does not verify email.
  */
 export const resetPassword = async (
   passwordReset: PasswordReset,
@@ -1408,6 +1424,11 @@ export type changePasswordResponse403 = {
   status: 403;
 };
 
+export type changePasswordResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
 export type changePasswordResponse500 = {
   data: ErrorResponse;
   status: 500;
@@ -1420,6 +1441,7 @@ export type changePasswordResponseError = (
   | changePasswordResponse400
   | changePasswordResponse401
   | changePasswordResponse403
+  | changePasswordResponse429
   | changePasswordResponse500
 ) & {
   headers: Headers;
@@ -1497,6 +1519,11 @@ export type reauthenticateResponse403 = {
   status: 403;
 };
 
+export type reauthenticateResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
 export type reauthenticateResponse500 = {
   data: ErrorResponse;
   status: 500;
@@ -1509,6 +1536,7 @@ export type reauthenticateResponseError = (
   | reauthenticateResponse400
   | reauthenticateResponse401
   | reauthenticateResponse403
+  | reauthenticateResponse429
   | reauthenticateResponse500
 ) & {
   headers: Headers;

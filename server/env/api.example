@@ -2,6 +2,7 @@ APP_ENV=development
 HTTP_ADDR=127.0.0.1:8080
 PUBLIC_ORIGIN=http://localhost:4321
 # Development/test may omit CSRF_SECRET. Production requires a private >=32-byte value.
+# AUTH_THROTTLE_SECRET follows the same rule; use the same value in API and Admin.
 MAIL_MODE=local
 MAIL_LOCAL_DIR=../.local/mail
 DATABASE_URL=postgres://gfp_api:replace-me@127.0.0.1:5432/gfp_dev?sslmode=disable

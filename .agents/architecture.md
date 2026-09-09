@@ -13,7 +13,7 @@ apps/web / apps/admin → generated API clients → Public/Admin transport
 worker → jobs adapter → shared Application/Domain (when implemented)
 ```
 
-P0-1A/B/C add local/OAuth auth, PostgreSQL sessions, recovery and basic profiles to P0-0 infrastructure.
+P0-1A/B/C/D add local/OAuth auth, PostgreSQL sessions, recovery, basic profiles and isolated Admin auth to P0-0 infrastructure.
 Only `auth` and `identity` are product packages. `cmd/*` composes dependencies, signals and
 bounded cleanup; reusable behavior lives in `internal/`.
 
@@ -28,6 +28,13 @@ tokens. `redisstore` implements one-use, ten-minute flows under `gfp:auth:oauth:
 Account resolution uses provider subjects; email collisions require explicit linking.
 All existing-user auth mutations take the User lock before credential/identity/
 session/challenge locks. Provider network I/O and KDFs stay outside transactions.
+
+Admin uses password-only `kind=admin` sessions (8h absolute, 1h idle, 5m touch),
+Strict cookies and independent Origin/CSRF. Current static roles are read on every
+request. `adminctl` role writes use the owner, an operator advisory lock then User
+lock, with last-active-admin protection. Reset/change revoke both session kinds.
+Auth owns subject/global throttle policies; Redis stores HMAC-keyed counters/TTLs.
+Public local auth fails open on Redis outage; Admin login/reauth fail closed.
 
 Worker never calls Public/Admin HTTP. Application/domain code must not import Fiber,
 transport DTOs, Redis or River. River types stay inside Jobs infrastructure and its

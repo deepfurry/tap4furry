@@ -23,6 +23,8 @@
     "smoke:dev": "node scripts/smoke-dev.mjs",
     "smoke:auth:dev": "node scripts/smoke-auth-dev.mjs",
     "smoke:oauth:dev": "node scripts/smoke-oauth-dev.mjs",
+    "smoke:admin:dev": "node scripts/smoke-admin-dev.mjs",
+    "adminctl:dev": "node scripts/adminctl-dev.mjs",
     "integration:ci": "node scripts/integration-ci.mjs",
     "build:images": "node scripts/build-images.mjs"
   },

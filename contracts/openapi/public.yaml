@@ -116,6 +116,8 @@ paths:
           $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
   /auth/login:
     post:
       operationId: login
@@ -132,6 +134,8 @@ paths:
         '403':
           $ref: '#/components/responses/Error'
         '500':
+          $ref: '#/components/responses/Error'
+        '429':
           $ref: '#/components/responses/Error'
   /auth/logout:
     post:
@@ -253,7 +257,7 @@ paths:
   /auth/password/reset:
     post:
       operationId: resetPassword
-      description: Consume challenge, replace password, revoke all public sessions and issue one new session. Does not verify email.
+      description: Consume challenge, replace password, revoke all Public and Admin sessions and issue one new Public session. Does not verify email.
       requestBody:
         required: true
         content:
@@ -291,6 +295,8 @@ paths:
           $ref: '#/components/responses/Error'
         '500':
           $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
   /auth/reauthenticate:
     post:
       operationId: reauthenticate
@@ -316,6 +322,8 @@ paths:
         '403':
           $ref: '#/components/responses/Error'
         '500':
+          $ref: '#/components/responses/Error'
+        '429':
           $ref: '#/components/responses/Error'
   /me/sessions:
     get:
@@ -596,7 +604,7 @@ components:
       properties:
         code:
           type: string
-          enum: [VALIDATION_ERROR, AUTH_EMAIL_ALREADY_REGISTERED, AUTH_INVALID_CREDENTIALS, AUTH_UNAUTHENTICATED, AUTH_ACCOUNT_DISABLED, PROFILE_HANDLE_UNAVAILABLE, PROFILE_NOT_FOUND, ORIGIN_FORBIDDEN, CSRF_INVALID, AUTH_CHALLENGE_INVALID, AUTH_REAUTH_FAILED, AUTH_SESSION_NOT_FOUND, MAIL_UNAVAILABLE, AUTH_PROVIDER_UNAVAILABLE, AUTH_PROVIDER_INVALID, AUTH_PROVIDER_ALREADY_LINKED, AUTH_PROVIDER_NOT_LINKED, AUTH_ACCOUNT_LINK_REQUIRED, AUTH_REAUTH_REQUIRED, AUTH_LAST_METHOD, INTERNAL_ERROR]
+          enum: [VALIDATION_ERROR, AUTH_EMAIL_ALREADY_REGISTERED, AUTH_INVALID_CREDENTIALS, AUTH_UNAUTHENTICATED, AUTH_ACCOUNT_DISABLED, PROFILE_HANDLE_UNAVAILABLE, PROFILE_NOT_FOUND, ORIGIN_FORBIDDEN, CSRF_INVALID, AUTH_CHALLENGE_INVALID, AUTH_REAUTH_FAILED, AUTH_SESSION_NOT_FOUND, MAIL_UNAVAILABLE, AUTH_PROVIDER_UNAVAILABLE, AUTH_PROVIDER_INVALID, AUTH_PROVIDER_ALREADY_LINKED, AUTH_PROVIDER_NOT_LINKED, AUTH_ACCOUNT_LINK_REQUIRED, AUTH_REAUTH_REQUIRED, AUTH_LAST_METHOD, AUTH_RATE_LIMITED, INTERNAL_ERROR]
         message:
           type: string
     Handle:

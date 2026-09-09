@@ -46,7 +46,7 @@ unconsumed/non-invalidated row per identity/purpose, enforced by a partial uniqu
 index. Indexed token hashes identify challenges; consumption is revalidated inside
 the transaction. Auth mutations lock the User, then the credential row when needed,
 before identity/session/challenge writes, and run password KDFs outside transactions.
-Reset/change revoke public sessions and create their replacement atomically with the event.
+Reset/change revoke all Public/Admin sessions and create one Public replacement atomically with the event.
 
 API may SELECT/INSERT/UPDATE challenges, INSERT events and update identity
 verification timestamps. It cannot read/update events or access their identity
@@ -62,3 +62,18 @@ users for row locking, UPDATE(email) on identities for private metadata, and DEL
 on identities for unlinking. Runtime SQL restricts deletion to Google/GitHub rows.
 These object grants use the prepared migrator; cluster roles remain unchanged.
 OAuth state/PKCE/nonce and provider tokens never enter application tables.
+
+Migration 5 adds only `app.user_roles` (User FK, fixed role CHECK, composite primary
+key) and extends the closed event CHECK. It clears inherited default table grants
+before granting Admin/readonly SELECT. API and Worker receive no role privileges.
+Admin may read users/email identities/credentials/roles/sessions, insert sessions
+and events, update session activity/revocation, lock users via UPDATE(updated_at),
+and CAS-upgrade credential password_hash/updated_at. Admin cannot change password
+epochs, identities, roles, profiles, challenges or account state. Identity sequence
+access is unnecessary. Migrations 1–5 are now immutable on shared development.
+
+Operator role changes serialize with a fixed transaction advisory lock before the
+target User lock. Last-active-admin checks, role writes, final-role Admin session
+revocation and role events commit together. Admin login/reauth lock User then
+credential and revalidate password, account, role and initiating session before
+writing; KDFs remain outside transactions. No role or capability cache exists.

@@ -136,10 +136,28 @@ func (a *App) Reauthenticate(ctx context.Context, actor Actor, password string) 
 }
 
 func (a *App) verifyCurrent(ctx context.Context, actor Actor, password string) (string, error) {
+	if err := requireActor(ctx, sqlc.New(a.pool), actor, a.now().UTC()); err != nil {
+		return "", err
+	}
+	subject := actor.UserID.String()
+	healthy, err := a.throttleCheck(ctx, PublicReauthLimit, subject, false)
+	if err != nil {
+		return "", err
+	}
+	verified, err := a.verifyCurrentPassword(ctx, actor.UserID, password)
+	if err == nil {
+		a.throttleSuccess(ctx, PublicReauthLimit, subject)
+	} else if healthy && errors.Is(err, ErrReauthFailed) {
+		a.throttleFailure(ctx, PublicReauthLimit, subject, uuid.Nil(), loginFailed)
+	}
+	return verified, err
+}
+
+func (a *App) verifyCurrentPassword(ctx context.Context, userID uuid.UUID, password string) (string, error) {
 	if ValidatePassword(password) != nil {
 		return "", ErrReauthFailed
 	}
-	row, err := sqlc.New(a.pool).GetPasswordCredentialByUser(ctx, dbID(actor.UserID))
+	row, err := sqlc.New(a.pool).GetPasswordCredentialByUser(ctx, dbID(userID))
 	if errors.Is(err, pgx.ErrNoRows) {
 		return "", ErrReauthFailed
 	}
@@ -162,7 +180,7 @@ func (a *App) verifyCurrent(ctx context.Context, actor Actor, password string) (
 func replaceSessions(ctx context.Context, q *sqlc.Queries, userID, superseded uuid.UUID, method string, event eventType, now time.Time) (Grant, error) {
 	var err error
 	if superseded == uuid.Nil() {
-		err = q.RevokeAllPublicSessions(ctx, sqlc.RevokeAllPublicSessionsParams{UserID: dbID(userID), Now: timestamp(now)})
+		err = q.RevokeAllUserSessions(ctx, sqlc.RevokeAllUserSessionsParams{UserID: dbID(userID), Now: timestamp(now)})
 	} else {
 		err = q.RevokeSession(ctx, sqlc.RevokeSessionParams{ID: dbID(superseded), UserID: dbID(userID), Now: timestamp(now)})
 	}

@@ -153,13 +153,16 @@ func (a *App) RequestVerification(ctx context.Context, actor Actor) error {
 }
 
 func (a *App) RequestPasswordReset(ctx context.Context, email string) {
-	// The same bounded dummy KDF is run for every request, including eligible
-	// accounts and cooldowns, reducing an obvious timing/existence distinction.
-	_, _, _, _ = verifyPassword(newToken(), a.dummyHash)
 	normalized, err := NormalizeEmail(email)
 	if err != nil {
 		return
 	}
+	if _, err = a.throttleCheck(ctx, PasswordResetLimit, normalized, true); err != nil {
+		return
+	}
+	// Eligible and unknown accounts share the same bounded KDF. A limited
+	// subject skips expensive work without disclosing account existence.
+	_, _, _, _ = verifyPassword(newToken(), a.dummyHash)
 	if err = a.requestReset(ctx, normalized); err != nil {
 		slog.Warn("password reset request could not be completed", "component", "auth")
 	}

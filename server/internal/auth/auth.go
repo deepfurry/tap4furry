@@ -30,6 +30,7 @@ type App struct {
 	now       func() time.Time
 	mailer    ChallengeMailer
 	oauth     OAuthConfig
+	throttle  Throttle
 }
 type Grant struct {
 	Me        identity.Me
@@ -62,6 +63,9 @@ func New(pool *pgxpool.Pool, mailer ChallengeMailer, oauth ...OAuthConfig) (*App
 func (a *App) Register(ctx context.Context, email, password string) (Grant, error) {
 	email, err := NormalizeEmail(email)
 	if err != nil {
+		return Grant{}, err
+	}
+	if _, err = a.throttleCheck(ctx, RegistrationLimit, email, true); err != nil {
 		return Grant{}, err
 	}
 	hash, err := HashPassword(password)
@@ -116,7 +120,7 @@ func (a *App) Register(ctx context.Context, email, password string) (Grant, erro
 	return Grant{Me: me, Token: token, ExpiresAt: now.Add(AbsoluteLifetime)}, nil
 }
 
-func (a *App) Login(ctx context.Context, email, password string) (Grant, error) {
+func (a *App) login(ctx context.Context, email, password string) (Grant, error) {
 	email, err := NormalizeEmail(email)
 	if err != nil {
 		return Grant{}, err

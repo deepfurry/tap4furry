@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "scripts": { "dev": "vite --port 4322", "typecheck": "tsc -p tsconfig.json", "build": "vite build" },
+  "scripts": { "dev": "vite --port 5173", "typecheck": "tsc -p tsconfig.json", "build": "vite build" },
   "dependencies": {
     "@gofurry/api-client": "workspace:*", "@gofurry/design": "workspace:*",
     "@tanstack/react-query": "5.102.8", "@tanstack/react-router": "1.170.33",

@@ -17,7 +17,8 @@ func TestPublicAndAdminHealthContract(t *testing.T) {
 	registerPublic := func(router fiber.Router, checker *health.Checker) {
 		public.Register(router, checker, nil, nil, public.Options{Environment: "test", PublicOrigin: "http://localhost:4321"})
 	}
-	for name, register := range map[string]func(fiber.Router, *health.Checker){"public": registerPublic, "admin": admin.Register} {
+	registerAdmin := func(router fiber.Router, checker *health.Checker) { admin.Register(router, checker) }
+	for name, register := range map[string]func(fiber.Router, *health.Checker){"public": registerPublic, "admin": registerAdmin} {
 		t.Run(name, func(t *testing.T) {
 			for _, scenario := range []struct {
 				name            string

@@ -46,6 +46,6 @@ WHERE id = sqlc.arg(id) AND user_id = sqlc.arg(user_id) AND kind = 'public' AND 
 UPDATE app.sessions SET revoked_at = sqlc.arg(now)
 WHERE user_id = sqlc.arg(user_id) AND id <> sqlc.arg(current_id) AND kind = 'public' AND revoked_at IS NULL;
 
--- name: RevokeAllPublicSessions :exec
+-- name: RevokeAllUserSessions :exec
 UPDATE app.sessions SET revoked_at = sqlc.arg(now)
-WHERE user_id = sqlc.arg(user_id) AND kind = 'public' AND revoked_at IS NULL;
+WHERE user_id = sqlc.arg(user_id) AND revoked_at IS NULL;

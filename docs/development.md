@@ -21,6 +21,8 @@ official Go APIs. No global Go tools, psql or redis-cli are needed.
 | `pnpm smoke:dev` | Real pgx/Redis and River execution checks with private config |
 | `pnpm smoke:auth:dev` | Temporary account through real Public HTTP/application handlers, with fixture cleanup |
 | `pnpm smoke:oauth:dev` | Check prepared OAuth pairs, fixed callbacks, PKCE URLs and Redis one-use flows without consent or token exchange |
+| `pnpm smoke:admin:dev` | Real Admin identity/grants, login/CSRF/session/role isolation with temporary fixture cleanup |
+| `pnpm adminctl:dev` | Operator-only static role grant/revoke/list using the prepared migrator |
 | `pnpm integration:ci` | Fresh, guarded loopback disposable PostgreSQL/Redis tests |
 | `pnpm build:images` | Build four local Docker images, without publishing |
 
@@ -65,18 +67,18 @@ pnpm dev:web
 pnpm dev:admin
 ```
 
-Web development serves on port 4321; Admin serves on 4322. Development `/api/*`
+Web development serves on port 4321; Admin serves on 5173. Development `/api/*`
 proxies strip `/api` and forward to the corresponding Go API. Browser clients use
 the generated facade. Both APIs expose GET `/health/live` and `/health/ready`.
 Live does not fan out; readiness requires PostgreSQL and reports Redis degradation.
 Anonymous public SSR never reads per-user state; `/foundation` is prerendered.
 
-## Local authentication (P0-1A/B/C)
+## Local authentication (P0-1A/B/C/D)
 
 Public Web provides `/register`, `/login` and `/account` as anonymous Astro shells
 with React islands. Account data is fetched in the browser through `/api/me`; it
 never enters shared SSR HTML. The public profile lookup is GET `/api/users/{handle}`.
-There is no public profile HTML route yet. Admin remains health-only.
+There is no public profile HTML route yet. Admin provides its own password login and protected workspace.
 
 Public API adds POST `/auth/register`, `/auth/login`, `/auth/logout`, GET `/me`,
 PATCH `/me/profile` and GET `/users/{handle}`. PATCH retains omitted fields; null
@@ -144,14 +146,104 @@ Reset requests always return the same accepted response for eligible/ineligible
 accounts and delivery failure; an authenticated resend may return `MAIL_UNAVAILABLE`.
 Delivery failures use static safe logs, without sender errors or private values.
 
-Password reset/change atomically revoke all public sessions and issue one replacement;
+Password reset/change atomically revoke all Public/Admin sessions and issue one Public replacement;
 reset does not auto-verify email. Reauthentication replaces only the current session
 and refreshes `authenticated_at`. Session management exposes only the user's active
 public sessions. Security events persist only IDs, event type and time, in the same
 transaction as the corresponding write. No production mail provider, SMTP SDK or
 durable raw-token queue is implemented. `MAIL_MODE=disabled` does not make recovery
-production-ready. Remaining scope is P0-1D Admin/roles/final
-hardening (including abuse controls); this implementation is not production-auth complete.
+production-ready. P0-1D completes application auth; human/provider acceptance and
+production deployment sign-off remain separate gates.
+
+## Admin authentication and role operations (P0-1D)
+
+Admin SPA serves `http://localhost:5173`; its `/api/*` proxy targets Admin API port
+8081. `/login` accepts email/password; `/` requires Admin `/me` and redirects to
+login on 401 or lost role access. The workspace displays current roles and Admin
+sessions, with reauthentication, current/other session revocation and logout.
+Passwords and CSRF exist only transiently in memory; session cookies remain HttpOnly.
+
+| Setting | Development/test | Production |
+| --- | --- | --- |
+| `ADMIN_ORIGIN` | Development defaults to `http://localhost:5173`; test sets it explicitly | Exact HTTPS origin, normally `https://admin.gofurry.com` |
+| `ADMIN_CSRF_SECRET` | Separate public development default | Explicit private >=32 bytes, different from Public CSRF |
+| `AUTH_THROTTLE_SECRET` | Public development default | Explicit private >=32 bytes, shared between API and Admin |
+
+Only active, non-deleted Users with a verified local email, password credential and
+at least one static privileged role may log in. No role means ordinary User; no
+`user` role row exists. Multiple roles are additive:
+
+| Role | Capabilities |
+| --- | --- |
+| `moderator` | AdminAccess, Moderation |
+| `editor` | AdminAccess, Editorial |
+| `admin` | AdminAccess, Moderation, Editorial, Administration |
+
+Use the existing verified local account, then run from the repository root:
+
+```text
+pnpm adminctl:dev grant-role -email operator@example.invalid -role admin
+pnpm adminctl:dev list-roles -email operator@example.invalid
+pnpm adminctl:dev revoke-role -email operator@example.invalid -role moderator
+```
+
+The address above is an example, not a seeded account. There is no default Admin
+password or automatic grant. `adminctl` checks actual `gfp_migrator`/`gfp_dev` and
+uses standard flags; the Admin HTTP runtime cannot change roles. Grants are
+idempotent. A transaction advisory lock serializes operators before the target
+User lock. Revoking the last active `admin` fails. Revoking a User's final privileged
+role also revokes every Admin session in the same transaction. Roles are re-read
+on each request, so a session never serves as a cached role grant.
+
+Admin shares `app.sessions` but requires `kind=admin`, `auth_method=password`.
+Absolute expiry is 8h, idle 1h, touch at most every 5m. Production cookie is
+`__Host-gofurry_admin_session` (Secure, HttpOnly, Strict, Path=/, no Domain); local
+HTTP uses `gofurry_admin_session`. No Public session exchange or OAuth login exists
+on Admin. Normal logout/revocation affects its own kind only. Password reset/change
+revoke both kinds atomically and issue exactly one replacement Public session.
+
+Auth throttle policy constants:
+
+| Operation | Subject | Global | Window |
+| --- | --- | --- | --- |
+| Public login failures | 10 | 500 | 15m |
+| Admin login failures | 5 | 100 | 15m |
+| Registration attempts | 3 | 200 | 1h |
+| Password reset requests | 3 | 200 | 1h |
+| Public password verification failures (change/reauth) | 5 per User | 500 | 15m |
+| Admin reauth failures | 5 per User | 100 | 15m |
+
+Keys are `gfp:auth:limit:` plus HMAC-SHA256 of operation/dimension/normalized email
+or User ID. Values are only counters with TTLs. Global fingerprints contain no
+identity. No IP/forwarding header is used. EVAL atomically checks and saturates both
+dimensions using GET/INCR/EXPIRE/TTL; DEL clears only the successful subject. The
+limits count completed failures; a pre-check avoids KDFs once a bucket is exhausted.
+Already admitted concurrent requests can finish, but cannot exceed the bounded
+failure-event count. Blocked attempts never prolong expiry. No KEYS/SCAN is used.
+
+Redis failure leaves Public local login/register/reset/password verification open
+with safe static warnings; no unbounded PostgreSQL failure events are written.
+Admin login and reauth fail closed (503 `INTERNAL_ERROR`); existing canonical Admin
+sessions remain usable. Limited login/register/reauth returns 429 `AUTH_RATE_LIMITED`.
+Limited reset still returns the same 202/body and sends no challenge. OAuth retains
+its independent fail-closed one-use flow dependency. CI grants only the required
+Redis commands to its disposable runtime user; shared ACLs are never changed.
+
+`pnpm smoke:admin:dev` validates `gfp_admin`, `gfp_api`, `gfp_migrator` on `gfp_dev`
+and inspects role-table grants. It registers a random account through the Public
+application, captures its post-commit verification token only in process memory,
+verifies it, grants a temporary moderator through the operator path, and runs Admin
+HTTP login/me/CSRF/rotation/session revocation/cookie isolation. Finally it removes
+the role, checks immediate access loss and cleans only that generated account and
+dependent rows. Separate `smoke:auth:dev` validates private filesystem mail capture.
+
+P0-1 application implementation can be complete while human sign-off remains pending:
+real Google/GitHub login/callback/link/reauth/unlink and an operator-led Admin browser
+walkthrough. Production also needs Cloudflare Access with enforced MFA, real OAuth
+registrations/callbacks, production mail delivery, separate private CSRF/throttle
+secrets, deployment secret management, trusted proxy policy, and a Turnstile decision.
+No Cloudflare provisioning, application TOTP/WebAuthn, dynamic RBAC or public role
+editor is included. Local/private mail capture is never a production delivery path.
 
 ## Migrations and shared Infra
 
@@ -166,11 +258,11 @@ Goose owns namespace/extension foundation; River owns all SQL inside `river`.
 Migration 1 retains pre-existing schemas/extensions on down; recovery uses new
 forward migrations. Once applied to shared Infra, do not edit it in place.
 Migration 2 adds the five identity/auth tables with restrictive FKs, CHECK/UNIQUE
-constraints and explicit API DML. Admin/Worker get no identity DML. Always pass
+constraints and explicit API DML. Worker gets no identity DML; Admin gains only migration 5 grants. Always pass
 disposable migration and auth tests before applying new migrations to shared dev.
 Migration 3 adds challenges and security events with minimal API grants and readonly
 SELECT. Security event identity insertion requires no direct sequence grant. Migration
-history 1–4 is immutable once applied to shared development. Migration 4 adds OAuth
+history 1–5 is immutable once applied to shared development. Migration 4 adds OAuth
 event/session constraints, one identity per User/provider, and minimal owned-object
 grants for User locking, provider email metadata and explicit unlinking.
 
@@ -209,7 +301,7 @@ use fresh containers for each acceptance run. Only this explicitly guarded fixtu
 setup creates cluster roles, on the disposable server.
 
 CI reuses `pnpm check`, repeats generation with Git drift/untracked-file checks,
-runs fresh migrations twice, driver smoke and P0-1A/B/C auth/database/HTTP/privacy tests,
+runs fresh migrations twice, driver smoke and P0-1A/B/C/D auth/database/HTTP/privacy tests,
 then builds all four images. Third
 party Actions are pinned to commit SHAs. No deployment, tag, release or image push.
 

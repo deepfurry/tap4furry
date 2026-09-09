@@ -1,4 +1,7 @@
 @use '@gofurry/design/mixins.scss' as design;
 .panel { @include design.surface; }
+.panel input { border: 1px solid var(--gfp-accent); border-radius: 0.5rem; background: transparent; color: inherit; }
+.panel input:focus-visible { outline: 2px solid var(--gfp-accent); outline-offset: 3px; }
+.panel li + li { border-top: 1px solid var(--gfp-accent); }
 .button { @include design.action; }
 .phase { color: var(--gfp-accent); font-size: 0.85rem; letter-spacing: 0.08em; text-transform: uppercase; }

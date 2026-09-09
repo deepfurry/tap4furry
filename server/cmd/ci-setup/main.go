@@ -61,7 +61,7 @@ func run() error {
 	// This admin connection exists only in the guarded disposable fixture.
 	cache := redis.NewClient(&redis.Options{Addr: "127.0.0.1:6379", DisableIdentity: true})
 	defer cache.Close()
-	if err := cache.Do(ctx, "ACL", "SETUSER", "gfp_runtime", "reset", "on", ">gfp_ci_only", "~gfp:*", "+ping", "+get", "+getdel", "+set", "+del", "+hello").Err(); err != nil {
+	if err := cache.Do(ctx, "ACL", "SETUSER", "gfp_runtime", "reset", "on", ">gfp_ci_only", "~gfp:*", "+ping", "+get", "+getdel", "+set", "+del", "+hello", "+eval", "+incr", "+expire", "+ttl").Err(); err != nil {
 		return errors.New("disposable Redis ACL fixture failed (details withheld)")
 	}
 	fmt.Println("Fresh disposable CI roles and database prepared")

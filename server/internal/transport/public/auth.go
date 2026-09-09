@@ -179,6 +179,8 @@ func meDTO(me identity.Me) generated.Me {
 func respondError(c fiber.Ctx, err error) error {
 	status, code, message := fiber.StatusInternalServerError, generated.INTERNALERROR, "The request could not be completed."
 	switch {
+	case errors.Is(err, auth.ErrRateLimited):
+		status, code, message = 429, generated.AUTHRATELIMITED, "Too many attempts. Please try again later."
 	case errors.Is(err, identity.ErrValidation):
 		status, code, message = 400, generated.VALIDATIONERROR, "Check the supplied fields."
 	case errors.Is(err, auth.ErrEmailRegistered):

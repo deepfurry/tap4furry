@@ -31,6 +31,12 @@
 
 ## Backend
 
+P0-1D reuses the installed dependencies: static capabilities are ordinary Go,
+`adminctl` uses standard `flag`, password verification reuses easyhash, sessions
+use existing pgx/sqlc, and atomic throttling uses go-redis EVAL with standard-library
+HMAC-SHA256. Admin uses existing TanStack Router/Query and React forms. No dynamic
+RBAC/MFA/CLI/cache framework, breach lookup SDK or new product package is installed.
+
 - Go 1.27+
 - Fiber v3
 - OpenAPI contract-first
