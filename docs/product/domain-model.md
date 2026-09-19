@@ -25,9 +25,9 @@ Admin
 
 ## Core Entities
 
-P0-2A implements Resource/Taxonomy data foundations only. The broader entity map
-below remains product direction; no Resource HTTP/UI, Contribution, Search or
-Exchange application behavior is implemented in this phase.
+P0-2A implements Resource/Taxonomy data foundations; P0-2B adds anonymous public
+reads and SSR Resource pages. The broader entity map remains product direction;
+Admin curation, Contribution, Search and Exchange are not implemented yet.
 
 ```text
 User
@@ -162,6 +162,13 @@ restricting a Source does not remove the Resource itself. Source URLs are normal
 conservatively without fetching, with zero or one primary Source per Resource.
 
 ## Resource Relations and External IDs
+
+Public reads hide all unpublished/deleted endpoints and Sources under rights review,
+dispute or removal. Published explicit/discontinued Resources remain readable with
+clear content rating/lifecycle labels. Related historical retired taxonomy remains
+visible; deleted taxonomy is hidden. Public pages expose knowledge, not internal
+publication state, version, deletion timestamps or Source rights status. Markdown
+descriptions render without raw HTML or images; Resource images remain Media work.
 
 Relations store only `part_of`, `successor_of`, `derived_from` and `related_to`.
 Directed edges retain direction and reads derive inverse semantics. `related_to`

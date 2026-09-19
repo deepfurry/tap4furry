@@ -2,8 +2,97 @@ openapi: 3.0.3
 info:
   title: Tap4Furry Public API
   version: 0.1.0
-  description: Public health, local authentication, session security and basic profiles. Unsafe requests require exact PUBLIC_ORIGIN; authenticated unsafe requests also require a session-bound CSRF header.
+  description: Public health, authentication, profiles and anonymous Resource knowledge reads. Unsafe requests require exact PUBLIC_ORIGIN; authenticated unsafe requests also require a session-bound CSRF header.
 paths:
+  /resources:
+    get:
+      operationId: listResources
+      security: []
+      description: Anonymous canonical knowledge read. Success uses short shared caching; errors are no-store.
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+      responses:
+        '200':
+          description: Public knowledge; no session or internal governance state.
+          headers:
+            Cache-Control:
+              schema: {type: string}
+              description: 'public, max-age=0, s-maxage=60, stale-while-revalidate=30'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ResourceList'}
+        '400':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /resources/{slug}:
+    get:
+      operationId: getResource
+      security: []
+      description: Anonymous canonical knowledge read. Success uses short shared caching; errors are no-store.
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+        - {name: slug, in: path, required: true, schema: {type: string, maxLength: 80}, description: Invalid or noncanonical slug returns RESOURCE_NOT_FOUND.}
+      responses:
+        '200':
+          description: Public knowledge; no session or internal governance state.
+          headers:
+            Cache-Control:
+              schema: {type: string}
+              description: 'public, max-age=0, s-maxage=60, stale-while-revalidate=30'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/ResourceDetail'}
+        '400':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /categories:
+    get:
+      operationId: listCategories
+      security: []
+      description: Anonymous canonical knowledge read. Success uses short shared caching; errors are no-store.
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+      responses:
+        '200':
+          description: Public knowledge; no session or internal governance state.
+          headers:
+            Cache-Control:
+              schema: {type: string}
+              description: 'public, max-age=0, s-maxage=60, stale-while-revalidate=30'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/CategoryList'}
+        '400':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
+  /tags:
+    get:
+      operationId: listTags
+      security: []
+      description: Anonymous canonical knowledge read. Success uses short shared caching; errors are no-store.
+      parameters:
+        - $ref: '#/components/parameters/Locale'
+      responses:
+        '200':
+          description: Public knowledge; no session or internal governance state.
+          headers:
+            Cache-Control:
+              schema: {type: string}
+              description: 'public, max-age=0, s-maxage=60, stale-while-revalidate=30'
+          content:
+            application/json:
+              schema: {$ref: '#/components/schemas/TagList'}
+        '400':
+          $ref: '#/components/responses/Error'
+        '500':
+          $ref: '#/components/responses/Error'
   /auth/oauth/{provider}/start:
     get:
       operationId: startOAuth
@@ -423,6 +512,22 @@ paths:
                 $ref: '#/components/schemas/Ready'
 components:
   parameters:
+    Locale:
+      name: locale
+      in: query
+      required: false
+      schema: {type: string, minLength: 2, maxLength: 64}
+      description: Canonical locale with exact-match field fallback; omitted uses each entity default.
+    Page:
+      name: page
+      in: query
+      required: false
+      schema: {type: integer, format: int64, minimum: 1, default: 1}
+    PageSize:
+      name: page_size
+      in: query
+      required: false
+      schema: {type: integer, minimum: 1, maximum: 100, default: 24}
     Provider:
       in: path
       name: provider
@@ -490,6 +595,149 @@ components:
           schema:
             $ref: '#/components/schemas/ApiError'
   schemas:
+    ResourceLifecycle:
+      type: string
+      enum: [active, inactive, discontinued, delisted, archived, unknown]
+    ResourceContentRating:
+      type: string
+      enum: [general, mature, explicit]
+    ResourceSourceType:
+      type: string
+      enum: [official, store, archive, mirror, community, external, unknown]
+    ResourceSourceAvailability:
+      type: string
+      enum: [active, unavailable, broken, restricted]
+    ResourceRelationType:
+      type: string
+      enum: [part_of, successor_of, derived_from, related_to]
+    ResourceRelationDirection:
+      type: string
+      enum: [outgoing, incoming, symmetric]
+    CategoryRef:
+      type: object
+      additionalProperties: false
+      required: [id, slug, name]
+      properties:
+        id: {type: string, format: uuid, x-go-type: string}
+        slug: {type: string}
+        name: {type: string}
+    TagRef:
+      type: object
+      additionalProperties: false
+      required: [id, slug, name]
+      properties:
+        id: {type: string, format: uuid, x-go-type: string}
+        slug: {type: string}
+        name: {type: string}
+    ResourceRef:
+      type: object
+      additionalProperties: false
+      required: [id, slug, name]
+      properties:
+        id: {type: string, format: uuid, x-go-type: string}
+        slug: {type: string}
+        name: {type: string}
+    ResourceListItem:
+      type: object
+      additionalProperties: false
+      required: [id, slug, name, summary, category, lifecycle, content_rating, published_at, updated_at]
+      properties:
+        id: {type: string, format: uuid, x-go-type: string}
+        slug: {type: string}
+        name: {type: string}
+        summary: {type: string, nullable: true}
+        category: {$ref: '#/components/schemas/CategoryRef'}
+        lifecycle: {$ref: '#/components/schemas/ResourceLifecycle'}
+        content_rating: {$ref: '#/components/schemas/ResourceContentRating'}
+        published_at: {type: string, format: date-time}
+        updated_at: {type: string, format: date-time}
+    ResourceList:
+      type: object
+      additionalProperties: false
+      required: [items, page, page_size, has_next]
+      properties:
+        items: {type: array, items: {$ref: '#/components/schemas/ResourceListItem'}}
+        page: {type: integer, format: int64}
+        page_size: {type: integer}
+        has_next: {type: boolean}
+    ResourceSource:
+      type: object
+      additionalProperties: false
+      required: [id, url, label, source_type, availability_state, is_primary]
+      properties:
+        id: {type: string, format: uuid, x-go-type: string}
+        url: {type: string, format: uri}
+        label: {type: string, nullable: true}
+        source_type: {$ref: '#/components/schemas/ResourceSourceType'}
+        availability_state: {$ref: '#/components/schemas/ResourceSourceAvailability'}
+        is_primary: {type: boolean}
+    ResourceRelation:
+      type: object
+      additionalProperties: false
+      required: [type, direction, resource]
+      properties:
+        type: {$ref: '#/components/schemas/ResourceRelationType'}
+        direction: {$ref: '#/components/schemas/ResourceRelationDirection'}
+        resource: {$ref: '#/components/schemas/ResourceRef'}
+    ResourceExternalID:
+      type: object
+      additionalProperties: false
+      required: [namespace, external_id]
+      properties:
+        namespace: {type: string}
+        external_id: {type: string}
+    ResourceDetail:
+      type: object
+      additionalProperties: false
+      required: [id, slug, name, summary, category, lifecycle, content_rating, published_at, updated_at, requested_locale, default_locale, available_locales, description, tags, sources, relations, external_ids]
+      properties:
+        id: {type: string, format: uuid, x-go-type: string}
+        slug: {type: string}
+        name: {type: string}
+        summary: {type: string, nullable: true}
+        category: {$ref: '#/components/schemas/CategoryRef'}
+        lifecycle: {$ref: '#/components/schemas/ResourceLifecycle'}
+        content_rating: {$ref: '#/components/schemas/ResourceContentRating'}
+        published_at: {type: string, format: date-time}
+        updated_at: {type: string, format: date-time}
+        requested_locale: {type: string, nullable: true}
+        default_locale: {type: string}
+        available_locales: {type: array, items: {type: string}}
+        description: {type: string, nullable: true}
+        tags: {type: array, items: {$ref: '#/components/schemas/TagRef'}}
+        sources: {type: array, items: {$ref: '#/components/schemas/ResourceSource'}}
+        relations: {type: array, items: {$ref: '#/components/schemas/ResourceRelation'}}
+        external_ids: {type: array, items: {$ref: '#/components/schemas/ResourceExternalID'}}
+    CategoryItem:
+      type: object
+      additionalProperties: false
+      required: [id, slug, name, description]
+      properties:
+        id: {type: string, format: uuid, x-go-type: string}
+        slug: {type: string}
+        name: {type: string}
+        description: {type: string, nullable: true}
+    CategoryList:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items: {type: array, items: {$ref: '#/components/schemas/CategoryItem'}}
+    TagItem:
+      type: object
+      additionalProperties: false
+      required: [id, slug, name, description]
+      properties:
+        id: {type: string, format: uuid, x-go-type: string}
+        slug: {type: string}
+        name: {type: string}
+        description: {type: string, nullable: true}
+    TagList:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items: {type: array, items: {$ref: '#/components/schemas/TagItem'}}
     OAuthProvider:
       type: string
       enum: [google, github]
@@ -604,7 +852,7 @@ components:
       properties:
         code:
           type: string
-          enum: [VALIDATION_ERROR, AUTH_EMAIL_ALREADY_REGISTERED, AUTH_INVALID_CREDENTIALS, AUTH_UNAUTHENTICATED, AUTH_ACCOUNT_DISABLED, PROFILE_HANDLE_UNAVAILABLE, PROFILE_NOT_FOUND, ORIGIN_FORBIDDEN, CSRF_INVALID, AUTH_CHALLENGE_INVALID, AUTH_REAUTH_FAILED, AUTH_SESSION_NOT_FOUND, MAIL_UNAVAILABLE, AUTH_PROVIDER_UNAVAILABLE, AUTH_PROVIDER_INVALID, AUTH_PROVIDER_ALREADY_LINKED, AUTH_PROVIDER_NOT_LINKED, AUTH_ACCOUNT_LINK_REQUIRED, AUTH_REAUTH_REQUIRED, AUTH_LAST_METHOD, AUTH_RATE_LIMITED, INTERNAL_ERROR]
+          enum: [VALIDATION_ERROR, AUTH_EMAIL_ALREADY_REGISTERED, AUTH_INVALID_CREDENTIALS, AUTH_UNAUTHENTICATED, AUTH_ACCOUNT_DISABLED, PROFILE_HANDLE_UNAVAILABLE, PROFILE_NOT_FOUND, ORIGIN_FORBIDDEN, CSRF_INVALID, AUTH_CHALLENGE_INVALID, AUTH_REAUTH_FAILED, AUTH_SESSION_NOT_FOUND, MAIL_UNAVAILABLE, AUTH_PROVIDER_UNAVAILABLE, AUTH_PROVIDER_INVALID, AUTH_PROVIDER_ALREADY_LINKED, AUTH_PROVIDER_NOT_LINKED, AUTH_ACCOUNT_LINK_REQUIRED, AUTH_REAUTH_REQUIRED, AUTH_LAST_METHOD, AUTH_RATE_LIMITED, RESOURCE_NOT_FOUND, INTERNAL_ERROR]
         message:
           type: string
     Handle:

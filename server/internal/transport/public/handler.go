@@ -10,21 +10,26 @@ import (
 	"github.com/deepfurry/tap4furry/server/internal/transport/health"
 	"github.com/deepfurry/tap4furry/server/internal/transport/public/generated"
 	"github.com/gofiber/fiber/v3"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Handler struct {
-	health   *health.Checker
-	auth     *auth.App
-	identity *identity.App
-	options  Options
+	health    *health.Checker
+	auth      *auth.App
+	identity  *identity.App
+	options   Options
+	resources *pgxpool.Pool
 }
-type Options struct{ Environment, PublicOrigin, CSRFSecret string }
+type Options struct {
+	Environment, PublicOrigin, CSRFSecret string
+	ResourcePool                          *pgxpool.Pool
+}
 
 var _ generated.ServerInterface = (*Handler)(nil)
 
 func Register(router fiber.Router, checker *health.Checker, authentication *auth.App, identities *identity.App, options Options) {
-	h := &Handler{health: checker, auth: authentication, identity: identities, options: options}
-	for _, path := range []string{"/auth", "/me", "/users"} {
+	h := &Handler{health: checker, auth: authentication, identity: identities, options: options, resources: options.ResourcePool}
+	for _, path := range []string{"/auth", "/me", "/users", "/resources", "/categories", "/tags"} {
 		router.Use(path, func(c fiber.Ctx) error {
 			deadline := 5 * time.Second
 			if strings.HasPrefix(c.Path(), "/auth/oauth/") {
@@ -35,6 +40,9 @@ func Register(router fiber.Router, checker *health.Checker, authentication *auth
 			c.SetContext(ctx)
 			return c.Next()
 		})
+	}
+	for _, path := range []string{"/resources", "/categories", "/tags"} {
+		router.Use(path, h.publicReadBoundary)
 	}
 	for _, path := range []string{"/auth", "/me"} {
 		router.Use(path, h.originGuard)

@@ -46,3 +46,21 @@
   required for retiring taxonomy, restricted/removed Resources, soft deletion and
   rights-status mutations. Moderator has no canonical write capability. `gfp_admin`
   is a database identity, distinct from the product's `admin` role. No new roles/API.
+
+## P0-2B anonymous reads
+
+- Only GET `/resources`, `/resources/{slug}`, `/categories`, `/tags` are added.
+  Public handlers use dedicated sqlc reads, with a five-second request deadline and
+  no session/Origin/CSRF/OAuth/Redis dependency. Auth behavior stays unchanged.
+- Resource/taxonomy remain pure domains. Detail reads one read-only PostgreSQL
+  snapshot for parent and children. No repository/service wrapper, mutation or cache.
+- Astro `/resources` and `/resources/[slug]` use server-only `API_INTERNAL_ORIGIN` and
+  generated URL builders (strip exactly `/api`). Runtime production configuration is
+  required; only development defaults to loopback. No Cookie/Auth/CSRF forwarding,
+  external-domain round trip, React island, retry or process-local cache.
+- Markdown-it disables raw HTML/linkify/typographer; sanitize-html allowlists content,
+  protocols and attributes. No images/MDX. Only Markdown.astro has `set:html` and server
+  helpers cannot be imported by browser modules/scripts.
+- API/page success uses `public, max-age=0, s-maxage=60, stale-while-revalidate=30`;
+  errors use no-store, SSR errors also noindex. SEO uses the fixed production site,
+  excludes locale from canonical, and includes page only above 1. No Accept-Language Vary.

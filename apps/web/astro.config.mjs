@@ -4,6 +4,7 @@ import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
+  site: 'https://tap4furry.com',
   output: 'server', adapter: node({ mode: 'standalone' }), integrations: [react()],
   vite: {
     plugins: [tailwindcss()],

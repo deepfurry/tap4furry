@@ -178,6 +178,15 @@ UGC may simply store original language and original text.
 
 ## Resource Core
 
+P0-2B keeps schema version 6 and migrations 1–6 unchanged. Its dedicated read model
+selects only public columns. Published/non-deleted Resources with a non-deleted
+Category are visible regardless of lifecycle/rating; linked retired taxonomy stays
+visible, while browse endpoints return active taxonomy only. Source availability and
+rights filtering and both Relation endpoint checks happen in SQL, not after DTO output.
+Canonical missing translations are invariant failures (500); nullable translated
+fields independently fall back to each entity default. Detail reads share one
+read-only snapshot, and list pagination is deterministic with lookahead and no counts.
+
 Keep the core Resource table generic.
 
 Do not continuously add resource-type-specific columns.

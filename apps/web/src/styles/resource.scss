@@ -1,0 +1,20 @@
+@use '@tap4furry/design/mixins.scss' as design;
+.resource-card { @include design.surface; }
+.resource-brand { font-weight: 750; text-decoration: none; }
+.resource-eyebrow { color: var(--tap4furry-accent); font-size: 0.85rem; letter-spacing: 0.06em; }
+.resource-muted { opacity: 0.72; font-size: 0.9rem; }
+.resource-summary { font-size: 1.2rem; line-height: 1.7; }
+.resource-badge, .resource-tag { border: 1px solid currentColor; border-radius: 0.4rem; padding: 0.2rem 0.55rem; font-size: 0.85rem; }
+.resource-tag { border-style: dashed; }
+.resource-markdown {
+  overflow-wrap: anywhere;
+  line-height: 1.8;
+  > * + * { margin-top: 1.2em; }
+  ul, ol { padding-left: 1.5em; }
+  ul { list-style: disc; } ol { list-style: decimal; }
+  pre { overflow-x: auto; padding: 1rem; background: var(--tap4furry-background); border-radius: 0.4rem; }
+  code { font-family: monospace; }
+  blockquote { border-left: 3px solid var(--tap4furry-accent); padding-left: 1rem; }
+  table { border-collapse: collapse; display: block; overflow-x: auto; }
+  th, td { padding: 0.5rem; border: 1px solid currentColor; }
+}

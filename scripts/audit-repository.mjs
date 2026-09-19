@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { parseEnv } from 'node:util';
 import { root } from './process.mjs';
 import { privateEnvValues } from './private-values.mjs';
+import { auditResourceWeb } from './resource-web-audit.mjs';
 
 const git = args => execFileSync('git', args, { cwd: root, encoding: 'utf8', windowsHide: true });
 const tracked = git(['ls-files', '-z']).split('\0').filter(Boolean);
@@ -49,7 +50,8 @@ if (files.filter(path => path.endsWith('go.mod')).join() !== 'server/go.mod' || 
 const forbiddenDomains = ['collection', 'contribution', 'discovery', 'exchange', 'discussion', 'poll', 'trust', 'moderation', 'notification', 'analytics'];
 if (files.some(path => forbiddenDomains.some(domain => path.startsWith(`server/internal/${domain}/`)))) throw new Error('Future product domain scaffold before its phase');
 const runtimeDependencies = execFileSync('go', ['-C', 'server', 'list', '-deps', './cmd/api', './cmd/admin', './cmd/worker'], { cwd: root, encoding: 'utf8', windowsHide: true });
-if (/pressly\/goose|river\/rivermigrate|pgx\/v5\/stdlib|go\.mongodb|nats-io|gorm\.io|pgvector|opentelemetry|internal\/database\/resourcecheck/.test(runtimeDependencies)) throw new Error('Migration, acceptance fixture or forbidden dependency in a runtime binary');
+if (/pressly\/goose|river\/rivermigrate|pgx\/v5\/stdlib|go\.mongodb|nats-io|gorm\.io|pgvector|opentelemetry|internal\/database\/(?:resourcecheck|publicreadcheck)/.test(runtimeDependencies)) throw new Error('Migration, acceptance fixture or forbidden dependency in a runtime binary');
+auditResourceWeb(files.filter(path => path.startsWith('apps/') && existsSync(join(root, path))).map(path => [path, readFileSync(join(root, path), 'utf8')]));
 const stagedDiff = git(['diff', '--cached', '--no-ext-diff', '--unified=0']);
 if ([...privateValues].some(value => stagedDiff.includes(value))) throw new Error('Private material detected in staged diff; values withheld');
 console.log('Repository secret, namespace, dependency and boundary audit passed (no private values emitted)');

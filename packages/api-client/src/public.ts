@@ -4,3 +4,5 @@ export { getCsrf, requestEmailVerification, verifyEmail, requestPasswordReset, r
 export type { Session, SessionList, PasswordChange, PasswordReset, Reauthentication, CsrfToken } from './generated/public/client';
 export { getAuthMethods, linkOAuthProvider, reauthenticateOAuthProvider, unlinkOAuthProvider } from './generated/public/client';
 export type { AuthMethods, OAuthProvider, ProviderMethod } from './generated/public/client';
+export { listResources, getResource, listCategories, listTags, getListResourcesUrl, getGetResourceUrl, getListCategoriesUrl, getListTagsUrl } from './generated/public/client';
+export type { ResourceList, ResourceListItem, ResourceDetail, CategoryRef, TagRef, ResourceRef, ResourceSource, ResourceRelation, ResourceExternalID, CategoryList, CategoryItem, TagList, TagItem, ResourceLifecycle, ResourceContentRating, ResourceSourceType, ResourceSourceAvailability, ResourceRelationType, ResourceRelationDirection, ListResourcesParams, GetResourceParams, ListCategoriesParams, ListTagsParams } from './generated/public/client';

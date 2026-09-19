@@ -3,6 +3,13 @@ import { test } from 'node:test';
 import * as publicClient from '../../packages/api-client/src/generated/public/client.ts';
 import * as adminClient from '../../packages/api-client/src/generated/admin/client.ts';
 
+test('public: anonymous Resource URL builders preserve query and same-origin paths', () => {
+  assert.equal(publicClient.getListResourcesUrl({ page: 2, page_size: 24, locale: 'zh-Hans' }), '/api/resources?page=2&page_size=24&locale=zh-Hans');
+  assert.equal(publicClient.getGetResourceUrl('test-resource', { locale: 'ja' }), '/api/resources/test-resource?locale=ja');
+  assert.equal(publicClient.getListCategoriesUrl(), '/api/categories');
+  assert.equal(publicClient.getListTagsUrl({ locale: 'en' }), '/api/tags?locale=en');
+});
+
 test('admin: generated session clients preserve CSRF, cookie options, 204 and rate errors', async t => {
   const calls = [];
   t.mock.method(globalThis, 'fetch', async (url, options) => {

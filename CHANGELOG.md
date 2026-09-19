@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Add P0-2B anonymous Resource list/detail and Category/Tag browse OpenAPI endpoints,
+  generated clients and purpose-built sqlc reads without changing migrations 1–6.
+- Filter public visibility, Source availability/rights and Relation endpoints in SQL;
+  apply per-field locale fallback and reject missing canonical translations with 500.
+- Add Astro Resource SSR pages using server-only internal API calls, generated URL
+  builders, no browser credentials/islands, canonical SEO and short public cache headers.
+- Render Markdown with markdown-it and sanitize-html behind one audited HTML sink;
+  disable raw HTML/MDX/images and unsafe links. Add disposable API/SSR acceptance and
+  shared-dev Public read smoke with owned fixture cleanup; P0-2C writes remain deferred.
+
 - Add P0-2A migration 6 with ten relational Resource Core tables, restrictive FKs,
   defensive constraints, explicit Admin column grants and read-only Public access.
 - Add pure Taxonomy/Resource primitives for ASCII slugs, canonical locales and text,

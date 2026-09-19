@@ -24,6 +24,7 @@ official Go APIs. No global Go tools, psql or redis-cli are needed.
 | `pnpm smoke:admin:dev` | Real Admin identity/grants, login/CSRF/session/role isolation with temporary fixture cleanup |
 | `pnpm smoke:mail:resend:dev` | Opt-in real Resend send using private smoke input, without DB state |
 | `pnpm smoke:resource:dev` | Five real DB identities, temporary Resource graph, privileges/CAS and owner cleanup |
+| `pnpm smoke:public-read:dev` | Anonymous real Public Handler reads, visibility/locale/privacy/cache and owner fixture cleanup |
 | `pnpm adminctl:dev` | Operator-only static role grant/revoke/list using the prepared migrator |
 | `pnpm integration:ci` | Fresh, guarded loopback disposable PostgreSQL/Redis tests |
 | `pnpm build:images` | Build four local Docker images, without publishing |
@@ -306,15 +307,57 @@ secrets, deployment secret management, trusted proxy policy, and a Turnstile dec
 No Cloudflare provisioning, application TOTP/WebAuthn, dynamic RBAC or public role
 editor is included. Local/private mail capture is never a production delivery path.
 
+## Anonymous Resource reads (P0-2B)
+
+The Public API exposes GET `/resources`, `/resources/{slug}`, `/categories` and
+`/tags`. `locale` is optional and canonicalized in Go; omission uses each entity's
+default. Resource list alone accepts `page` (default 1) and `page_size` (1–100,
+default 24), ordered by publication time then UUID descending with `has_next`.
+No filters, custom sorting, search or authenticated Resource actions are implemented.
+
+Astro `/resources` and `/resources/[slug]` render on the server without islands.
+Run the existing `pnpm dev:api` and `pnpm dev:web`; development SSR defaults to the
+loopback Go API. Set server-only `API_INTERNAL_ORIGIN` explicitly for production
+Node SSR, or to override development. It must be an HTTP(S) origin without credentials,
+path, query or fragment. Never prefix it with PUBLIC_, embed it in client code, or
+route SSR through the external site. Generated API URL builders own endpoint paths;
+the server adapter strips only leading `/api` and sends no Cookie/Auth/CSRF headers.
+
+Web locale defaults to explicit `en`; optional locale is retained in detail and
+pagination links. Canonical URLs use `https://tap4furry.com` without locale, and list
+pages above 1 include only `page`. PublicLayout owns language/title/description/OG/
+robots/navigation. Markdown uses markdown-it with raw HTML disabled and a sanitize-html
+allowlist; Markdown.astro is the single HTML sink. No images or MDX are supported.
+
+Successful API/page reads send `public, max-age=0, s-maxage=60, stale-while-revalidate=30`.
+Errors send no-store; SSR errors add noindex. API 400/404 map to page 400/404;
+invalid responses, 5xx and five-second upstream timeouts map to a generic 503.
+The adapter has no retries or application cache and never renders provider bodies.
+
+Run `pnpm smoke:public-read:dev` after disposable acceptance and image builds.
+It starts no listener: a real Fiber Handler uses prepared API SELECT permissions,
+while migrator creates and removes only this run's UUIDv7 graph in FK-safe order.
+It covers four endpoints, non-public nodes, historical taxonomy, locale fallback,
+30 Source combinations, relation privacy, pagination, serialized DTOs and cache.
+It changes no schema/grants and requires Goose version 6. No migrate command is
+needed in this phase; migrations 1–6 remain immutable and 00007 must not exist.
+
+`pnpm integration:ci` retains P0-1/P0-2A checks and adds real Public Handler reads,
+canonical-corruption tests (500, never 404) and a locked-table five-second deadline
+test. It builds Astro and runs `node scripts/ssr-public-read.mjs` against a local fake
+API to verify SSR/security/status/SEO/cache with no external service or `.local` access.
+The SSR test can also be run separately after `pnpm --filter @tap4furry/web build`.
+
 ## Migrations and shared Infra
 
 P0-2A adds only migration `00006_resource_core.sql`; migrations 00001–00005 remain
 immutable. Shared `gfp_dev` is up-only. There is no developer down command. Resource
-Core has no Public/Admin Resource HTTP endpoints, frontend pages, new Redis data or
-Worker jobs. Public API DB access is SELECT-only; Admin has explicit minimal DML;
+Core now has P0-2B anonymous Public reads and Astro SSR; Admin writes, new Redis data
+and Worker jobs remain future work. Public API DB access is SELECT-only; Admin has explicit minimal DML;
 Worker has no Resource grants; readonly remains an operator identity, not a service.
 
-After disposable acceptance and image builds, run:
+To initialize the P0-2A foundation on a prepared development database after
+disposable acceptance and image builds, run:
 
 ```text
 pnpm migrate:dev
@@ -336,7 +379,7 @@ Default localization is an application transaction invariant: create with the
 parent, require the target before switching, and reject deleting the current default.
 P0-2A integration tests demonstrate parent locks plus CAS; full mutation orchestration
 is P0-2C. Normal Resource reads and CAS exclude deleted parents. Taxonomy/Resource
-domain code is pure Go; no server endpoint or product use-case API is added.
+domain code is pure Go; complete mutation use cases remain P0-2C.
 
 Shared development Infra is accessed only using private configuration. No SSH,
 server/container administration, cluster-role changes or Redis ACL changes are part

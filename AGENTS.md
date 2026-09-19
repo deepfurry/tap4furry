@@ -3,7 +3,8 @@
 A multi-process modular monolith for furry resource discovery and exchange. P0-0
 established infrastructure; P0-1A/B/C/D add identity, local authentication, session
 security, account recovery, explicit Google/GitHub linking and isolated Admin auth.
-MAIL-0 adds Resend; P0-2A adds Resource/Taxonomy schema and domain primitives only.
+MAIL-0 adds Resend; P0-2A adds Resource/Taxonomy schema and domain primitives.
+P0-2B adds anonymous Resource reads and Astro SSR; curation remains P0-2C.
 
 ## Start here
 
@@ -46,12 +47,18 @@ are pattern references only and never override this repository.
   Startup never migrates. Never rewrite released/applied migration history.
 - PostgreSQL is canonical; Redis is ephemeral with `gfp:` keys. River imports stay
   under `server/internal/jobs`. Do not create speculative domain packages.
-- P0-2A opens only `taxonomy` and `resource` as pure domain packages. Resource Core
-  has no HTTP/UI surface yet. Resource version/CAS spans owned knowledge changes;
+- `taxonomy` and `resource` remain pure domain packages. P0-2B reads use dedicated
+  sqlc queries and the Public pool, independently of Auth/Redis. Version/CAS spans
+  owned knowledge changes;
   relation edits affect both endpoints. Default localization is transaction-owned.
-- Migrations 1–5 are immutable. Resource migration 6 down is tested only against
+- Migrations 1–6 are immutable; P0-2B stays at version 6. Migration 6 down is tested against
   guarded disposable `gfp_ci`; shared `gfp_dev` remains up-only. Worker has no
   Resource grants; Public API is SELECT-only, Admin has explicit column-level DML.
+- Public reads filter visibility/Source rights/Relation endpoints in SQL and fail
+  closed on missing canonical translations. Internal governance fields stay private.
+- Resource pages are Astro SSR without islands. Only server helpers read
+  `API_INTERNAL_ORIGIN`; no credentials are forwarded. Markdown.astro is the sole
+  audited sanitized HTML sink. Errors are no-store/noindex; success uses short shared cache.
 - Auth owns transactions and the challenge-mail interface. Raw challenge tokens
   never enter jobs; mail delivers once after commit to Resend or private local capture.
   Production requires explicit Resend config; provider payloads/errors stay private.

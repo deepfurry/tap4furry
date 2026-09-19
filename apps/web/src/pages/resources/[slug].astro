@@ -1,0 +1,27 @@
+---
+import PublicLayout from '../../layouts/PublicLayout.astro';
+import Markdown from '../../components/Markdown.astro';
+import { getResource, readQuery, listHref, resourceHref } from '../../lib/public-api.server';
+const query = readQuery(Astro.url, false);
+const slug = Astro.params.slug ?? '';
+const result = query ? await getResource(slug, query) : { status: 400 as const };
+const data = result.status === 200 ? result.data : null;
+const title = data?.name ?? (result.status === 404 ? 'Resource not found' : result.status === 400 ? 'Invalid request' : 'Resource temporarily unavailable');
+const description = data ? data.summary ?? `Discover ${data.name} on Tap4Furry.` : 'Browse published knowledge on Tap4Furry.';
+const canonical = new URL(`/resources/${encodeURIComponent(data?.slug ?? slug)}`, Astro.site).href;
+---
+<PublicLayout title={title} description={description} canonical={canonical} locale={query?.locale ?? 'en'} status={result.status}>
+  <nav aria-label="Breadcrumb"><a href={query ? listHref(1, query) : '/resources'}>Back to Resources</a></nav>
+  {data && query ? <>
+    <header class="flex flex-col gap-4"><p class="resource-eyebrow">{data.category.name}</p><h1>{data.name}</h1>{data.summary && <p class="resource-summary">{data.summary}</p>}
+      <div class="flex flex-wrap gap-3"><span class="resource-badge">{data.lifecycle}</span><span class="resource-badge">{data.content_rating}</span></div>
+      {data.tags.length > 0 && <ul aria-label="Tags" class="flex flex-wrap gap-3">{data.tags.map(tag => <li class="resource-tag">{tag.name}</li>)}</ul>}
+    </header>
+    {data.description && <section class="resource-card p-6 sm:p-8" aria-label="Description"><Markdown source={data.description} /></section>}
+    <div class="grid gap-8 sm:grid-cols-2">
+      <section class="flex flex-col gap-4"><h2>Sources</h2>{data.sources.length ? <ul class="flex flex-col gap-4">{data.sources.map(source => <li class="flex flex-col gap-1"><a href={source.url}>{source.label ?? source.url}</a><span class="resource-muted">{source.source_type} · {source.availability_state}{source.is_primary ? ' · Primary' : ''}</span></li>)}</ul> : <p>No public sources available.</p>}</section>
+      <section class="flex flex-col gap-4"><h2>Related resources</h2>{data.relations.length ? <ul class="flex flex-col gap-4">{data.relations.map(relation => <li><a href={resourceHref(relation.resource.slug, query)}>{relation.resource.name}</a><p class="resource-muted">{relation.type.replaceAll('_', ' ')} · {relation.direction}</p></li>)}</ul> : <p>No public relations yet.</p>}</section>
+    </div>
+    {data.external_ids.length > 0 && <section class="flex flex-col gap-4"><h2>External IDs</h2><dl class="grid gap-3 sm:grid-cols-2">{data.external_ids.map(id => <div><dt class="resource-muted">{id.namespace}</dt><dd>{id.external_id}</dd></div>)}</dl></section>}
+  </> : <section class="flex flex-col gap-4"><h1>{title}</h1><p>{result.status === 404 ? 'This resource is not available.' : result.status === 400 ? 'Check the locale in the URL.' : 'Please try again in a moment.'}</p></section>}
+</PublicLayout>

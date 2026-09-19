@@ -17,9 +17,10 @@ tap4furry-worker
 
 One Go module and one shared backend codebase.
 
-P0-2A adds only pure `internal/taxonomy` and `internal/resource` primitives plus
-sqlc/database groundwork. No Resource routes, full CRUD service, Redis key or Worker
-job is composed. `taxonomy` uses the already pinned `golang.org/x/text/language`
+P0-2A adds pure `internal/taxonomy` and `internal/resource` primitives plus
+sqlc/database groundwork. P0-2B adds four anonymous Public read routes through
+purpose-built sqlc, without full CRUD, Redis data or Worker jobs.
+`taxonomy` uses the already pinned `golang.org/x/text/language`
 for locale canonicalization; it and `resource` do not import pgx, SQL, HTTP or queues.
 
 ## Call Direction
@@ -112,6 +113,14 @@ Avoid ceremonial DDD unless real complexity justifies it.
 Use Application/Domain rules and explicit transactions.
 
 ### Queries
+
+P0-2B's `public_resource.sql` owns Resource list/detail, localizations, sources,
+relations, external IDs and active taxonomy browse reads. The Public handler maps
+only public columns into generated DTOs, applies the five-second deadline and stable
+errors/cache headers, and leaves Auth middleware outside these routes. Detail reads
+use a read-only repeatable-read snapshot. Missing canonical defaults fail with 500;
+private/missing Resources uniformly return 404. No Resource service wrapper is added.
+
 May directly use purpose-built sqlc read queries when reconstructing domain objects adds no value.
 
 This is a CQRS mindset without CQRS infrastructure.

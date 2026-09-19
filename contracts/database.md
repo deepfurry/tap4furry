@@ -120,3 +120,25 @@ Only a `_test.go` migration helper can perform the 6→5→6 round-trip. It requ
 `gfp_ci`/migrator identity and exactly current/target version 6. Shared `migrate:dev`
 remains up-only. Resource smoke cleanup uses migrator only and randomly owned fixture
 IDs in FK-safe order; it never rolls back shared schema or touches existing Resources.
+
+## P0-2B read model (schema frozen at 6)
+
+Migrations 00001–00006 are immutable; P0-2B creates no migration 00007 or schema,
+index, grant or role changes. `public_resource.sql` is the sole Public Resource
+query source. API uses the existing SELECT grants; Worker still has no Resource access.
+
+Public Resources require published + not deleted + Category not deleted; lifecycle
+and content rating do not hide published knowledge. Browse taxonomy requires active,
+while linked retired taxonomy stays visible. Deleted tags are omitted. Sources omit
+removed availability and allow only unknown/creator_provided/confirmed rights.
+Relations require a public other endpoint and preserve stored vocabulary with
+outgoing/incoming/symmetric direction; no hidden endpoint or relation-row ID leaks.
+
+Requested locale matches exactly after canonicalization, with independent nullable
+field fallback to each entity's default. No language-family matching. LEFT JOIN plus
+explicit canonical-row checks distinguish corrupt defaults (500 INTERNAL_ERROR) from
+hidden/missing Resources (404 RESOURCE_NOT_FOUND), including Category/Tag defaults.
+Read DTOs never expose publication_state/version/deleted_at/rights_status/created_at.
+Resource lists sort published_at DESC then id DESC, fetch page_size+1 with overflow-safe
+offset and return has_next without counts. Detail child reads share a read-only
+repeatable-read snapshot so concurrent visibility changes cannot split the graph.

@@ -16,6 +16,13 @@ Server/Web run as non-root; Admin uses an unprivileged runtime. PostgreSQL follo
 its upstream entrypoint and keeps PGDATA independent from image contents.
 Web uses tini to forward container signals to Node and reap child processes.
 
+Resource SSR requires explicit runtime `API_INTERNAL_ORIGIN` in production (for
+example `http://api:8080` on an operator-configured private container network).
+This server-only value is not an Astro PUBLIC_ variable or build argument. SSR calls
+the Go API directly using generated paths and never forwards browser credentials.
+The canonical site remains `https://tap4furry.com`; missing/invalid internal origin
+makes Resource pages return a no-store/noindex 503. No deployment is provisioned here.
+
 The server image's command selects a runtime binary; API and Admin require separate
 HTTP_ADDR values when sharing a network namespace. Migrations are explicit developer
 or CI commands and never run at application startup.
@@ -27,7 +34,7 @@ MAIL-0 additionally requires explicit `MAIL_MODE=resend`, a private
 `MAIL_REPLY_TO=support@tap4furry.com` in the Public API runtime only.
 Mail credentials are never image build inputs; Admin and Worker do not read them.
 
-The `local` tags contain the current P0-1A/B/C/D implementation. Future origins are
+The `local` tags contain the current implementation. Future deployment origins are
 `https://tap4furry.com` and `https://admin.tap4furry.com`. Same-origin `/api/*`
 forwarding belongs to a future deployment reverse proxy; the Admin static container
 returns 503 on that prefix until

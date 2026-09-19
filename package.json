@@ -26,6 +26,7 @@
     "smoke:admin:dev": "node scripts/smoke-admin-dev.mjs",
     "smoke:mail:resend:dev": "node scripts/smoke-mail-resend-dev.mjs",
     "smoke:resource:dev": "node scripts/smoke-resource-dev.mjs",
+    "smoke:public-read:dev": "node scripts/smoke-public-read-dev.mjs",
     "adminctl:dev": "node scripts/adminctl-dev.mjs",
     "integration:ci": "node scripts/integration-ci.mjs",
     "build:images": "node scripts/build-images.mjs"

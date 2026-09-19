@@ -36,6 +36,7 @@ const (
 	ORIGINFORBIDDEN            ApiErrorCode = "ORIGIN_FORBIDDEN"
 	PROFILEHANDLEUNAVAILABLE   ApiErrorCode = "PROFILE_HANDLE_UNAVAILABLE"
 	PROFILENOTFOUND            ApiErrorCode = "PROFILE_NOT_FOUND"
+	RESOURCENOTFOUND           ApiErrorCode = "RESOURCE_NOT_FOUND"
 	VALIDATIONERROR            ApiErrorCode = "VALIDATION_ERROR"
 )
 
@@ -84,6 +85,8 @@ func (e ApiErrorCode) Valid() bool {
 		return true
 	case PROFILENOTFOUND:
 		return true
+	case RESOURCENOTFOUND:
+		return true
 	case VALIDATIONERROR:
 		return true
 	default:
@@ -108,13 +111,13 @@ func (e LiveStatus) Valid() bool {
 
 // Defines values for MeAccountState.
 const (
-	Active MeAccountState = "active"
+	MeAccountStateActive MeAccountState = "active"
 )
 
 // Valid indicates whether the value is a known member of the MeAccountState enum.
 func (e MeAccountState) Valid() bool {
 	switch e {
-	case Active:
+	case MeAccountStateActive:
 		return true
 	default:
 		return false
@@ -196,6 +199,159 @@ func (e ReadyStatus) Valid() bool {
 	}
 }
 
+// Defines values for ResourceContentRating.
+const (
+	Explicit ResourceContentRating = "explicit"
+	General  ResourceContentRating = "general"
+	Mature   ResourceContentRating = "mature"
+)
+
+// Valid indicates whether the value is a known member of the ResourceContentRating enum.
+func (e ResourceContentRating) Valid() bool {
+	switch e {
+	case Explicit:
+		return true
+	case General:
+		return true
+	case Mature:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ResourceLifecycle.
+const (
+	ResourceLifecycleActive       ResourceLifecycle = "active"
+	ResourceLifecycleArchived     ResourceLifecycle = "archived"
+	ResourceLifecycleDelisted     ResourceLifecycle = "delisted"
+	ResourceLifecycleDiscontinued ResourceLifecycle = "discontinued"
+	ResourceLifecycleInactive     ResourceLifecycle = "inactive"
+	ResourceLifecycleUnknown      ResourceLifecycle = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the ResourceLifecycle enum.
+func (e ResourceLifecycle) Valid() bool {
+	switch e {
+	case ResourceLifecycleActive:
+		return true
+	case ResourceLifecycleArchived:
+		return true
+	case ResourceLifecycleDelisted:
+		return true
+	case ResourceLifecycleDiscontinued:
+		return true
+	case ResourceLifecycleInactive:
+		return true
+	case ResourceLifecycleUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ResourceRelationDirection.
+const (
+	Incoming  ResourceRelationDirection = "incoming"
+	Outgoing  ResourceRelationDirection = "outgoing"
+	Symmetric ResourceRelationDirection = "symmetric"
+)
+
+// Valid indicates whether the value is a known member of the ResourceRelationDirection enum.
+func (e ResourceRelationDirection) Valid() bool {
+	switch e {
+	case Incoming:
+		return true
+	case Outgoing:
+		return true
+	case Symmetric:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ResourceRelationType.
+const (
+	DerivedFrom ResourceRelationType = "derived_from"
+	PartOf      ResourceRelationType = "part_of"
+	RelatedTo   ResourceRelationType = "related_to"
+	SuccessorOf ResourceRelationType = "successor_of"
+)
+
+// Valid indicates whether the value is a known member of the ResourceRelationType enum.
+func (e ResourceRelationType) Valid() bool {
+	switch e {
+	case DerivedFrom:
+		return true
+	case PartOf:
+		return true
+	case RelatedTo:
+		return true
+	case SuccessorOf:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ResourceSourceAvailability.
+const (
+	ResourceSourceAvailabilityActive      ResourceSourceAvailability = "active"
+	ResourceSourceAvailabilityBroken      ResourceSourceAvailability = "broken"
+	ResourceSourceAvailabilityRestricted  ResourceSourceAvailability = "restricted"
+	ResourceSourceAvailabilityUnavailable ResourceSourceAvailability = "unavailable"
+)
+
+// Valid indicates whether the value is a known member of the ResourceSourceAvailability enum.
+func (e ResourceSourceAvailability) Valid() bool {
+	switch e {
+	case ResourceSourceAvailabilityActive:
+		return true
+	case ResourceSourceAvailabilityBroken:
+		return true
+	case ResourceSourceAvailabilityRestricted:
+		return true
+	case ResourceSourceAvailabilityUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ResourceSourceType.
+const (
+	ResourceSourceTypeArchive   ResourceSourceType = "archive"
+	ResourceSourceTypeCommunity ResourceSourceType = "community"
+	ResourceSourceTypeExternal  ResourceSourceType = "external"
+	ResourceSourceTypeMirror    ResourceSourceType = "mirror"
+	ResourceSourceTypeOfficial  ResourceSourceType = "official"
+	ResourceSourceTypeStore     ResourceSourceType = "store"
+	ResourceSourceTypeUnknown   ResourceSourceType = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the ResourceSourceType enum.
+func (e ResourceSourceType) Valid() bool {
+	switch e {
+	case ResourceSourceTypeArchive:
+		return true
+	case ResourceSourceTypeCommunity:
+		return true
+	case ResourceSourceTypeExternal:
+		return true
+	case ResourceSourceTypeMirror:
+		return true
+	case ResourceSourceTypeOfficial:
+		return true
+	case ResourceSourceTypeStore:
+		return true
+	case ResourceSourceTypeUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for SessionAuthMethod.
 const (
 	SessionAuthMethodGithub        SessionAuthMethod = "github"
@@ -238,6 +394,26 @@ type ApiErrorCode string
 type AuthMethods struct {
 	Password  bool             `json:"password"`
 	Providers []ProviderMethod `json:"providers"`
+}
+
+// CategoryItem defines model for CategoryItem.
+type CategoryItem struct {
+	Description *string `json:"description"`
+	Id          string  `json:"id"`
+	Name        string  `json:"name"`
+	Slug        string  `json:"slug"`
+}
+
+// CategoryList defines model for CategoryList.
+type CategoryList struct {
+	Items []CategoryItem `json:"items"`
+}
+
+// CategoryRef defines model for CategoryRef.
+type CategoryRef struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
 }
 
 // ChallengeToken defines model for ChallengeToken.
@@ -359,6 +535,96 @@ type ResetRequest struct {
 	Email string `json:"email"`
 }
 
+// ResourceContentRating defines model for ResourceContentRating.
+type ResourceContentRating string
+
+// ResourceDetail defines model for ResourceDetail.
+type ResourceDetail struct {
+	AvailableLocales []string              `json:"available_locales"`
+	Category         CategoryRef           `json:"category"`
+	ContentRating    ResourceContentRating `json:"content_rating"`
+	DefaultLocale    string                `json:"default_locale"`
+	Description      *string               `json:"description"`
+	ExternalIds      []ResourceExternalID  `json:"external_ids"`
+	Id               string                `json:"id"`
+	Lifecycle        ResourceLifecycle     `json:"lifecycle"`
+	Name             string                `json:"name"`
+	PublishedAt      time.Time             `json:"published_at"`
+	Relations        []ResourceRelation    `json:"relations"`
+	RequestedLocale  *string               `json:"requested_locale"`
+	Slug             string                `json:"slug"`
+	Sources          []ResourceSource      `json:"sources"`
+	Summary          *string               `json:"summary"`
+	Tags             []TagRef              `json:"tags"`
+	UpdatedAt        time.Time             `json:"updated_at"`
+}
+
+// ResourceExternalID defines model for ResourceExternalID.
+type ResourceExternalID struct {
+	ExternalId string `json:"external_id"`
+	Namespace  string `json:"namespace"`
+}
+
+// ResourceLifecycle defines model for ResourceLifecycle.
+type ResourceLifecycle string
+
+// ResourceList defines model for ResourceList.
+type ResourceList struct {
+	HasNext  bool               `json:"has_next"`
+	Items    []ResourceListItem `json:"items"`
+	Page     int64              `json:"page"`
+	PageSize int                `json:"page_size"`
+}
+
+// ResourceListItem defines model for ResourceListItem.
+type ResourceListItem struct {
+	Category      CategoryRef           `json:"category"`
+	ContentRating ResourceContentRating `json:"content_rating"`
+	Id            string                `json:"id"`
+	Lifecycle     ResourceLifecycle     `json:"lifecycle"`
+	Name          string                `json:"name"`
+	PublishedAt   time.Time             `json:"published_at"`
+	Slug          string                `json:"slug"`
+	Summary       *string               `json:"summary"`
+	UpdatedAt     time.Time             `json:"updated_at"`
+}
+
+// ResourceRef defines model for ResourceRef.
+type ResourceRef struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
+// ResourceRelation defines model for ResourceRelation.
+type ResourceRelation struct {
+	Direction ResourceRelationDirection `json:"direction"`
+	Resource  ResourceRef               `json:"resource"`
+	Type      ResourceRelationType      `json:"type"`
+}
+
+// ResourceRelationDirection defines model for ResourceRelationDirection.
+type ResourceRelationDirection string
+
+// ResourceRelationType defines model for ResourceRelationType.
+type ResourceRelationType string
+
+// ResourceSource defines model for ResourceSource.
+type ResourceSource struct {
+	AvailabilityState ResourceSourceAvailability `json:"availability_state"`
+	Id                string                     `json:"id"`
+	IsPrimary         bool                       `json:"is_primary"`
+	Label             *string                    `json:"label"`
+	SourceType        ResourceSourceType         `json:"source_type"`
+	Url               string                     `json:"url"`
+}
+
+// ResourceSourceAvailability defines model for ResourceSourceAvailability.
+type ResourceSourceAvailability string
+
+// ResourceSourceType defines model for ResourceSourceType.
+type ResourceSourceType string
+
 // Session defines model for Session.
 type Session struct {
 	AbsoluteExpiresAt time.Time         `json:"absolute_expires_at"`
@@ -379,8 +645,37 @@ type SessionList struct {
 	Sessions []Session `json:"sessions"`
 }
 
+// TagItem defines model for TagItem.
+type TagItem struct {
+	Description *string `json:"description"`
+	Id          string  `json:"id"`
+	Name        string  `json:"name"`
+	Slug        string  `json:"slug"`
+}
+
+// TagList defines model for TagList.
+type TagList struct {
+	Items []TagItem `json:"items"`
+}
+
+// TagRef defines model for TagRef.
+type TagRef struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
 // CSRF defines model for CSRF.
 type CSRF = string
+
+// Locale defines model for Locale.
+type Locale = string
+
+// Page defines model for Page.
+type Page = int64
+
+// PageSize defines model for PageSize.
+type PageSize = int
 
 // Provider defines model for Provider.
 type Provider = OAuthProvider
@@ -425,6 +720,12 @@ type ReauthenticateParams struct {
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
 }
 
+// ListCategoriesParams defines parameters for ListCategories.
+type ListCategoriesParams struct {
+	// Locale Canonical locale with exact-match field fallback; omitted uses each entity default.
+	Locale *Locale `form:"locale,omitempty" json:"locale,omitempty"`
+}
+
 // UnlinkOAuthProviderParams defines parameters for UnlinkOAuthProvider.
 type UnlinkOAuthProviderParams struct {
 	// XCSRFToken Obtain from GET /auth/csrf for the current session. Exact PUBLIC_ORIGIN is also required.
@@ -459,6 +760,26 @@ type RevokeOtherSessionsParams struct {
 type RevokeSessionParams struct {
 	// XCSRFToken Obtain from GET /auth/csrf for the current session. Exact PUBLIC_ORIGIN is also required.
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// ListResourcesParams defines parameters for ListResources.
+type ListResourcesParams struct {
+	// Locale Canonical locale with exact-match field fallback; omitted uses each entity default.
+	Locale   *Locale   `form:"locale,omitempty" json:"locale,omitempty"`
+	Page     *Page     `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *PageSize `form:"page_size,omitempty" json:"page_size,omitempty"`
+}
+
+// GetResourceParams defines parameters for GetResource.
+type GetResourceParams struct {
+	// Locale Canonical locale with exact-match field fallback; omitted uses each entity default.
+	Locale *Locale `form:"locale,omitempty" json:"locale,omitempty"`
+}
+
+// ListTagsParams defines parameters for ListTags.
+type ListTagsParams struct {
+	// Locale Canonical locale with exact-match field fallback; omitted uses each entity default.
+	Locale *Locale `form:"locale,omitempty" json:"locale,omitempty"`
 }
 
 // VerifyEmailJSONRequestBody defines body for VerifyEmail for application/json ContentType.
@@ -524,6 +845,9 @@ type ServerInterface interface {
 	// (POST /auth/register)
 	Register(c fiber.Ctx) error
 
+	// (GET /categories)
+	ListCategories(c fiber.Ctx, params ListCategoriesParams) error
+
 	// (GET /health/live)
 	GetLive(c fiber.Ctx) error
 
@@ -556,6 +880,15 @@ type ServerInterface interface {
 
 	// (DELETE /me/sessions/{session_id})
 	RevokeSession(c fiber.Ctx, sessionId string, params RevokeSessionParams) error
+
+	// (GET /resources)
+	ListResources(c fiber.Ctx, params ListResourcesParams) error
+
+	// (GET /resources/{slug})
+	GetResource(c fiber.Ctx, slug string, params GetResourceParams) error
+
+	// (GET /tags)
+	ListTags(c fiber.Ctx, params ListTagsParams) error
 
 	// (GET /users/{handle})
 	GetPublicProfile(c fiber.Ctx, handle string) error
@@ -933,6 +1266,43 @@ func (siw *ServerInterfaceWrapper) Register(c fiber.Ctx) error {
 
 	handler := func(c fiber.Ctx) error {
 		return siw.Handler.Register(c)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// ListCategories operation middleware
+func (siw *ServerInterfaceWrapper) ListCategories(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListCategoriesParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "locale" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locale", query, &params.Locale, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter locale: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.ListCategories(c, params)
 	}
 
 	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
@@ -1338,6 +1708,139 @@ func (siw *ServerInterfaceWrapper) RevokeSession(c fiber.Ctx) error {
 	return handler(c)
 }
 
+// ListResources operation middleware
+func (siw *ServerInterfaceWrapper) ListResources(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListResourcesParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "locale" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locale", query, &params.Locale, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter locale: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", query, &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page_size" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page_size", query, &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page_size: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.ListResources(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// GetResource operation middleware
+func (siw *ServerInterfaceWrapper) GetResource(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "slug" -------------
+	var slug string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "slug", c.Params("slug"), &slug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter slug: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetResourceParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "locale" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locale", query, &params.Locale, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter locale: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.GetResource(c, slug, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// ListTags operation middleware
+func (siw *ServerInterfaceWrapper) ListTags(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListTagsParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "locale" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locale", query, &params.Locale, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter locale: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.ListTags(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
 // GetPublicProfile operation middleware
 func (siw *ServerInterfaceWrapper) GetPublicProfile(c fiber.Ctx) error {
 
@@ -1389,6 +1892,14 @@ func RegisterHandlersWithOptions(router fiber.Router, si ServerInterface, option
 	for _, m := range options.Middlewares {
 		router.Use(fiber.Handler(m))
 	}
+
+	router.Get(options.BaseURL+"/resources", wrapper.ListResources)
+
+	router.Get(options.BaseURL+"/resources/:slug", wrapper.GetResource)
+
+	router.Get(options.BaseURL+"/categories", wrapper.ListCategories)
+
+	router.Get(options.BaseURL+"/tags", wrapper.ListTags)
 
 	router.Get(options.BaseURL+"/auth/oauth/:provider/start", wrapper.StartOAuth)
 

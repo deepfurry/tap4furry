@@ -1,0 +1,27 @@
+---
+import PublicLayout from '../../layouts/PublicLayout.astro';
+import { listResources, readQuery, listHref, resourceHref } from '../../lib/public-api.server';
+const query = readQuery(Astro.url, true);
+const result = query ? await listResources(query) : { status: 400 as const };
+const data = result.status === 200 ? result.data : null;
+const title = result.status === 400 ? 'Invalid request' : result.status === 503 ? 'Resources temporarily unavailable' : 'Resources';
+const canonical = new URL(`/resources${query && query.page > 1 ? `?page=${query.page}` : ''}`, Astro.site).href;
+---
+<PublicLayout title={title} description="Discover furry games, creative works, tools and community resources." canonical={canonical} locale={query?.locale ?? 'en'} status={result.status}>
+  <section class="flex flex-col gap-3"><p class="resource-eyebrow">Explore the community</p><h1>{title}</h1><p>Discover the works, tools and places that bring us together.</p></section>
+  {data && query ? <>
+    {data.items.length ? <div class="grid gap-5 sm:grid-cols-2">
+      {data.items.map(resource => <article class="resource-card flex flex-col gap-4 p-6">
+        <span class="resource-eyebrow">{resource.category.name}</span>
+        <h2><a href={resourceHref(resource.slug, query)}>{resource.name}</a></h2>
+        {resource.summary && <p>{resource.summary}</p>}
+        <div class="mt-auto flex flex-wrap gap-3"><span class="resource-badge">{resource.lifecycle}</span><span class="resource-badge">{resource.content_rating}</span></div>
+      </article>)}
+    </div> : <p>No published resources yet.</p>}
+    <nav aria-label="Pagination" class="flex items-center justify-between gap-6">
+      {query.page > 1 ? <a rel="prev" href={listHref(query.page - 1, query)}>Previous</a> : <span />}
+      <span>Page {data.page}</span>
+      {data.has_next ? <a rel="next" href={listHref(query.page + 1, query)}>Next</a> : <span />}
+    </nav>
+  </> : <p>{result.status === 400 ? 'Check the locale and page in the URL.' : 'Please try again in a moment.'}</p>}
+</PublicLayout>
