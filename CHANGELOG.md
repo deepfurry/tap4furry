@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Add P0-2A migration 6 with ten relational Resource Core tables, restrictive FKs,
+  defensive constraints, explicit Admin column grants and read-only Public access.
+- Add pure Taxonomy/Resource primitives for ASCII slugs, canonical locales and text,
+  conservative Source URLs, independent state axes, symmetric relations and external IDs.
+- Add sqlc existence/lock/version-CAS groundwork and executable localization/revision
+  transaction patterns; no Resource HTTP/UI or full CRUD orchestration is introduced.
+- Add guarded disposable 00006 Down/Up, schema/privilege/concurrency tests and
+  `smoke:resource:dev` with five prepared identities and owner-only fixture cleanup.
+  Preserve migrations 1–5, shared Infra identifiers and all private launch inputs.
+
 - Add MAIL-0 production verification/reset email through the official Resend Go
   SDK, preserving the Auth-owned ChallengeMailer and post-commit failure semantics.
 - Require explicit production Resend configuration with validated From/Reply-To;

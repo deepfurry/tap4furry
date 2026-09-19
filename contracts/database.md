@@ -77,3 +77,46 @@ target User lock. Last-active-admin checks, role writes, final-role Admin sessio
 revocation and role events commit together. Admin login/reauth lock User then
 credential and revalidate password, account, role and initiating session before
 writing; KDFs remain outside transactions. No role or capability cache exists.
+
+## P0-2A Resource Core
+
+Migration `00006_resource_core.sql` owns exactly ten new tables:
+`categories`, `category_localizations`, `tags`, `tag_localizations`, `resources`,
+`resource_localizations`, `resource_tags`, `resource_sources`, `resource_relations`
+and `resource_external_ids`, all in `app`. Migrations 1–5 remain byte-for-byte intact.
+IDs come from Go UUIDv7; pure mappings use composite keys. FKs use RESTRICT, states
+use TEXT/CHECK, times use explicit timestamptz. No ENUM/JSONB/EAV/RLS/triggers or seeds.
+
+Category/Tag slugs (1–64) cannot be changed by Admin. Resource slugs (1–80) freeze
+after first publication through domain/application policy. Parents soft-delete;
+Sources use availability=removed; memberships/relations/external IDs delete physically.
+Public visibility and lifecycle/rating remain independent. Rating and Resource
+version require explicit values; new Resources start at version 1. Published requires
+published_at. No search indexes are introduced.
+
+Locale columns have defensive shape/length checks and per-entity lower(locale)
+uniqueness. Go `x/text/language` canonicalizes input. The parent and default locale
+row commit together; parent locking protects default switches and localization
+deletion. No circular FK exists. P0-2B will use field-level requested→default fallback.
+
+Resource version anchors Resource-owned canonical knowledge, including children,
+state and soft delete. A logical mutation increments once per affected Resource;
+relations affect both endpoints, locked in UUID order. sqlc compare-and-bump rejects
+stale expected versions and deleted rows. Full mutation orchestration is P0-2C.
+
+Source URL normalization never fetches; `(resource_id,url)` is unique, with at most
+one primary per Resource, independently of availability/rights. `related_to` orders
+UUID endpoints; the three directed relation types keep direction. Cycle checks are
+future application work. External IDs are globally unique by `(namespace,external_id)`.
+
+Migration 6 first clears inherited default grants on its own tables. API and readonly
+receive SELECT on all ten; Worker receives nothing. Admin gets SELECT/INSERT, exact
+mutable-column UPDATE grants, and DELETE only on localization/mapping/relation tables.
+No Admin hard DELETE exists for Category/Tag/Resource/Source, and IDs/created_at and
+relationship identities cannot be updated. No cluster-role/default-privilege changes.
+
+Only a `_test.go` migration helper can perform the 6→5→6 round-trip. It requires
+`CI=true`, `GFP_DISPOSABLE_INFRA=1`, `GFP_RESOURCE_INTEGRATION=1`, fixed loopback
+`gfp_ci`/migrator identity and exactly current/target version 6. Shared `migrate:dev`
+remains up-only. Resource smoke cleanup uses migrator only and randomly owned fixture
+IDs in FK-safe order; it never rolls back shared schema or touches existing Resources.

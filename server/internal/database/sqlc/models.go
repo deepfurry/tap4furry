@@ -31,12 +31,89 @@ type AppAuthIdentity struct {
 	UpdatedAt       pgtype.Timestamptz
 }
 
+type AppCategory struct {
+	ID            pgtype.UUID
+	Slug          string
+	DefaultLocale string
+	State         string
+	CreatedAt     pgtype.Timestamptz
+	UpdatedAt     pgtype.Timestamptz
+	DeletedAt     pgtype.Timestamptz
+}
+
+type AppCategoryLocalization struct {
+	CategoryID  pgtype.UUID
+	Locale      string
+	Name        string
+	Description pgtype.Text
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+}
+
 type AppPasswordCredential struct {
 	UserID            pgtype.UUID
 	PasswordHash      string
 	PasswordUpdatedAt pgtype.Timestamptz
 	CreatedAt         pgtype.Timestamptz
 	UpdatedAt         pgtype.Timestamptz
+}
+
+type AppResource struct {
+	ID               pgtype.UUID
+	Slug             string
+	DefaultLocale    string
+	CategoryID       pgtype.UUID
+	PublicationState string
+	Lifecycle        string
+	ContentRating    string
+	Version          int64
+	PublishedAt      pgtype.Timestamptz
+	CreatedAt        pgtype.Timestamptz
+	UpdatedAt        pgtype.Timestamptz
+	DeletedAt        pgtype.Timestamptz
+}
+
+type AppResourceExternalID struct {
+	ResourceID pgtype.UUID
+	Namespace  string
+	ExternalID string
+	CreatedAt  pgtype.Timestamptz
+}
+
+type AppResourceLocalization struct {
+	ResourceID  pgtype.UUID
+	Locale      string
+	Name        string
+	Summary     pgtype.Text
+	Description pgtype.Text
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
+}
+
+type AppResourceRelation struct {
+	ID               pgtype.UUID
+	SourceResourceID pgtype.UUID
+	TargetResourceID pgtype.UUID
+	RelationType     string
+	CreatedAt        pgtype.Timestamptz
+}
+
+type AppResourceSource struct {
+	ID                pgtype.UUID
+	ResourceID        pgtype.UUID
+	Url               string
+	Label             pgtype.Text
+	SourceType        string
+	AvailabilityState string
+	RightsStatus      string
+	IsPrimary         bool
+	CreatedAt         pgtype.Timestamptz
+	UpdatedAt         pgtype.Timestamptz
+}
+
+type AppResourceTag struct {
+	ResourceID pgtype.UUID
+	TagID      pgtype.UUID
 }
 
 type AppSecurityEvent struct {
@@ -59,6 +136,25 @@ type AppSession struct {
 	IdleExpiresAt     pgtype.Timestamptz
 	AbsoluteExpiresAt pgtype.Timestamptz
 	RevokedAt         pgtype.Timestamptz
+}
+
+type AppTag struct {
+	ID            pgtype.UUID
+	Slug          string
+	DefaultLocale string
+	State         string
+	CreatedAt     pgtype.Timestamptz
+	UpdatedAt     pgtype.Timestamptz
+	DeletedAt     pgtype.Timestamptz
+}
+
+type AppTagLocalization struct {
+	TagID       pgtype.UUID
+	Locale      string
+	Name        string
+	Description pgtype.Text
+	CreatedAt   pgtype.Timestamptz
+	UpdatedAt   pgtype.Timestamptz
 }
 
 type AppUser struct {

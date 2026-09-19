@@ -14,7 +14,8 @@ worker → jobs adapter → shared Application/Domain (when implemented)
 ```
 
 P0-1A/B/C/D add local/OAuth auth, PostgreSQL sessions, recovery, basic profiles and isolated Admin auth to P0-0 infrastructure.
-Only `auth` and `identity` are product packages. `cmd/*` composes dependencies, signals and
+P0-2A adds pure `taxonomy` and `resource` domain packages alongside `auth` and `identity`.
+Resource HTTP/UI and complete mutation use cases remain P0-2B/P0-2C. `cmd/*` composes dependencies, signals and
 bounded cleanup; reusable behavior lives in `internal/`.
 
 Auth owns the challenge-mail interface; `internal/mail` implements post-commit local
@@ -42,6 +43,14 @@ Worker never calls Public/Admin HTTP. Application/domain code must not import Fi
 transport DTOs, Redis or River. River types stay inside Jobs infrastructure and its
 objects live in `river`; business data lives in `app`. PostgreSQL is canonical,
 Redis holds disposable state. No ORM, AutoMigrate, vectors, MongoDB or message broker.
+
+Resource Core is ten relational tables in `app`, owned by Goose migration 6. Domain
+primitives normalize locale/text/URLs and canonicalize symmetric relations without
+I/O. sqlc provides parent locks and optimistic version bumps. A transaction creates
+the parent plus its default localization and bumps each affected Resource once;
+relation edits lock both endpoints in UUID order. No circular localization FK,
+trigger, queue, seed taxonomy or Resource Worker access exists. Acceptance fixtures
+under `database/resourcecheck` are developer-only, never runtime dependencies.
 
 OpenAPI owns Go transport and TypeScript clients. Goose migrations plus SQL queries
 own sqlc output. Generated files are committed, reviewed, and never manually edited.

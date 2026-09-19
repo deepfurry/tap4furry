@@ -2,7 +2,10 @@
 
 A discovery and exchange platform for the furry ecosystem, centered on resource
 knowledge. P0-1 Identity/Auth and human acceptance are complete. MAIL-0 connects
-verification and recovery mail to Resend; P0-2 Taxonomy & Resource Core is next.
+verification and recovery mail to Resend. P0-2A adds the ten-table Resource Core,
+pure Taxonomy/Resource primitives, localization and Resource revision/CAS groundwork.
+P0-2B Public Resource Read Surface and P0-2C Admin Curation are next; Resource HTTP
+APIs and pages are not implemented yet.
 Production deployment sign-off remains a separate gate.
 
 Canonical repository: [deepfurry/tap4furry](https://github.com/deepfurry/tap4furry).
@@ -53,7 +56,7 @@ Publishing, merging to `main`, tagging and releasing require explicit instructio
 `gfp_*` and `gfp:` are intentionally retained stable infrastructure identifiers and
 are not product-brand surfaces. BRAND-0 changes no database schema or infrastructure.
 
-Start with [AGENTS.md](AGENTS.md), the [MAIL-0 specification](docs/implementation/mail-0-production-transactional-mail.md),
+Start with [AGENTS.md](AGENTS.md), the [P0-2A specification](docs/implementation/p0-2a-resource-domain-schema.md),
 [product overview](docs/product/PRODUCT.md) and [architecture](docs/architecture/ARCHITECTURE.md).
 See [CHANGELOG.md](CHANGELOG.md) and [deployment artifacts](deploy/README.md).
 

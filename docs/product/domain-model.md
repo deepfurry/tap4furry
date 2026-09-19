@@ -25,6 +25,10 @@ Admin
 
 ## Core Entities
 
+P0-2A implements Resource/Taxonomy data foundations only. The broader entity map
+below remains product direction; no Resource HTTP/UI, Contribution, Search or
+Exchange application behavior is implemented in this phase.
+
 ```text
 User
 Organization
@@ -60,6 +64,28 @@ SecurityEvent
 ## Resource
 
 A Resource is a long-lived knowledge entity, not a download link.
+
+It belongs to exactly one Category and has flat many-to-many Tags. Category/Tag
+states are `active` and `retired`; retired taxonomy remains historically valid but
+cannot receive new bindings. Category/Tag/Resource use independent soft deletion.
+Category/Tag slugs are immutable ASCII kebab-case (1–64); Resource slugs (1–80)
+become immutable through normal application behavior after first publication.
+
+The intended initial categories are `game`, `creative-work`, `tool`, `platform`,
+`community`, `event`, `knowledge`, `marketplace`, `service` and `other`. Migration 6
+seeds none; P0-2C/operator curation creates them without magic UUIDs. Tags have no
+hierarchy, aliases, implications, weights or primary-tag concept.
+
+Each entity has a canonical `default_locale` and a separate localization table.
+Creation atomically includes its default translation. Switching requires an existing
+target; the current default cannot be deleted. Resource translations contain required
+name and optional summary/description; blank optional fields become NULL. Future
+reads fall back per field from requested locale to default locale, not per whole row.
+
+`Resource.version` starts explicitly at 1 and represents a logical revision of the
+node plus Resource-owned localizations, tags, sources, relations and external IDs.
+Each transaction bumps each affected Resource exactly once; relation edits affect
+both endpoints. Category/Tag entity edits do not cascade revision changes.
 
 Independent state dimensions:
 
@@ -101,7 +127,6 @@ Source types:
 ```text
 Official
 Store
-CreatorProvided
 Archive
 Mirror
 Community
@@ -109,7 +134,7 @@ External
 Unknown
 ```
 
-Source states:
+Availability states (independent of Source type and rights status):
 
 ```text
 Active
@@ -117,8 +142,6 @@ Unavailable
 Broken
 Removed
 Restricted
-Disputed
-ReviewHold
 ```
 
 Authorization-related platform states should be factual:
@@ -131,6 +154,27 @@ Disputed
 RightsReview
 RemovedByRequest
 ```
+
+P0-2A stores lowercase state values. `creator_provided` belongs to rights status,
+not Source type; `disputed`/`rights_review` also describe rights rather than availability.
+A primary Source may be unavailable; a mirror may have unknown rights. Removing or
+restricting a Source does not remove the Resource itself. Source URLs are normalized
+conservatively without fetching, with zero or one primary Source per Resource.
+
+## Resource Relations and External IDs
+
+Relations store only `part_of`, `successor_of`, `derived_from` and `related_to`.
+Directed edges retain direction and reads derive inverse semantics. `related_to`
+stores smaller UUID→larger UUID; self-edges are forbidden. P0-2C will own directed
+cycle prevention. No actor ownership, duplicate merge or source-as-relation model.
+
+External IDs use a lowercase stable namespace and an opaque trimmed identifier;
+`(namespace, external_id)` is globally unique. Several distinct IDs may share a
+namespace on one Resource. No provider snapshots or synchronization state is stored.
+
+Future canonical editing uses Editorial (`editor`/`admin`), not `moderator`.
+Retiring taxonomy, restricted/removed Resource states, soft deletion and rights
+status changes require Administration. P0-2A adds no new role or Admin CRUD surface.
 
 ## Identity
 

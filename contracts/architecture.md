@@ -15,7 +15,8 @@
   reports degraded state while PostgreSQL remains ready.
 - Go 1.27+, Node 24, pnpm workspace; Astro/React 19 public SSR, React 19/Vite admin.
   Tailwind v4 handles layout; SCSS handles appearance.
-- Only `auth` and `identity` product packages in P0-1A/B/C/D. No future scaffolds, unused
+- `auth` and `identity` serve P0-1; P0-2A opens only `taxonomy` and `resource` as pure
+  domain packages with no transport, database, Redis or River dependency. No future scaffolds, unused
   dependencies, ORM/AutoMigrate, MongoDB, NATS, vectors or observability stack.
 - Business IDs use Go standard-library `uuid.NewV7`. easyhash must explicitly use
   Argon2id and an Argon2id upgrade policy; password hashes never enter transport.
@@ -34,3 +35,14 @@
   `adminctl` alone changes roles via the owner connection; runtime cannot write roles.
   Normal revocations stay within one session kind. Password reset/change are the
   explicit exception: all kinds revoked atomically, one Public replacement created.
+- P0-2A implements Resource Domain/Schema only: no Resource HTTP contract, frontend,
+  full CRUD, Contribution, Search, Redis data or River business jobs. Taxonomy is
+  flat and unseeded; slugs are ASCII and no automatic transliteration is performed.
+- Parent/default localization creation is atomic. Default changes require an existing
+  translation; deleting the current default is rejected while holding the parent lock.
+  Resource-owned knowledge edits bump `version` once per logical transaction and
+  endpoint; stale CAS aborts all child writes. Category/Tag edits do not bump Resources.
+- Future curation uses Editorial for ordinary canonical edits; Administration is
+  required for retiring taxonomy, restricted/removed Resources, soft deletion and
+  rights-status mutations. Moderator has no canonical write capability. `gfp_admin`
+  is a database identity, distinct from the product's `admin` role. No new roles/API.

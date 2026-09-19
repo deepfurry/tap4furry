@@ -23,6 +23,7 @@ official Go APIs. No global Go tools, psql or redis-cli are needed.
 | `pnpm smoke:oauth:dev` | Check prepared OAuth pairs, fixed callbacks, PKCE URLs and Redis one-use flows without consent or token exchange |
 | `pnpm smoke:admin:dev` | Real Admin identity/grants, login/CSRF/session/role isolation with temporary fixture cleanup |
 | `pnpm smoke:mail:resend:dev` | Opt-in real Resend send using private smoke input, without DB state |
+| `pnpm smoke:resource:dev` | Five real DB identities, temporary Resource graph, privileges/CAS and owner cleanup |
 | `pnpm adminctl:dev` | Operator-only static role grant/revoke/list using the prepared migrator |
 | `pnpm integration:ci` | Fresh, guarded loopback disposable PostgreSQL/Redis tests |
 | `pnpm build:images` | Build four local Docker images, without publishing |
@@ -307,6 +308,36 @@ editor is included. Local/private mail capture is never a production delivery pa
 
 ## Migrations and shared Infra
 
+P0-2A adds only migration `00006_resource_core.sql`; migrations 00001–00005 remain
+immutable. Shared `gfp_dev` is up-only. There is no developer down command. Resource
+Core has no Public/Admin Resource HTTP endpoints, frontend pages, new Redis data or
+Worker jobs. Public API DB access is SELECT-only; Admin has explicit minimal DML;
+Worker has no Resource grants; readonly remains an operator identity, not a service.
+
+After disposable acceptance and image builds, run:
+
+```text
+pnpm migrate:dev
+pnpm smoke:resource:dev
+```
+
+The Resource smoke reads the four existing service `.local` files and
+`.local/readonly.env` only through the developer launcher. DSNs pass in child process
+environment, never command arguments or logs; `config.Load` has no readonly service.
+It verifies all identities on `gfp_dev`, creates a UUIDv7/random-slug fixture through
+Admin (Category, Tag, two Resources, localizations, membership, Source, Relation and
+External ID), and tests allowed/denied operations under API/Admin/Worker/readonly.
+Effective table and column privileges must match exactly; denied operations return
+SQLSTATE 42501. The graph edit bumps both relation endpoints once via sqlc CAS.
+Only migrator cleans this run's fixture in FK-safe reverse order. No existing row,
+shared role/ACL or schema rollback is involved.
+
+Default localization is an application transaction invariant: create with the
+parent, require the target before switching, and reject deleting the current default.
+P0-2A integration tests demonstrate parent locks plus CAS; full mutation orchestration
+is P0-2C. Normal Resource reads and CAS exclude deleted parents. Taxonomy/Resource
+domain code is pure Go; no server endpoint or product use-case API is added.
+
 Shared development Infra is accessed only using private configuration. No SSH,
 server/container administration, cluster-role changes or Redis ACL changes are part
 of ordinary work. Migrator may apply repository-owned changes only to `gfp_dev`.
@@ -375,6 +406,23 @@ set `CI=true`, `GFP_DISPOSABLE_INFRA=1`, `GFP_AUTH_INTEGRATION=1` and run
 Tests hard-code the disposable loopback database and never read developer URLs.
 The ordinary Go test suite skips these integration tests until explicitly enabled.
 CI mail tests use fake delivery or `t.TempDir`, never network email or developer captures.
+
+P0-2A extends the same CI command with guarded migration 6→5→6 acceptance, Resource
+schema/privilege/CAS/localization tests and the Resource smoke against `gfp_ci`.
+The Down helper exists only in `server/internal/database/migrate/*_test.go`, requires
+`CI=true`, `GFP_DISPOSABLE_INFRA=1`, `GFP_RESOURCE_INTEGRATION=1`, hard-codes loopback
+and verifies `gfp_ci`/`gfp_migrator` plus current/target version 6 before one Down.
+It never consults developer env URLs. To rerun only Resource tests on an already
+initialized disposable fixture, set those three guards and run:
+
+```text
+go -C server test -count=1 -timeout=3m -run TestIntegration ./internal/database/resourcecheck
+```
+
+Do not run the round-trip over retained fixtures; provide fresh disposable services
+before full `pnpm integration:ci`, which sets up the database, performs the migration
+round-trip and then runs all regressions.
+Resource tests use no external mail/OAuth provider, shared Infra or `.local` input.
 
 ## Google/GitHub OAuth and account linking (P0-1C)
 

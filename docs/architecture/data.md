@@ -154,6 +154,15 @@ description
 PRIMARY KEY(resource_id, locale)
 ```
 
+P0-2A also records created_at/updated_at on localization rows and enforces
+case-insensitive locale uniqueness per parent. Go parses/canonicalizes locales with
+`x/text/language`; the database only checks shape and length. Every Category, Tag
+and Resource has a `default_locale`. Application transactions create parent and
+translation together, require an existing row before switching default, and reject
+deletion of the current default while holding the parent lock. No circular FK.
+Empty optional text becomes NULL; Resource description has no small column limit.
+Future reads fall back per nullable/missing field to the default translation.
+
 Use BCP 47-style locale values:
 
 ```text
@@ -177,11 +186,35 @@ No generic EAV system in P0.
 
 If a resource type later needs stable dedicated fields, add an explicit extension table.
 
+Migration 00006 owns exactly ten tables: categories/category_localizations,
+tags/tag_localizations, resources/resource_localizations, resource_tags,
+resource_sources, resource_relations and resource_external_ids. It seeds no rows.
+Publication defaults to draft, lifecycle to unknown; content_rating and version are
+explicit. Published requires published_at; soft deletion stays independent of state.
+All FKs are RESTRICT and all business timestamps are explicit UTC timestamptz.
+
+`resources.version` starts at 1 and anchors node plus owned canonical child changes.
+CAS updates only the expected current version of a non-deleted Resource. A logical
+transaction increments once per affected Resource, including both endpoints of a
+relation change. Independent taxonomy edits do not cascade bumps. There is no
+trigger, revision-history table, outbox or P0-2C mutation orchestration in P0-2A.
+
+API and readonly have SELECT-only access to all ten tables; Worker has none. Admin
+has INSERT plus enumerated mutable-column UPDATE and child/mapping DELETE grants.
+No runtime hard-deletes Category/Tag/Resource/Source or updates taxonomy slugs.
+The migration clears inherited grants on these new objects without changing roles.
+
 ## ResourceSource
 
 Resource and Source are independent entities.
 
 Restricting/removing a Source does not remove the Resource knowledge entity.
+
+Type, availability and rights are independent checked TEXT dimensions. Normalize
+http/https URLs without fetching: trim, lowercase scheme/host, strip default ports
+and fragments, retain path/query semantics. `(resource_id,url)` and one partial
+primary-source index enforce uniqueness; identical URLs across Resources are allowed.
+Source removal uses availability=removed rather than a deleted_at/hard-delete path.
 
 ## External IDs
 
@@ -209,6 +242,12 @@ Use explicit relation tables and real foreign keys.
 Avoid polymorphic foreign keys when referential integrity matters.
 
 Prefer separate Resource↔User and Resource↔Organization relation tables.
+
+Only Resource→Resource edges are implemented in P0-2A: part_of, successor_of,
+derived_from and related_to. The symmetric type stores ordered UUID endpoints;
+directed types keep direction. Self-edges and duplicate edges are rejected. The
+incoming index supplements the outgoing unique prefix. Cycles are future application
+checks, not triggers. Actor relations remain outside the implemented schema.
 
 ## JSONB
 
@@ -274,6 +313,9 @@ P0 performance strategy:
 - `pg_trgm`
 
 Do not preemptively add projection systems, partitioning, materialized views, or read replicas.
+
+P0-2A uses only required PK/unique/FK/incoming/partial indexes. Resource FTS/trigram
+search indexes remain later work; the existing pg_trgm extension contract is unchanged.
 
 ## Search
 

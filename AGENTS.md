@@ -3,6 +3,7 @@
 A multi-process modular monolith for furry resource discovery and exchange. P0-0
 established infrastructure; P0-1A/B/C/D add identity, local authentication, session
 security, account recovery, explicit Google/GitHub linking and isolated Admin auth.
+MAIL-0 adds Resend; P0-2A adds Resource/Taxonomy schema and domain primitives only.
 
 ## Start here
 
@@ -45,6 +46,12 @@ are pattern references only and never override this repository.
   Startup never migrates. Never rewrite released/applied migration history.
 - PostgreSQL is canonical; Redis is ephemeral with `gfp:` keys. River imports stay
   under `server/internal/jobs`. Do not create speculative domain packages.
+- P0-2A opens only `taxonomy` and `resource` as pure domain packages. Resource Core
+  has no HTTP/UI surface yet. Resource version/CAS spans owned knowledge changes;
+  relation edits affect both endpoints. Default localization is transaction-owned.
+- Migrations 1–5 are immutable. Resource migration 6 down is tested only against
+  guarded disposable `gfp_ci`; shared `gfp_dev` remains up-only. Worker has no
+  Resource grants; Public API is SELECT-only, Admin has explicit column-level DML.
 - Auth owns transactions and the challenge-mail interface. Raw challenge tokens
   never enter jobs; mail delivers once after commit to Resend or private local capture.
   Production requires explicit Resend config; provider payloads/errors stay private.

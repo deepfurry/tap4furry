@@ -17,6 +17,11 @@ tap4furry-worker
 
 One Go module and one shared backend codebase.
 
+P0-2A adds only pure `internal/taxonomy` and `internal/resource` primitives plus
+sqlc/database groundwork. No Resource routes, full CRUD service, Redis key or Worker
+job is composed. `taxonomy` uses the already pinned `golang.org/x/text/language`
+for locale canonicalization; it and `resource` do not import pgx, SQL, HTTP or queues.
+
 ## Call Direction
 
 ```text
@@ -77,6 +82,14 @@ MergeResources
 ```
 
 Application owns transaction boundaries.
+
+The use cases above remain future phase work. P0-2A demonstrates localization
+creation/default-switch/deletion and Resource CAS transaction patterns in disposable
+integration tests. Future P0-2C must hold the parent lock for localization decisions,
+create parent/default translation atomically, and reject deleting the default.
+Resource child mutations and version CAS share the same transaction; stale versions
+roll back all child writes. Relations lock both endpoint Resources in UUID order and
+bump each once. Category/Tag-only edits never bump Resource revisions.
 
 ## Domain
 
@@ -194,6 +207,12 @@ goose SQL migrations
 ```
 
 No GORM / AutoMigrate / ORM.
+
+Resource smoke and shared disposable fixture code live under developer commands and
+`internal/database/resourcecheck`, outside domain and runtime dependencies. The only
+00006 Down/Up helper is a guarded test with a fixed loopback `gfp_ci` connection;
+the normal migrator remains up-only. Generated queries are deliberately limited to
+existence/state lookup, parent locks, relation lookup and Resource revision CAS.
 
 ## Logging
 
