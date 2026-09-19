@@ -1,9 +1,9 @@
 # Tap4Furry
 
 A discovery and exchange platform for the furry ecosystem, centered on resource
-knowledge. P0-1 Identity/Auth implementation complete; P0-2 Taxonomy & Resource Core
-next. Human OAuth/Admin acceptance and production mail/deployment sign-off remain
-separate gates.
+knowledge. P0-1 Identity/Auth and human acceptance are complete. MAIL-0 connects
+verification and recovery mail to Resend; P0-2 Taxonomy & Resource Core is next.
+Production deployment sign-off remains a separate gate.
 
 Canonical repository: [deepfurry/tap4furry](https://github.com/deepfurry/tap4furry).
 Future production origins are `https://tap4furry.com` and
@@ -26,6 +26,15 @@ Prepare private `server/env/*.local` inputs as described in
 separate terminals, `pnpm dev:api`, `pnpm dev:admin-api`, `pnpm dev:worker`,
 `pnpm dev:web` and `pnpm dev:admin` start the applications.
 
+Mail defaults to private local capture in development. Production Public API
+requires explicit `MAIL_MODE=resend`, a private `RESEND_API_KEY`,
+`MAIL_FROM=Tap4Furry <no-reply@tap4furry.com>` and
+`MAIL_REPLY_TO=support@tap4furry.com`. Verification/reset emails use plain text and
+minimal HTML; tracking stays disabled at the provider. Delivery is one bounded
+post-commit attempt, with no durable raw-token queue. The opt-in
+`pnpm smoke:mail:resend:dev` reads only ignored `.local/resend-smoke.env` and sends
+one synthetic email; see the [private smoke procedure](docs/development.md#transactional-mail-mail-0).
+
 ## Repository map
 
 | Area | Responsibility |
@@ -44,7 +53,7 @@ Publishing, merging to `main`, tagging and releasing require explicit instructio
 `gfp_*` and `gfp:` are intentionally retained stable infrastructure identifiers and
 are not product-brand surfaces. BRAND-0 changes no database schema or infrastructure.
 
-Start with [AGENTS.md](AGENTS.md), the [BRAND-0 specification](docs/implementation/brand-0-gofurry-platform-to-tap4furry.md),
+Start with [AGENTS.md](AGENTS.md), the [MAIL-0 specification](docs/implementation/mail-0-production-transactional-mail.md),
 [product overview](docs/product/PRODUCT.md) and [architecture](docs/architecture/ARCHITECTURE.md).
 See [CHANGELOG.md](CHANGELOG.md) and [deployment artifacts](deploy/README.md).
 

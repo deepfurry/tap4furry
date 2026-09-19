@@ -104,7 +104,7 @@ func (a *App) deliver(ctx context.Context, pending *pendingChallenge) error {
 	if pending == nil {
 		return nil
 	}
-	deliveryCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 2*time.Second)
+	deliveryCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
 	defer cancel()
 	var err error
 	if pending.purpose == purposeVerify {

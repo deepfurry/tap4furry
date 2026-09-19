@@ -48,14 +48,22 @@ func run() error {
 	}
 	defer store.Close()
 	checker := health.New(func(ctx context.Context) error { return database.Ready(ctx, pool) }, store.Ping)
-	var mailer auth.ChallengeMailer = mail.Disabled{}
-	if c.MailMode == "local" {
+	var mailer auth.ChallengeMailer
+	switch c.MailMode {
+	case "local":
 		capture, err := mail.NewLocal(filepath.Join("..", ".local"), c.MailLocalDir, c.PublicOrigin)
 		if err != nil {
 			return err
 		}
 		defer capture.Close()
 		mailer = capture
+	case "resend":
+		mailer, err = mail.NewResend(c.ResendAPIKey, c.MailFrom, c.MailReplyTo, c.PublicOrigin)
+		if err != nil {
+			return err
+		}
+	case "disabled":
+		mailer = mail.Disabled{}
 	}
 	throttle, err := store.AuthThrottle(c.AuthThrottleSecret)
 	if err != nil {

@@ -16,7 +16,7 @@ import (
 
 var errDelivery = errors.New("challenge mail unavailable")
 
-// Disabled is the explicit absence of a production delivery provider.
+// Disabled is explicit delivery failure for development and tests.
 type Disabled struct{}
 
 func (Disabled) SendEmailVerification(context.Context, string, string) error { return errDelivery }

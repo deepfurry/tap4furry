@@ -4,10 +4,12 @@ package config
 import (
 	"errors"
 	"net"
+	"net/mail"
 	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 )
 
 type Config struct {
@@ -24,6 +26,9 @@ type Config struct {
 	AuthThrottleSecret       string
 	MailMode                 string
 	MailLocalDir             string
+	ResendAPIKey             string
+	MailFrom                 string
+	MailReplyTo              string
 	GoogleOAuth, GitHubOAuth OAuthCredentials
 }
 
@@ -116,17 +121,26 @@ func load(service string, env func(string) string) (Config, error) {
 			return Config{}, errors.New("CSRF_SECRET must contain at least 32 bytes; production requires a private secret")
 		}
 		c.MailMode = env("MAIL_MODE")
-		if c.MailMode == "" {
+		if c.MailMode == "" && c.Environment != "production" {
 			c.MailMode = "local"
-			if c.Environment == "production" {
-				c.MailMode = "disabled"
+		}
+		if c.Environment == "production" && c.MailMode != "resend" {
+			return Config{}, errors.New("production requires explicit MAIL_MODE=resend")
+		}
+		if c.MailMode != "local" && c.MailMode != "disabled" && c.MailMode != "resend" {
+			return Config{}, errors.New("MAIL_MODE must be local, disabled or resend")
+		}
+		if c.MailMode == "resend" {
+			c.ResendAPIKey = env("RESEND_API_KEY")
+			c.MailFrom, c.MailReplyTo = env("MAIL_FROM"), env("MAIL_REPLY_TO")
+			if strings.TrimSpace(c.ResendAPIKey) == "" {
+				return Config{}, errors.New("RESEND_API_KEY is required in resend mode")
 			}
-		}
-		if c.MailMode != "local" && c.MailMode != "disabled" {
-			return Config{}, errors.New("MAIL_MODE must be local or disabled")
-		}
-		if c.Environment == "production" && c.MailMode == "local" {
-			return Config{}, errors.New("production cannot use local mail capture")
+			for _, field := range []struct{ key, value string }{{"MAIL_FROM", c.MailFrom}, {"MAIL_REPLY_TO", c.MailReplyTo}} {
+				if _, err := mail.ParseAddress(field.value); err != nil || strings.ContainsAny(field.value, "\r\n") {
+					return Config{}, errors.New(field.key + " must be a valid mailbox address")
+				}
+			}
 		}
 		if c.MailMode == "local" {
 			c.MailLocalDir = env("MAIL_LOCAL_DIR")

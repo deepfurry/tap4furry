@@ -114,6 +114,7 @@ func TestPublicOriginEnvironmentRules(t *testing.T) {
 		{"production", "null", false},
 	} {
 		env := map[string]string{"APP_ENV": test.environment, "PUBLIC_ORIGIN": test.origin, "CSRF_SECRET": strings.Repeat("test-only", 4), "ADMIN_ORIGIN": "https://admin.example.com", "ADMIN_CSRF_SECRET": strings.Repeat("admin-only", 4), "AUTH_THROTTLE_SECRET": strings.Repeat("throttle-only", 4), "DATABASE_URL": "postgres://localhost/gfp_ci", "REDIS_URL": "redis://localhost:6379", "REDIS_KEY_PREFIX": "gfp:", "HTTP_ADDR": "127.0.0.1:8080"}
+		env["MAIL_MODE"], env["RESEND_API_KEY"], env["MAIL_FROM"], env["MAIL_REPLY_TO"] = "resend", "test-only-key", "sender@example.invalid", "reply@example.invalid"
 		cfg, err := load("api", func(k string) string { return env[k] })
 		if (err == nil) != test.valid {
 			t.Error("PUBLIC_ORIGIN environment contract failed")
@@ -132,6 +133,7 @@ func TestPublicOriginEnvironmentRules(t *testing.T) {
 
 func TestSecurityEnvironmentRules(t *testing.T) {
 	base := map[string]string{"APP_ENV": "production", "PUBLIC_ORIGIN": "https://example.com", "AUTH_THROTTLE_SECRET": strings.Repeat("throttle-only", 4), "DATABASE_URL": "postgres://localhost/gfp_ci", "REDIS_URL": "redis://localhost:6379", "REDIS_KEY_PREFIX": "gfp:", "HTTP_ADDR": "127.0.0.1:8080"}
+	base["MAIL_MODE"], base["RESEND_API_KEY"], base["MAIL_FROM"], base["MAIL_REPLY_TO"] = "resend", "test-only-key", "sender@example.invalid", "reply@example.invalid"
 	for _, secret := range []string{"", "too-short", DevelopmentCSRFSecret} {
 		base["CSRF_SECRET"] = secret
 		if _, err := load("api", func(k string) string { return base[k] }); err == nil {
@@ -139,9 +141,9 @@ func TestSecurityEnvironmentRules(t *testing.T) {
 		}
 	}
 	base["CSRF_SECRET"] = strings.Repeat("private-fixture", 3)
-	cfg, err := load("api", func(k string) string { return base[k] })
-	if err != nil || cfg.MailMode != "disabled" {
-		t.Fatal("production default fabricated a delivery provider")
+	base["MAIL_MODE"] = ""
+	if _, err := load("api", func(k string) string { return base[k] }); err == nil {
+		t.Fatal("production accepted missing mail configuration")
 	}
 	base["MAIL_MODE"] = "local"
 	if _, err := load("api", func(k string) string { return base[k] }); err == nil {
@@ -149,7 +151,7 @@ func TestSecurityEnvironmentRules(t *testing.T) {
 	}
 	base["APP_ENV"] = "development"
 	base["CSRF_SECRET"] = ""
-	cfg, err = load("api", func(k string) string { return base[k] })
+	cfg, err := load("api", func(k string) string { return base[k] })
 	if err != nil || cfg.CSRFSecret != DevelopmentCSRFSecret || cfg.MailMode != "local" {
 		t.Fatal("explicit development defaults failed")
 	}

@@ -22,6 +22,10 @@ or CI commands and never run at application startup.
 Public API production configuration also requires an HTTPS `PUBLIC_ORIGIN`; it
 always uses the Secure `__Host-tap4furry_session` cookie. Inject this through runtime
 environment, never through image build arguments or checked-in local files.
+MAIL-0 additionally requires explicit `MAIL_MODE=resend`, a private
+`RESEND_API_KEY`, `MAIL_FROM=Tap4Furry <no-reply@tap4furry.com>` and
+`MAIL_REPLY_TO=support@tap4furry.com` in the Public API runtime only.
+Mail credentials are never image build inputs; Admin and Worker do not read them.
 
 The `local` tags contain the current P0-1A/B/C/D implementation. Future origins are
 `https://tap4furry.com` and `https://admin.tap4furry.com`. Same-origin `/api/*`

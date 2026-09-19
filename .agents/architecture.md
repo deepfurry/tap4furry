@@ -18,7 +18,9 @@ Only `auth` and `identity` are product packages. `cmd/*` composes dependencies, 
 bounded cleanup; reusable behavior lives in `internal/`.
 
 Auth owns the challenge-mail interface; `internal/mail` implements post-commit local
-capture. Challenges persist only easyhash token hashes; security events accept only
+capture and Resend delivery with a five-second budget, no queue/retry and safe errors.
+Only Public API composes mail; production explicitly requires Resend. Challenges
+persist only easyhash token hashes; security events accept only
 IDs, a closed event type and time. Public unsafe authenticated routes require exact
 Origin and a session-bound HMAC CSRF value; rotation invalidates the previous value.
 

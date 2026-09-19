@@ -22,6 +22,7 @@ official Go APIs. No global Go tools, psql or redis-cli are needed.
 | `pnpm smoke:auth:dev` | Temporary account through real Public HTTP/application handlers, with fixture cleanup |
 | `pnpm smoke:oauth:dev` | Check prepared OAuth pairs, fixed callbacks, PKCE URLs and Redis one-use flows without consent or token exchange |
 | `pnpm smoke:admin:dev` | Real Admin identity/grants, login/CSRF/session/role isolation with temporary fixture cleanup |
+| `pnpm smoke:mail:resend:dev` | Opt-in real Resend send using private smoke input, without DB state |
 | `pnpm adminctl:dev` | Operator-only static role grant/revoke/list using the prepared migrator |
 | `pnpm integration:ci` | Fresh, guarded loopback disposable PostgreSQL/Redis tests |
 | `pnpm build:images` | Build four local Docker images, without publishing |
@@ -126,8 +127,10 @@ requests need Origin only. Session authentication remains the PostgreSQL lookup.
 | API-only setting | Development/test | Production |
 | --- | --- | --- |
 | `CSRF_SECRET` | Explicit public development default if omitted | Private value of at least 32 bytes required; development default rejected |
-| `MAIL_MODE` | `local` by default; `disabled` supports failure testing | Defaults to `disabled`; `local` rejected |
-| `MAIL_LOCAL_DIR` | Defaults to `../.local/mail` when launched from `server` | Unused with disabled delivery |
+| `MAIL_MODE` | `local` by default; `disabled` and `resend` allowed | Must explicitly be `resend`; missing/local/disabled rejected |
+| `MAIL_LOCAL_DIR` | Defaults to `../.local/mail` when launched from `server`; used only in local mode | Unused |
+| `RESEND_API_KEY` | Private non-empty value required only for resend | Private non-empty value required |
+| `MAIL_FROM` / `MAIL_REPLY_TO` | Valid single RFC mailbox/address required only for resend | Required; canonical values below |
 
 Existing ignored credentials need no edits. Local captures must stay below the
 repository `.local` directory; `os.Root` confines nested paths/symlinks. New capture
@@ -155,10 +158,62 @@ Password reset/change atomically revoke all Public/Admin sessions and issue one 
 reset does not auto-verify email. Reauthentication replaces only the current session
 and refreshes `authenticated_at`. Session management exposes only the user's active
 public sessions. Security events persist only IDs, event type and time, in the same
-transaction as the corresponding write. No production mail provider, SMTP SDK or
-durable raw-token queue is implemented. `MAIL_MODE=disabled` does not make recovery
-production-ready. P0-1D completes application auth; human/provider acceptance and
-production deployment sign-off remain separate gates.
+transaction as the corresponding write. MAIL-0 adds production Resend delivery;
+SMTP, automatic retries and durable raw-token queues remain out of scope.
+Production deployment sign-off is separate from application/human acceptance.
+
+## Transactional mail (MAIL-0)
+
+Only Public API owns mail configuration and delivery. `ChallengeMailer` remains
+Auth-owned; the official `github.com/resend/resend-go/v3` SDK is confined to
+`internal/mail`. Admin, Worker and Migrator do not read mail settings.
+
+Set production process environment through the existing secret-management path:
+
+```dotenv
+MAIL_MODE=resend
+MAIL_FROM=Tap4Furry <no-reply@tap4furry.com>
+MAIL_REPLY_TO=support@tap4furry.com
+```
+
+Supply `RESEND_API_KEY` privately. Never put it in tracked files, shell command
+arguments or reports. Production refuses to start without explicit Resend mode,
+a non-empty key and valid From/Reply-To addresses. No local directory is required
+for Resend. Existing development `.local` inputs need no changes.
+
+Verification/reset mail includes text and minimal HTML, with 24-hour/30-minute
+expiration and fragment-only links at `PUBLIC_ORIGIN`. The auth transaction commits
+before the single five-second delivery attempt. The adapter uses a fixed Resend
+HTTPS endpoint, disallows redirects, and flattens provider/network errors. It does
+not print recipients, tokens, URLs, provider bodies or headers. Registration keeps
+its account/session on failure; authenticated resend returns `MAIL_UNAVAILABLE`;
+reset requests retain the same accepted response regardless of account/delivery.
+
+Open and click tracking remain disabled in the externally prepared Resend domain
+settings. No tracking markup, remote images, custom metadata, CC/BCC, attachment,
+template system, webhook, SMTP, River mail job, retry or outbox is added. Tokens
+remain non-durable in application storage; the existing private development
+capture is an explicit local debugging facility, never a production path.
+
+For a real send, privately prepare the ignored `.local/resend-smoke.env` with a
+restricted `RESEND_API_KEY` and `RESEND_TEST_RECIPIENT` controlled by the operator.
+The file may optionally override `MAIL_FROM`, `MAIL_REPLY_TO` and `PUBLIC_ORIGIN`.
+Defaults are the canonical sender/reply address above and `http://localhost:4321`.
+Then run from the repository root:
+
+```text
+pnpm smoke:mail:resend:dev
+```
+
+The command refuses CI, requires the private file, generates a random synthetic
+token in memory, and calls the real adapter exactly once. It creates no User or DB
+challenge and needs no database/Redis credentials. The emailed link is intentionally
+not redeemable. Only a safe PASS/failure summary is printed; PASS means Resend
+accepted the message, not proof of inbox delivery. There is no automatic retry.
+If networking requires a local proxy, provide normal process-scoped HTTP(S) proxy
+settings; never change the shared Infra or weaken TLS. Do not paste any private
+file or email content into diagnostics. CI uses only injected fake senders and
+local temporary capture; it never sends real mail.
 
 ## Admin authentication and role operations (P0-1D)
 
@@ -245,7 +300,7 @@ dependent rows. Separate `smoke:auth:dev` validates private filesystem mail capt
 P0-1 application implementation can be complete while human sign-off remains pending:
 real Google/GitHub login/callback/link/reauth/unlink and an operator-led Admin browser
 walkthrough. Production also needs Cloudflare Access with enforced MFA, real OAuth
-registrations/callbacks, production mail delivery, separate private CSRF/throttle
+registrations/callbacks, private Resend configuration and delivery sign-off, separate private CSRF/throttle
 secrets, deployment secret management, trusted proxy policy, and a Turnstile decision.
 No Cloudflare provisioning, application TOTP/WebAuthn, dynamic RBAC or public role
 editor is included. Local/private mail capture is never a production delivery path.

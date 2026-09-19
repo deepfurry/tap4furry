@@ -3,13 +3,14 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { parseEnv } from 'node:util';
 import { root } from './process.mjs';
+import { privateEnvValues } from './private-values.mjs';
 
 const git = args => execFileSync('git', args, { cwd: root, encoding: 'utf8', windowsHide: true });
 const tracked = git(['ls-files', '-z']).split('\0').filter(Boolean);
 const files = [...new Set(git(['ls-files', '-z', '--cached', '--others', '--exclude-standard']).split('\0').filter(Boolean))];
 const privatePath = path => path.startsWith('.local/') || /^server\/env\/.*\.local$/.test(path);
 if (tracked.some(privatePath)) throw new Error('Private local configuration is tracked; stop and untrack with user guidance');
-for (const path of ['server/env/api.local', 'server/env/admin.local', 'server/env/worker.local', 'server/env/migrator.local', '.local/readonly.env', '.local/mail/capture.json']) {
+for (const path of ['server/env/api.local', 'server/env/admin.local', 'server/env/worker.local', 'server/env/migrator.local', '.local/readonly.env', '.local/mail/capture.json', '.local/resend-smoke.env', '.local/human-acceptance.env']) {
   if (!git(['check-ignore', '--', path]).trim()) throw new Error(`Missing secret ignore rule: ${path}`);
 }
 
@@ -17,19 +18,12 @@ for (const path of ['server/env/api.local', 'server/env/admin.local', 'server/en
 // are printed. CI must never read private developer configuration.
 const privateValues = new Set();
 if (!process.env.CI) {
-  for (const path of ['server/env/api.local', 'server/env/admin.local', 'server/env/worker.local', 'server/env/migrator.local', '.local/readonly.env']) {
+  for (const path of ['server/env/api.local', 'server/env/admin.local', 'server/env/worker.local', 'server/env/migrator.local', '.local/readonly.env', '.local/resend-smoke.env', '.local/human-acceptance.env']) {
     if (!existsSync(join(root, path))) continue;
     let env;
     try { env = parseEnv(readFileSync(join(root, path), 'utf8')); }
     catch { throw new Error('Cannot audit private launch input (contents withheld)'); }
-    for (const [key, value] of Object.entries(env)) {
-      if (/(PASSWORD|SECRET|TOKEN|DSN|DATABASE_URL|REDIS_URL|OAUTH_CLIENT_ID)/i.test(key) && value.length >= 8) privateValues.add(value);
-      try {
-        const url = new URL(value);
-        if (url.password.length >= 8) { privateValues.add(url.password); privateValues.add(decodeURIComponent(url.password)); }
-        if (url.hostname && !['localhost', '127.0.0.1', '[::1]'].includes(url.hostname)) privateValues.add(url.hostname);
-      } catch { /* Non-URL configuration has no connection hostname. */ }
-    }
+    for (const value of privateEnvValues(env)) privateValues.add(value);
   }
 }
 const forbiddenModules = /(?:go\.mongodb\.org\/|github\.com\/nats-io\/|gorm\.io\/|github\.com\/jinzhu\/gorm|github\.com\/pgvector\/)/;
@@ -45,6 +39,7 @@ for (const path of files) {
   if ((path === 'server/go.mod' || path.endsWith('/package.json')) && forbiddenModules.test(content)) throw new Error(`Forbidden dependency in ${path}`);
   if (path.endsWith('.sql') && /CREATE\s+EXTENSION\s+(?:IF\s+NOT\s+EXISTS\s+)?"?vector\b/i.test(content)) throw new Error(`Prohibited vector extension in ${path}`);
   if (path.endsWith('.go') && !path.startsWith('server/internal/jobs/') && /"github\.com\/riverqueue\//.test(content)) throw new Error(`River import outside Jobs: ${path}`);
+  if (path.endsWith('.go') && !path.startsWith('server/internal/mail/') && /"github\.com\/resend\//.test(content)) throw new Error(`Resend import outside Mail: ${path}`);
   if (/^server\/internal\/(auth|identity)\/.*\.go$/.test(path) && /"(?:github\.com\/gofiber\/|github\.com\/google\/uuid|github\.com\/redis\/|github\.com\/deepfurry\/tap4furry\/server\/internal\/transport\/)/.test(content)) throw new Error(`Application boundary violation: ${path}`);
   if (/^apps\//.test(path) && /@tap4furry\/api-client\/.*generated/.test(content)) throw new Error(`Deep generated client import: ${path}`);
   if (/^server\/internal\/oauthprovider\/.*\.go$/.test(path) && /(?:SkipClientIDCheck|SkipIssuerCheck|SkipExpiryCheck|InsecureSkipSignatureCheck)\s*:\s*true/.test(content)) throw new Error(`Unsafe OIDC verifier in ${path}`);

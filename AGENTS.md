@@ -46,7 +46,8 @@ are pattern references only and never override this repository.
 - PostgreSQL is canonical; Redis is ephemeral with `gfp:` keys. River imports stay
   under `server/internal/jobs`. Do not create speculative domain packages.
 - Auth owns transactions and the challenge-mail interface. Raw challenge tokens
-  never enter jobs; the mail adapter delivers after commit to private local capture.
+  never enter jobs; mail delivers once after commit to Resend or private local capture.
+  Production requires explicit Resend config; provider payloads/errors stay private.
 - Auth owns OAuth provider/flow interfaces. Provider tokens stay inside the adapter;
   Redis holds only ten-minute one-use flows. Never auto-link accounts by email.
 - Admin uses separate password sessions and live static-role checks. Only owner

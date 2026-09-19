@@ -47,6 +47,11 @@ RBAC/MFA/CLI/cache framework, breach lookup SDK or new product package is instal
 - go-redis/v9
 - River OSS
 - log/slog
+- `github.com/resend/resend-go/v3` v3.17.0 for production verification/reset mail
+  through `Emails.SendWithContext`, isolated in `internal/mail`. Production requires
+  explicit Resend configuration; private local capture stays the development default.
+  Text/minimal HTML, no automatic retry/queue/outbox/SMTP/templates/webhooks; provider
+  open/click tracking remain externally disabled. No other dependency changes in MAIL-0.
 - `golang.org/x/oauth2` v0.37.0 for backend Google/GitHub Authorization Code + S256 PKCE
 - `github.com/coreos/go-oidc/v3` v3.21.0 for Google OIDC verification; its
   `go-jose/v4` v4.1.4 dependency also signs ephemeral test fixtures. No custom JWT

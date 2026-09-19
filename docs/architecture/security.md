@@ -149,11 +149,27 @@ Reauthentication verifies the current password, replaces just the current sessio
 and refreshes `authenticated_at`. Foreign/nonexistent session IDs return the same 404.
 
 Challenge delivery is an explicit post-commit exception to general queued mail:
-auth owns the mail interface; `internal/mail` writes private local captures. Raw tokens
-never enter PostgreSQL, Redis, River, logs or normal API responses. Capture links use
+auth owns `ChallengeMailer`; `internal/mail` implements private development capture
+and MAIL-0 Resend delivery through the official Go SDK. The raw token exists only
+transiently for production delivery and never enters PostgreSQL, Redis, River, logs
+or normal API responses. Private local captures remain development-only. Links use
 fragments, browser pages immediately clear them, and Referrer-Policy is no-referrer.
-Registration keeps its committed account/session even on mail failure. Local capture
-is rejected in production; no production provider is included in P0-1B.
+
+Production requires explicit `MAIL_MODE=resend`, a private `RESEND_API_KEY`, valid
+`MAIL_FROM` and `MAIL_REPLY_TO`. Canonical sender is
+`Tap4Furry <no-reply@tap4furry.com>`; replies go to `support@tap4furry.com`.
+Only Public API reads these settings. Missing mail configuration, local capture
+and disabled delivery are rejected in production.
+
+Delivery runs once after commit with a five-second context and HTTP bound, fixed
+Resend HTTPS endpoint and no redirects. Provider errors flatten to a static mail
+failure without wrapping/logging payloads, recipients, credentials, tokens or URLs.
+Registration keeps its committed account/session on failure; authenticated resend
+uses `MAIL_UNAVAILABLE`; reset requests preserve their enumeration-safe accepted
+response. No automatic retry, outbox, mail job, delivery-state table or raw-token
+persistence is introduced. Text/minimal HTML include expiration and ignore notes;
+there are no remote images, tracking pixels, CC/BCC or provider metadata. Open/click
+tracking remain disabled externally; MAIL-0 does not modify provider/DNS settings.
 
 ## Enumeration Resistance
 

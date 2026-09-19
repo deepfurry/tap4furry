@@ -5,6 +5,11 @@ PUBLIC_ORIGIN=http://localhost:4321
 # AUTH_THROTTLE_SECRET follows the same rule; use the same value in API and Admin.
 MAIL_MODE=local
 MAIL_LOCAL_DIR=../.local/mail
+# Production requires explicit Resend mode and a private key:
+# MAIL_MODE=resend
+# RESEND_API_KEY=replace-me
+# MAIL_FROM=Tap4Furry <no-reply@tap4furry.com>
+# MAIL_REPLY_TO=support@tap4furry.com
 DATABASE_URL=postgres://gfp_api:replace-me@127.0.0.1:5432/gfp_dev?sslmode=disable
 REDIS_URL=redis://gfp_runtime:replace-me@127.0.0.1:6379/0
 REDIS_KEY_PREFIX=gfp:

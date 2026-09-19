@@ -24,7 +24,9 @@
   also require a session-bound HMAC CSRF value. Never expose raw session tokens to JS.
 - Auth owns the challenge-mail consumer interface and database transactions. Mail
   delivery happens after commit, with no raw challenge token in Redis/River/logs.
-  P0-1B provides private local capture only, rejected in production.
+  MAIL-0 adds Resend via its official SDK inside `internal/mail`, with a five-second
+  bound and flattened errors. Production requires explicit `MAIL_MODE=resend`;
+  private local capture remains the development default. No mail queue/outbox/retry.
 - Auth owns static role/capability policy and the narrow throttle interface;
   `redisstore` implements HMAC subject/global counters with bounded TTLs.
   Public local auth fails open on Redis outage; Admin login/reauth fail closed.

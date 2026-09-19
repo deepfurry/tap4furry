@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Add MAIL-0 production verification/reset email through the official Resend Go
+  SDK, preserving the Auth-owned ChallengeMailer and post-commit failure semantics.
+- Require explicit production Resend configuration with validated From/Reply-To;
+  preserve private local capture and disabled development/test delivery.
+- Send text/minimal HTML with encoded fragment tokens and a five-second budget;
+  flatten provider errors, with no retry/outbox/queue or database migration.
+- Add offline config/adapter/security tests, API-key/recipient secret auditing and
+  opt-in `smoke:mail:resend:dev` using only ignored private input and synthetic mail.
+
 - Complete BRAND-0 repository branding for Tap4Furry (`deepfurry/tap4furry`),
   including product UI/mail/docs, the Go module and `@tap4furry/*` workspace scope.
 - Rename Public/Admin/OAuth cookies, development-only secret defaults, runtime
