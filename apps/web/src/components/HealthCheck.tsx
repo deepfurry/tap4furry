@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getReady } from '@gofurry/api-client/public';
+import { getReady } from '@tap4furry/api-client/public';
 import styles from './HealthCheck.module.scss';
 
 export default function HealthCheck() {

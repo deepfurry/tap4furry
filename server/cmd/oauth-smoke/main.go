@@ -10,10 +10,10 @@ import (
 	"os"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/config"
-	"github.com/deepfurry/gofurry-platform/server/internal/oauthprovider"
-	"github.com/deepfurry/gofurry-platform/server/internal/redisstore"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/oauthprovider"
+	"github.com/deepfurry/tap4furry/server/internal/redisstore"
 	"golang.org/x/oauth2"
 )
 

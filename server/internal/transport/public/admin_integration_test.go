@@ -18,13 +18,13 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/config"
-	"github.com/deepfurry/gofurry-platform/server/internal/database"
-	"github.com/deepfurry/gofurry-platform/server/internal/mail"
-	"github.com/deepfurry/gofurry-platform/server/internal/redisstore"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/admin"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/health"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/database"
+	"github.com/deepfurry/tap4furry/server/internal/mail"
+	"github.com/deepfurry/tap4furry/server/internal/redisstore"
+	"github.com/deepfurry/tap4furry/server/internal/transport/admin"
+	"github.com/deepfurry/tap4furry/server/internal/transport/health"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofurry/easyhash"
 	"github.com/jackc/pgx/v5"
@@ -193,7 +193,7 @@ func TestIntegrationAdminRolesAndEligibility(t *testing.T) {
 		_, email, _ := f.eligible(role)
 		me, cookie := f.adminLogin(email)
 		assertKeys(t, me, []string{"id", "email", "roles", "authenticated_at"})
-		if cookie == nil || cookie.Name != "gofurry_admin_session" || !cookie.HttpOnly || cookie.Secure || cookie.Path != "/" || cookie.Domain != "" || cookie.SameSite != http.SameSiteStrictMode {
+		if cookie == nil || cookie.Name != "tap4furry_admin_session" || !cookie.HttpOnly || cookie.Secure || cookie.Path != "/" || cookie.Domain != "" || cookie.SameSite != http.SameSiteStrictMode {
 			t.Fatal("Admin cookie contract failed")
 		}
 		if !reflect.DeepEqual(me["roles"], []any{string(role)}) {

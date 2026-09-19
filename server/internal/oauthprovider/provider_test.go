@@ -12,15 +12,15 @@ import (
 	"testing"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/config"
 	jose "github.com/go-jose/go-jose/v4"
 	"github.com/go-jose/go-jose/v4/jwt"
 	"golang.org/x/oauth2"
 )
 
 func TestAuthorizationContract(t *testing.T) {
-	for _, origin := range []string{"http://localhost:4321", "https://gofurry.com"} {
+	for _, origin := range []string{"http://localhost:4321", "https://tap4furry.com"} {
 		providers := New(config.Config{PublicOrigin: origin, GoogleOAuth: config.OAuthCredentials{ClientID: "fake-google", ClientSecret: "fixture-secret"}, GitHubOAuth: config.OAuthCredentials{ClientID: "fake-github", ClientSecret: "fixture-secret"}})
 		for kind, p := range providers {
 			state := oauth2.GenerateVerifier()

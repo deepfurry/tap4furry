@@ -1,4 +1,4 @@
-# GoFurry International — Product Domain Model
+# Tap4Furry — Product Domain Model
 
 ## Core Domains
 

@@ -1,5 +1,5 @@
 {
-  "name": "@gofurry/design",
+  "name": "@tap4furry/design",
   "version": "0.0.0",
   "private": true,
   "exports": { "./*": "./src/*" }

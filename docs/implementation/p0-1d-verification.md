@@ -1,5 +1,8 @@
 # P0-1D 实施与验收报告
 
+历史记录：下文命令和二进制名称保留当时实际执行值；可访问的仓库链接已更新。
+BRAND-0 后的当前产品、构建与部署契约使用 Tap4Furry，不以历史命令作为现行名称。
+
 验收日期：2026-09-09。实施依据为
 [P0-1D 规格](p0-1d-admin-auth-roles-hardening.md)及仓库工程契约。
 
@@ -93,7 +96,7 @@ Windows race 检查使用 `CGO_ENABLED=1` 及现有 MinGW 工具链。
 
 开始时 `dev`/`origin/dev` 为 `7b3d6a07743503baf93efafb4c3cb87b4240b21e`，工作区只有用户提供的未跟踪 P0-1D 规格。
 通过 `gh run list --repo deepfurry/gofurry-platform --branch dev --limit 5 --json databaseId,headSha,status,conclusion,url,workflowName` 确认
-[P0-1C 远端 CI 34318443835](https://github.com/deepfurry/gofurry-platform/actions/runs/34318443835) 成功。
+[P0-1C 远端 CI 34318443835](https://github.com/deepfurry/tap4furry/actions/runs/34318443835) 成功。
 本轮 P0-1D 的 disposable CI 流程在本机完整执行通过；依照不 push 的要求，没有触发本提交的远端 Actions。
 
 | 人工/部署门槛 | 状态 |

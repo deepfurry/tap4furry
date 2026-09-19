@@ -7,8 +7,8 @@ COPY apps/admin/package.json apps/admin/package.json
 COPY packages/ packages/
 COPY tsconfig.base.json ./
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter @gofurry/web build
-RUN pnpm --filter @gofurry/web deploy --legacy --prod /out
+RUN pnpm --filter @tap4furry/web build
+RUN pnpm --filter @tap4furry/web deploy --legacy --prod /out
 
 FROM node:24-bookworm-slim
 RUN apt-get update && apt-get install -y --no-install-recommends tini && rm -rf /var/lib/apt/lists/*

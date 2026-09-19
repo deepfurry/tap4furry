@@ -11,7 +11,7 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
 )
 
 func TestIntegrationAuthThrottle(t *testing.T) {

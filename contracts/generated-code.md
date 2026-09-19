@@ -7,7 +7,7 @@
 | `server/db/migrations`, `server/db/queries` | `server/internal/database/sqlc` | sqlc |
 
 Never manually edit generated outputs. Go DTOs remain transport-only. TypeScript
-consumers import `@gofurry/api-client/public` or `@gofurry/api-client/admin` facades.
+consumers import `@tap4furry/api-client/public` or `@tap4furry/api-client/admin` facades.
 
 Pin tools in the Go module and pnpm lockfile. `pnpm generate` invokes Go generation
 and Orval; orchestration scripts do not implement generators. A second generation

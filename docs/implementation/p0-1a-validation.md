@@ -35,8 +35,10 @@ No third-party application ID generator was added.
 
 Sessions use 32 cryptographically random bytes, unpadded base64url browser encoding,
 and a 32-byte SHA-256 lookup hash in PostgreSQL. No raw token enters database or
-JSON responses. Production uses Secure/HttpOnly `__Host-gofurry_session`, Path=/,
-SameSite=Lax, no Domain. Explicit development/test uses `gofurry_session`.
+JSON responses. Current names after BRAND-0 are Secure/HttpOnly
+`__Host-tap4furry_session` in production, Path=/, SameSite=Lax, no Domain, and
+`tap4furry_session` in explicit development/test. These names were updated after
+the original P0-1A validation; the cookie security properties are unchanged.
 Absolute/idle lifetimes are 30/14 days; touches are throttled to 10 minutes and
 bounded by absolute expiry. Revoked, expired, disabled and deleted cases fail.
 Exact `PUBLIC_ORIGIN` protects unsafe routes; production requires HTTPS.

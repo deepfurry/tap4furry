@@ -5,8 +5,8 @@ import (
 	"io/fs"
 	"log/slog"
 
-	"github.com/deepfurry/gofurry-platform/server/db"
-	"github.com/deepfurry/gofurry-platform/server/internal/database"
+	"github.com/deepfurry/tap4furry/server/db"
+	"github.com/deepfurry/tap4furry/server/internal/database"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/jackc/pgx/v5/stdlib"
 	"github.com/pressly/goose/v3"

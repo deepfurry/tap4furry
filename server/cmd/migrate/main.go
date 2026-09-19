@@ -8,11 +8,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/config"
-	"github.com/deepfurry/gofurry-platform/server/internal/database"
-	dbmigrate "github.com/deepfurry/gofurry-platform/server/internal/database/migrate"
-	jobmigrate "github.com/deepfurry/gofurry-platform/server/internal/jobs/migrate"
-	platformruntime "github.com/deepfurry/gofurry-platform/server/internal/runtime"
+	"github.com/deepfurry/tap4furry/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/database"
+	dbmigrate "github.com/deepfurry/tap4furry/server/internal/database/migrate"
+	jobmigrate "github.com/deepfurry/tap4furry/server/internal/jobs/migrate"
+	platformruntime "github.com/deepfurry/tap4furry/server/internal/runtime"
 )
 
 func main() {

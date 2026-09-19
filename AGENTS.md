@@ -1,4 +1,4 @@
-# GoFurry Platform
+# Tap4Furry
 
 A multi-process modular monolith for furry resource discovery and exchange. P0-0
 established infrastructure; P0-1A/B/C/D add identity, local authentication, session
@@ -15,6 +15,12 @@ security, account recovery, explicit Google/GitHub linking and isolated Admin au
 `dev` is the development integration branch; `main` is a stable release snapshot.
 Work on `dev` for P0 phases. Never merge, push, tag or release without explicit user
 instruction. Preserve unrelated changes and all ignored local credentials.
+
+Canonical identity is Tap4Furry, `deepfurry/tap4furry`, Go module
+`github.com/deepfurry/tap4furry/server` and pnpm scope `@tap4furry/*`.
+`gfp_*` and `gfp:` are intentionally retained stable infrastructure identifiers,
+not product-brand surfaces. Historical verification commands and external dependency
+names retain their original identity.
 
 ## Map and authority
 

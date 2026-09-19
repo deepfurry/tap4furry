@@ -7,7 +7,7 @@ COPY apps/web/package.json apps/web/package.json
 COPY packages/ packages/
 COPY tsconfig.base.json ./
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter @gofurry/admin build
+RUN pnpm --filter @tap4furry/admin build
 
 FROM nginxinc/nginx-unprivileged:1.29-alpine
 COPY deploy/docker/admin.nginx.conf /etc/nginx/conf.d/default.conf

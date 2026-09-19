@@ -16,14 +16,14 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/config"
-	"github.com/deepfurry/gofurry-platform/server/internal/database"
-	"github.com/deepfurry/gofurry-platform/server/internal/identity"
-	"github.com/deepfurry/gofurry-platform/server/internal/mail"
-	"github.com/deepfurry/gofurry-platform/server/internal/redisstore"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/admin"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/public"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/database"
+	"github.com/deepfurry/tap4furry/server/internal/identity"
+	"github.com/deepfurry/tap4furry/server/internal/mail"
+	"github.com/deepfurry/tap4furry/server/internal/redisstore"
+	"github.com/deepfurry/tap4furry/server/internal/transport/admin"
+	"github.com/deepfurry/tap4furry/server/internal/transport/public"
 	"github.com/gofiber/fiber/v3"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -192,7 +192,7 @@ func run() (result error) {
 	if err != nil {
 		return err
 	}
-	if cookie == nil || cookie.Name != "gofurry_admin_session" || !cookie.HttpOnly || cookie.SameSite != http.SameSiteStrictMode || len(me) != 4 {
+	if cookie == nil || cookie.Name != "tap4furry_admin_session" || !cookie.HttpOnly || cookie.SameSite != http.SameSiteStrictMode || len(me) != 4 {
 		return errors.New("Admin smoke cookie/privacy contract failed")
 	}
 	if _, _, err = request(app, "GET", "/me", nil, cookie, 200); err != nil {
@@ -220,7 +220,7 @@ func run() (result error) {
 	if !ok || len(sessions) != 1 {
 		return errors.New("Admin session isolation failed")
 	}
-	publicCookie := &http.Cookie{Name: "gofurry_session", Value: grant.Token}
+	publicCookie := &http.Cookie{Name: "tap4furry_session", Value: grant.Token}
 	if _, _, err = request(app, "GET", "/me", nil, publicCookie, 401); err != nil {
 		return err
 	}

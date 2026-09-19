@@ -1,6 +1,6 @@
 # P0-1C — Google/GitHub OAuth + Account Linking
 
-**Repository:** `deepfurry/gofurry-platform`\
+**Repository:** `deepfurry/tap4furry`\
 **Target branch:** `dev`\
 **Prerequisite:** P0-1B complete\
 **Status:** Codex implementation specification
@@ -118,8 +118,8 @@ http://localhost:4321/api/auth/oauth/github/callback
 Future production:
 
 ```text
-https://gofurry.com/api/auth/oauth/google/callback
-https://gofurry.com/api/auth/oauth/github/callback
+https://tap4furry.com/api/auth/oauth/google/callback
+https://tap4furry.com/api/auth/oauth/github/callback
 ```
 
 Do not introduce redirect-URI env vars.
@@ -249,7 +249,7 @@ GitHub Device Flow
 production OAuth clients
 Turnstile
 final auth rate limiting
-JWT GoFurry sessions
+JWT Tap4Furry sessions
 NATS
 MongoDB
 pgvector
@@ -314,7 +314,7 @@ GitHub login/email/profile URL
 
 as stable subject keys.
 
-If an existing `(provider, provider_subject)` reports a different email later, the stable provider subject still selects the same GoFurry account.
+If an existing `(provider, provider_subject)` reports a different email later, the stable provider subject still selects the same Tap4Furry account.
 
 ---
 
@@ -368,7 +368,7 @@ When OAuth subject is new:
 
 Create a new OAuth account.
 
-### Email already belongs to an existing GoFurry account
+### Email already belongs to an existing Tap4Furry account
 
 Do not:
 
@@ -448,7 +448,7 @@ AND
 
 Otherwise create the local account-email identity unverified and preserve the existing P0-1B email-verification flow.
 
-Do not block OAuth sign-up solely because a third-party Google-account email requires GoFurry verification.
+Do not block OAuth sign-up solely because a third-party Google-account email requires Tap4Furry verification.
 
 ---
 
@@ -679,7 +679,7 @@ Do not store:
 ```text
 email
 provider access/refresh/ID token
-GoFurry session token
+Tap4Furry session token
 CSRF token
 client secret
 ```
@@ -789,7 +789,7 @@ type OAuthProvider interface {
 }
 ```
 
-Return a GoFurry-owned identity result such as:
+Return a Tap4Furry-owned identity result such as:
 
 ```text
 Provider
@@ -874,7 +874,7 @@ Flow:
 7. verify/fetch provider identity;
 8. discard provider tokens;
 9. resolve/create/link/reauth according to flow mode;
-10. set replacement/new GoFurry Public Session cookie when required;
+10. set replacement/new Tap4Furry Public Session cookie when required;
 11. redirect to fixed same-origin UI.
 
 Headers:
@@ -1429,7 +1429,7 @@ The frontend only sees:
 ```text
 provider authorization URL
 provider redirects
-GoFurry HttpOnly session cookie
+Tap4Furry HttpOnly session cookie
 stable non-secret error code
 ```
 

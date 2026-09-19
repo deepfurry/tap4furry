@@ -1,4 +1,4 @@
-# GoFurry International — Information Architecture
+# Tap4Furry — Information Architecture
 
 ## Primary Navigation
 
@@ -20,7 +20,7 @@ User
 ## Public IA
 
 ```text
-GoFurry
+Tap4Furry
 │
 ├── Discover
 │   ├── Trending

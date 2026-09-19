@@ -1,4 +1,4 @@
-# GoFurry International — Content & Resource Policy
+# Tap4Furry — Content & Resource Policy
 
 ## Three Decisions
 
@@ -31,7 +31,7 @@ Name
 Type
 Category
 Summary or URL
-Why it belongs on GoFurry
+Why it belongs on Tap4Furry
 At least one Source where possible
 ```
 
@@ -131,4 +131,4 @@ Polls must not be used to publicly target or judge individual users.
 
 ## Translation
 
-Keep UI language, Resource original language, supported languages, and localized GoFurry content separate.
+Keep UI language, Resource original language, supported languages, and localized Tap4Furry content separate.

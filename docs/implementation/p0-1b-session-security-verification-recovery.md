@@ -1,6 +1,6 @@
 # P0-1B — Session Security, Verification & Recovery
 
-**Repository:** `deepfurry/gofurry-platform`  
+**Repository:** `deepfurry/tap4furry`\
 **Target branch:** `dev`  
 **Release snapshot branch:** `main`  
 **Prerequisite:** P0-1A complete
@@ -76,7 +76,7 @@ opaque 256-bit public session token
 SHA-256 session lookup hash in PostgreSQL
 30d absolute / 14d idle
 10m touch interval
-production __Host-gofurry_session
+production __Host-tap4furry_session
 exact PUBLIC_ORIGIN guard
 ```
 

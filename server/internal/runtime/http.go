@@ -7,7 +7,7 @@ import (
 	"net"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/health"
+	"github.com/deepfurry/tap4furry/server/internal/transport/health"
 	"github.com/gofiber/fiber/v3"
 )
 

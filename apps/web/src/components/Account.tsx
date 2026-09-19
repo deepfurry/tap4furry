@@ -1,5 +1,5 @@
 import { useEffect, useState, type SubmitEvent } from 'react';
-import { getMe, logout, updateProfile, type Me } from '@gofurry/api-client/public';
+import { getMe, logout, updateProfile, type Me } from '@tap4furry/api-client/public';
 import styles from './Account.module.scss';
 import { authenticatedRequest } from '../lib/security';
 import AccountSecurity from './AccountSecurity';

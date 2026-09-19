@@ -21,7 +21,7 @@ const tasks = {
   test() { run('node', ['--test', ...readdirSync(join(root, 'scripts/tests')).filter(name => name.endsWith('.test.mjs')).map(name => `scripts/tests/${name}`)]); go(['test', './...']); },
   build() {
     run('pnpm', ['-r', '--if-present', 'build']);
-    for (const name of ['api', 'admin', 'worker']) go(['build', '-o', `bin/gofurry-${name}${process.platform === 'win32' ? '.exe' : ''}`, `./cmd/${name}`]);
+    for (const name of ['api', 'admin', 'worker']) go(['build', '-o', `bin/tap4furry-${name}${process.platform === 'win32' ? '.exe' : ''}`, `./cmd/${name}`]);
   },
   check() {
     run('node', ['scripts/audit-repository.mjs']);

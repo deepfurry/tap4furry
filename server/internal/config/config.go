@@ -38,9 +38,9 @@ func (c Config) OAuthCallback(provider string) (string, error) {
 	return c.PublicOrigin + "/api/auth/oauth/" + provider + "/callback", nil
 }
 
-const DevelopmentCSRFSecret = "gofurry-development-only-csrf-secret"
-const DevelopmentAdminCSRFSecret = "gofurry-development-only-admin-csrf-secret"
-const DevelopmentAuthThrottleSecret = "gofurry-development-only-auth-throttle-secret"
+const DevelopmentCSRFSecret = "tap4furry-development-only-csrf-secret"
+const DevelopmentAdminCSRFSecret = "tap4furry-development-only-admin-csrf-secret"
+const DevelopmentAuthThrottleSecret = "tap4furry-development-only-auth-throttle-secret"
 
 func Load(service string) (Config, error) {
 	return load(service, os.Getenv)

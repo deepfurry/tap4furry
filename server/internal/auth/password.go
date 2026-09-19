@@ -6,7 +6,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/identity"
+	"github.com/deepfurry/tap4furry/server/internal/identity"
 	"github.com/gofurry/easyhash"
 )
 

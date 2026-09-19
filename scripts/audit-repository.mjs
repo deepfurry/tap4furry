@@ -45,8 +45,8 @@ for (const path of files) {
   if ((path === 'server/go.mod' || path.endsWith('/package.json')) && forbiddenModules.test(content)) throw new Error(`Forbidden dependency in ${path}`);
   if (path.endsWith('.sql') && /CREATE\s+EXTENSION\s+(?:IF\s+NOT\s+EXISTS\s+)?"?vector\b/i.test(content)) throw new Error(`Prohibited vector extension in ${path}`);
   if (path.endsWith('.go') && !path.startsWith('server/internal/jobs/') && /"github\.com\/riverqueue\//.test(content)) throw new Error(`River import outside Jobs: ${path}`);
-  if (/^server\/internal\/(auth|identity)\/.*\.go$/.test(path) && /"(?:github\.com\/gofiber\/|github\.com\/google\/uuid|github\.com\/redis\/|github\.com\/deepfurry\/gofurry-platform\/server\/internal\/transport\/)/.test(content)) throw new Error(`Application boundary violation: ${path}`);
-  if (/^apps\//.test(path) && /@gofurry\/api-client\/.*generated/.test(content)) throw new Error(`Deep generated client import: ${path}`);
+  if (/^server\/internal\/(auth|identity)\/.*\.go$/.test(path) && /"(?:github\.com\/gofiber\/|github\.com\/google\/uuid|github\.com\/redis\/|github\.com\/deepfurry\/tap4furry\/server\/internal\/transport\/)/.test(content)) throw new Error(`Application boundary violation: ${path}`);
+  if (/^apps\//.test(path) && /@tap4furry\/api-client\/.*generated/.test(content)) throw new Error(`Deep generated client import: ${path}`);
   if (/^server\/internal\/oauthprovider\/.*\.go$/.test(path) && /(?:SkipClientIDCheck|SkipIssuerCheck|SkipExpiryCheck|InsecureSkipSignatureCheck)\s*:\s*true/.test(content)) throw new Error(`Unsafe OIDC verifier in ${path}`);
 }
 if (files.filter(path => path.endsWith('go.mod')).join() !== 'server/go.mod' || files.some(path => path.endsWith('go.work'))) throw new Error('Expected one server/go.mod and no go.work');

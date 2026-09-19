@@ -6,7 +6,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/database/sqlc"
+	"github.com/deepfurry/tap4furry/server/internal/database/sqlc"
 	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jackc/pgx/v5/pgxpool"
 )

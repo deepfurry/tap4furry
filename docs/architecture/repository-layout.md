@@ -1,9 +1,9 @@
-# GoFurry International — Repository & Code Generation Layout
+# Tap4Furry — Repository & Code Generation Layout
 
 ## Monorepo
 
 ```text
-gofurry-intl/
+tap4furry/
 │
 ├── apps/
 │   ├── web/

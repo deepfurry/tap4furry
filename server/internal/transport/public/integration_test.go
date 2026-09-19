@@ -18,13 +18,13 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/config"
-	"github.com/deepfurry/gofurry-platform/server/internal/database"
-	"github.com/deepfurry/gofurry-platform/server/internal/database/sqlc"
-	"github.com/deepfurry/gofurry-platform/server/internal/identity"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/admin"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/health"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/database"
+	"github.com/deepfurry/tap4furry/server/internal/database/sqlc"
+	"github.com/deepfurry/tap4furry/server/internal/identity"
+	"github.com/deepfurry/tap4furry/server/internal/transport/admin"
+	"github.com/deepfurry/tap4furry/server/internal/transport/health"
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofurry/easyhash"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -151,7 +151,7 @@ func TestIntegrationHTTPAndPrivacy(t *testing.T) {
 	credentials := map[string]string{"email": email, "password": testPassword}
 	me, cookie := f.request("POST", "/auth/register", credentials, nil, 201)
 	assertMePrivacy(t, me)
-	if cookie == nil || !cookie.HttpOnly || cookie.Secure || cookie.Name != "gofurry_session" || cookie.Path != "/" || cookie.Domain != "" || cookie.SameSite != http.SameSiteLaxMode {
+	if cookie == nil || !cookie.HttpOnly || cookie.Secure || cookie.Name != "tap4furry_session" || cookie.Path != "/" || cookie.Domain != "" || cookie.SameSite != http.SameSiteLaxMode {
 		t.Fatal("registration cookie contract failed")
 	}
 	raw, err := base64.RawURLEncoding.Strict().DecodeString(cookie.Value)

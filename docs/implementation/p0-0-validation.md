@@ -1,5 +1,8 @@
 # P0-0 validation record
 
+Historical evidence: local environment names below record the original execution;
+current product/build contracts use Tap4Furry. BRAND-0 does not rename that environment.
+
 Executed locally on 2026-09-08 on `dev`. Initial HEAD was
 `7c122c3` and the working tree was clean. Existing product/architecture/engineering
 documents were preserved. The supplied implementation specification was copied to

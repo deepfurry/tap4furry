@@ -7,9 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/admin"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/health"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/public"
+	"github.com/deepfurry/tap4furry/server/internal/transport/admin"
+	"github.com/deepfurry/tap4furry/server/internal/transport/health"
+	"github.com/deepfurry/tap4furry/server/internal/transport/public"
 	"github.com/gofiber/fiber/v3"
 )
 

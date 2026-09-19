@@ -1,12 +1,12 @@
 {
-  "name": "@gofurry/web",
+  "name": "@tap4furry/web",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": { "dev": "astro dev", "typecheck": "astro check", "build": "astro build", "start": "node dist/server/entry.mjs" },
   "dependencies": {
     "@astrojs/node": "11.1.5", "@astrojs/react": "6.0.5", "astro": "7.3.1",
-    "@gofurry/api-client": "workspace:*", "@gofurry/design": "workspace:*",
+    "@tap4furry/api-client": "workspace:*", "@tap4furry/design": "workspace:*",
     "react": "19.2.8", "react-dom": "19.2.8"
   },
   "devDependencies": {

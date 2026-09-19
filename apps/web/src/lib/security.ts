@@ -1,4 +1,4 @@
-import { getCsrf } from '@gofurry/api-client/public';
+import { getCsrf } from '@tap4furry/api-client/public';
 
 // Fetch for each mutation: no persisted token or cache can outlive a rotation.
 export async function authenticatedRequest(): Promise<RequestInit> {

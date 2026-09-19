@@ -8,7 +8,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
 )
 
 type AuthThrottle struct {

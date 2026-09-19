@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: GoFurry Admin API
+  title: Tap4Furry Admin API
   version: 0.1.0
   description: Separate password-only Admin authentication with current static roles. Unsafe requests require exact ADMIN_ORIGIN; session mutations also require an Admin session-bound CSRF header. Auth responses are no-store. Public sessions are never accepted.
 paths:
@@ -142,8 +142,8 @@ components:
     AdminSession:
       type: apiKey
       in: cookie
-      name: __Host-gofurry_admin_session
-      description: Production Secure HttpOnly SameSite Strict host-only cookie, Path /. Local development/test uses gofurry_admin_session without Secure. Absolute lifetime 8h, idle 1h, touch interval 5m.
+      name: __Host-tap4furry_admin_session
+      description: Production Secure HttpOnly SameSite Strict host-only cookie, Path /. Local development/test uses tap4furry_admin_session without Secure. Absolute lifetime 8h, idle 1h, touch interval 5m.
   parameters:
     CSRF:
       name: X-CSRF-Token

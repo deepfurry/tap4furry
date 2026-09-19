@@ -1,6 +1,6 @@
 # P0-1D — Admin Authentication, Roles & Final Auth Hardening
 
-**Repository:** `deepfurry/gofurry-platform`\
+**Repository:** `deepfurry/tap4furry`\
 **Target branch:** `dev`\
 **Release snapshot branch:** `main`\
 **Prerequisite:** P0-1C implementation complete\
@@ -262,9 +262,9 @@ The frozen production Admin model remains:
 ```text
 Cloudflare Access
 + mandatory MFA
-+ GoFurry Admin Login
++ Tap4Furry Admin Login
 + separate Admin Session
-+ GoFurry Admin Authorization
++ Tap4Furry Admin Authorization
 ```
 
 P0-1D implements the latter three.
@@ -272,7 +272,7 @@ P0-1D implements the latter three.
 Cloudflare Access remains a deployment/pre-production gate because production infrastructure is not being provisioned yet.
 
 Do not treat any `CF-*` header as a role.
-Cloudflare identity is not GoFurry authorization.
+Cloudflare identity is not Tap4Furry authorization.
 
 ---
 
@@ -636,7 +636,7 @@ If all privileged roles disappear, the session immediately becomes invalid.
 Production:
 
 ```text
-__Host-gofurry_admin_session
+__Host-tap4furry_admin_session
 Secure
 HttpOnly
 SameSite=Strict
@@ -647,7 +647,7 @@ No Domain
 Development/test HTTP:
 
 ```text
-gofurry_admin_session
+tap4furry_admin_session
 ```
 
 Never silently downgrade production semantics.
@@ -695,7 +695,7 @@ http://localhost:5173
 Production:
 
 ```text
-https://admin.gofurry.com
+https://admin.tap4furry.com
 ```
 
 Use the same exact-origin validation constraints as `PUBLIC_ORIGIN`.
@@ -1063,7 +1063,7 @@ GET /api/me
 Display:
 
 ```text
-GoFurry Admin
+Tap4Furry Admin
 roles
 Admin session controls
 reauth
@@ -1454,7 +1454,7 @@ AUTH_THROTTLE_SECRET=<dev-only default allowed>
 Production requires explicit:
 
 ```text
-ADMIN_ORIGIN=https://admin.gofurry.com
+ADMIN_ORIGIN=https://admin.tap4furry.com
 ADMIN_CSRF_SECRET >=32 bytes
 AUTH_THROTTLE_SECRET >=32 bytes
 ```

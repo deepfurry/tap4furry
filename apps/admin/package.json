@@ -1,11 +1,11 @@
 {
-  "name": "@gofurry/admin",
+  "name": "@tap4furry/admin",
   "version": "0.0.0",
   "private": true,
   "type": "module",
   "scripts": { "dev": "vite --port 5173", "typecheck": "tsc -p tsconfig.json", "build": "vite build" },
   "dependencies": {
-    "@gofurry/api-client": "workspace:*", "@gofurry/design": "workspace:*",
+    "@tap4furry/api-client": "workspace:*", "@tap4furry/design": "workspace:*",
     "@tanstack/react-query": "5.102.8", "@tanstack/react-router": "1.170.33",
     "react": "19.2.8", "react-dom": "19.2.8"
   },

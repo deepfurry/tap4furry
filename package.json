@@ -1,5 +1,5 @@
 {
-  "name": "gofurry-platform",
+  "name": "tap4furry",
   "private": true,
   "license": "AGPL-3.0-only",
   "type": "module",
@@ -17,8 +17,8 @@
     "dev:api": "node scripts/run-local.mjs api",
     "dev:admin-api": "node scripts/run-local.mjs admin",
     "dev:worker": "node scripts/run-local.mjs worker",
-    "dev:web": "pnpm --filter @gofurry/web dev",
-    "dev:admin": "pnpm --filter @gofurry/admin dev",
+    "dev:web": "pnpm --filter @tap4furry/web dev",
+    "dev:admin": "pnpm --filter @tap4furry/admin dev",
     "migrate:dev": "node scripts/run-local.mjs migrator",
     "smoke:dev": "node scripts/smoke-dev.mjs",
     "smoke:auth:dev": "node scripts/smoke-auth-dev.mjs",

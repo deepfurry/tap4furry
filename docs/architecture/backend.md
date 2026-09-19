@@ -1,4 +1,4 @@
-# GoFurry International — Backend Architecture
+# Tap4Furry — Backend Architecture
 
 ## Runtime
 
@@ -10,9 +10,9 @@ Fiber v3
 Three binaries:
 
 ```text
-gofurry-api
-gofurry-admin
-gofurry-worker
+tap4furry-api
+tap4furry-admin
+tap4furry-worker
 ```
 
 One Go module and one shared backend codebase.

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type SubmitEvent } from 'react';
-import { requestPasswordReset, resetPassword, verifyEmail } from '@gofurry/api-client/public';
+import { requestPasswordReset, resetPassword, verifyEmail } from '@tap4furry/api-client/public';
 import { validPassword } from '../lib/security';
 import styles from './Account.module.scss';
 

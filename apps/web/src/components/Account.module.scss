@@ -1,13 +1,13 @@
-@use '@gofurry/design/mixins.scss' as design;
+@use '@tap4furry/design/mixins.scss' as design;
 .button { @include design.action; }
 .input {
-  color: var(--gfp-text);
-  background: var(--gfp-background);
-  border: 1px solid var(--gfp-muted);
+  color: var(--tap4furry-text);
+  background: var(--tap4furry-background);
+  border: 1px solid var(--tap4furry-muted);
   border-radius: 0.5rem;
   font: inherit;
   padding: 0.7rem 0.8rem;
-  &:focus-visible { outline: 2px solid var(--gfp-accent); outline-offset: 2px; }
+  &:focus-visible { outline: 2px solid var(--tap4furry-accent); outline-offset: 2px; }
 }
-.hint { color: var(--gfp-muted); font-size: 0.875rem; }
-.error { color: var(--gfp-text); font-weight: 600; }
+.hint { color: var(--tap4furry-muted); font-size: 0.875rem; }
+.error { color: var(--tap4furry-text); font-weight: 600; }

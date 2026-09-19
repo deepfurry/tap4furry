@@ -1,4 +1,4 @@
-module github.com/deepfurry/gofurry-platform/server
+module github.com/deepfurry/tap4furry/server
 
 go 1.27.1
 

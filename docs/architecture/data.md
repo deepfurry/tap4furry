@@ -1,4 +1,4 @@
-# GoFurry International — Data Architecture
+# Tap4Furry — Data Architecture
 
 ## Core Principle
 
@@ -14,7 +14,7 @@ Baseline:
 PostgreSQL 18.x
 ```
 
-GoFurry maintains a reproducible PostgreSQL runtime image:
+Tap4Furry maintains a reproducible PostgreSQL runtime image:
 
 ```text
 deploy/postgres/
@@ -288,7 +288,7 @@ Development infrastructure may include pgvector, but P0 does not depend on it.
 Future semantic-search rollout:
 
 ```text
-1. Update GoFurry PostgreSQL runtime image to include pgvector.
+1. Update Tap4Furry PostgreSQL runtime image to include pgvector.
 2. Validate in staging.
 3. Reuse compatible PGDATA.
 4. Goose: CREATE EXTENSION vector.

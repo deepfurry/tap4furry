@@ -1,5 +1,8 @@
 # P0-1B validation — 2026-09-09
 
+Historical evidence: commands below retain the repository/image names actually used
+at execution time. Current repository/build contracts use Tap4Furry after BRAND-0.
+
 Implemented against `p0-1b-session-security-verification-recovery.md` on `dev`,
 starting from `efe741d842165b77a9e205542a9c21f8b0a4e2af`. The supplied P0-1B spec
 was the only initial untracked file and is included without content changes.

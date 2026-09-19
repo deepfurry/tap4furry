@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/identity"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/identity"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -19,11 +19,28 @@ func TestCookieEnvironments(t *testing.T) {
 			h := Handler{options: Options{Environment: environment}}
 			cookie := h.cookie("temporary-test-value", time.Now().Add(auth.AbsoluteLifetime), clear)
 			secure := environment != "development" && environment != "test"
-			if cookie.Secure != secure || !cookie.HTTPOnly || cookie.Path != "/" || cookie.Domain != "" || cookie.SameSite != "Lax" || strings.HasPrefix(cookie.Name, "__Host-") != secure {
+			name := "tap4furry_session"
+			if secure {
+				name = "__Host-" + name
+			}
+			if cookie.Name != name || cookie.Secure != secure || !cookie.HTTPOnly || cookie.Path != "/" || cookie.Domain != "" || cookie.SameSite != "Lax" {
 				t.Fatal("cookie security contract failed")
 			}
 			if clear && (cookie.Value != "" || cookie.MaxAge != -1 || !cookie.Expires.Before(time.Now())) {
 				t.Fatal("logout cookie was not expired")
+			}
+			for _, provider := range []auth.Provider{auth.Google, auth.GitHub} {
+				flow := h.flowCookie(provider, "temporary-test-value", clear)
+				flowName := "tap4furry_oauth_" + string(provider)
+				if secure {
+					flowName = "__Host-" + flowName
+				}
+				if flow.Name != flowName || flow.Secure != secure || !flow.HTTPOnly || flow.Path != "/" || flow.Domain != "" || flow.SameSite != "Lax" {
+					t.Fatal("OAuth binding cookie namespace or security contract failed")
+				}
+				if clear && (flow.Value != "" || flow.MaxAge != -1 || !flow.Expires.Before(time.Now())) || !clear && flow.MaxAge != 600 {
+					t.Fatal("OAuth binding cookie lifetime or clearing failed")
+				}
 			}
 			app := fiber.New()
 			app.Get("/", func(c fiber.Ctx) error { c.Cookie(cookie); return c.SendStatus(204) })

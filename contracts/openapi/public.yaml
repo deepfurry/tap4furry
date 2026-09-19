@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: GoFurry Public API
+  title: Tap4Furry Public API
   version: 0.1.0
   description: Public health, local authentication, session security and basic profiles. Unsafe requests require exact PUBLIC_ORIGIN; authenticated unsafe requests also require a session-bound CSRF header.
 paths:
@@ -438,8 +438,8 @@ components:
     PublicSession:
       type: apiKey
       in: cookie
-      name: __Host-gofurry_session
-      description: Production uses Secure, HttpOnly, SameSite=Lax, Path=/ and no Domain. Local HTTP development/test uses gofurry_session.
+      name: __Host-tap4furry_session
+      description: Production uses Secure, HttpOnly, SameSite=Lax, Path=/ and no Domain. Local HTTP development/test uses tap4furry_session.
   requestBodies:
     Credentials:
       required: true

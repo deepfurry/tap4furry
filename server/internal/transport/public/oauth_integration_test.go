@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/identity"
-	"github.com/deepfurry/gofurry-platform/server/internal/redisstore"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/identity"
+	"github.com/deepfurry/tap4furry/server/internal/redisstore"
 	"github.com/gofiber/fiber/v3"
 	"golang.org/x/oauth2"
 )
@@ -95,7 +95,7 @@ func newOAuthFixture(t *testing.T) *oauthFixture {
 	}
 	baseline.auth = authentication
 	baseline.app = fiber.New()
-	Register(baseline.app, nil, authentication, baseline.identity, Options{Environment: "test", PublicOrigin: testOrigin, CSRFSecret: "gofurry-development-only-csrf-secret"})
+	Register(baseline.app, nil, authentication, baseline.identity, Options{Environment: "test", PublicOrigin: testOrigin, CSRFSecret: "tap4furry-development-only-csrf-secret"})
 	return &oauthFixture{baseline, store, providers}
 }
 func fakeIdentity(kind auth.Provider) auth.ProviderIdentity {
@@ -236,7 +236,7 @@ func TestIntegrationOAuthOnlySecondMethodAndHTTPRotation(t *testing.T) {
 	ctx := t.Context()
 	github := fakeIdentity(auth.GitHub)
 	initial, actor := f.login(github)
-	session := &http.Cookie{Name: "gofurry_session", Value: initial.Token}
+	session := &http.Cookie{Name: "tap4furry_session", Value: initial.Token}
 	f.request("GET", "/me", nil, session, 200)
 	f.request("PATCH", "/me/profile", map[string]any{"display_name": "My own name"}, session, 200)
 	f.request("GET", "/me/sessions", nil, session, 200)
@@ -257,7 +257,7 @@ func TestIntegrationOAuthOnlySecondMethodAndHTTPRotation(t *testing.T) {
 		t.Fatal("link callback did not return account")
 	}
 	for _, cookie := range response.Cookies() {
-		if cookie.Name == "gofurry_session" {
+		if cookie.Name == "tap4furry_session" {
 			session = cookie
 		}
 	}
@@ -268,7 +268,7 @@ func TestIntegrationOAuthOnlySecondMethodAndHTTPRotation(t *testing.T) {
 	req = httptest.NewRequest("POST", "/me/auth-methods/google/reauthenticate", nil)
 	req.AddCookie(session)
 	req.Header.Set("Origin", testOrigin)
-	req.Header.Set("X-CSRF-Token", csrfToken("gofurry-development-only-csrf-secret", initial.Token))
+	req.Header.Set("X-CSRF-Token", csrfToken("tap4furry-development-only-csrf-secret", initial.Token))
 	response, err = f.app.Test(req)
 	if err != nil {
 		t.Fatal("old CSRF test failed")
@@ -396,7 +396,7 @@ func TestIntegrationOAuthHTTPStateAndCSRF(t *testing.T) {
 		t.Fatal("OAuth start headers differ")
 	}
 	cookies := response.Cookies()
-	if len(cookies) != 1 || !cookies[0].HttpOnly || cookies[0].MaxAge != 600 || cookies[0].SameSite != http.SameSiteLaxMode {
+	if len(cookies) != 1 || cookies[0].Name != "tap4furry_oauth_google" || !cookies[0].HttpOnly || cookies[0].MaxAge != 600 || cookies[0].SameSite != http.SameSiteLaxMode {
 		t.Fatal("flow cookie unsafe")
 	}
 	parsed, _ := url.Parse(response.Header.Get("Location"))
@@ -416,7 +416,7 @@ func TestIntegrationOAuthHTTPStateAndCSRF(t *testing.T) {
 	}
 	var session *http.Cookie
 	for _, cookie := range response.Cookies() {
-		if cookie.Name == "gofurry_session" {
+		if cookie.Name == "tap4furry_session" {
 			session = cookie
 		}
 	}

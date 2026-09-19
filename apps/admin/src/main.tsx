@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { createRootRoute, createRoute, createRouter, Outlet, redirect, RouterProvider } from '@tanstack/react-router';
 import { AdminRequestError, Login, requireAdmin, Workspace } from './Auth';
-import '@gofurry/design/global.scss';
+import '@tap4furry/design/global.scss';
 import './layout.css';
 
 const rootRoute = createRootRoute({ component: Outlet });

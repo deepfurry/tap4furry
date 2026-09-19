@@ -1,4 +1,4 @@
-# GoFurry International — Technology Stack
+# Tap4Furry — Technology Stack
 
 ## Frontend
 
@@ -53,7 +53,7 @@ RBAC/MFA/CLI/cache framework, breach lookup SDK or new product package is instal
   verifier or browser OAuth SDK. Redis stores only ten-minute, one-use OAuth flows.
 - Argon2id through `github.com/gofurry/easyhash` v1.2.0: explicit `WithArgon2id()`
   for new credentials and an explicit Argon2id `VerifyAndUpgrade` policy. The
-  library's default bcrypt preference is not GoFurry's password policy.
+  library's default bcrypt preference is not Tap4Furry's password policy.
 - AWS SDK v2 S3 client
 
 ## Database
@@ -104,7 +104,7 @@ Distributed Tracing platform
 ## Runtime Alternatives
 
 ### Deno
-Preferred alternative if GoFurry later chooses to leave Node for Astro SSR.
+Preferred alternative if Tap4Furry later chooses to leave Node for Astro SSR.
 
 ### Bun
 Re-evaluate when Astro/runtime integration risk is low enough.

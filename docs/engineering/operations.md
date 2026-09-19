@@ -1,4 +1,4 @@
-# GoFurry International — Operations Baseline
+# Tap4Furry — Operations Baseline
 
 ## Scope
 

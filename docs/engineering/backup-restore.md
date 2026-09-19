@@ -1,4 +1,4 @@
-# GoFurry International — Backup & Restore
+# Tap4Furry — Backup & Restore
 
 ## Principle
 
@@ -29,7 +29,7 @@ Also periodically save required cluster/global objects such as roles.
 
 Use PostgreSQL tooling compatible with the production runtime.
 
-Prefer using the GoFurry PostgreSQL runtime image as the backup-tool environment.
+Prefer using the Tap4Furry PostgreSQL runtime image as the backup-tool environment.
 
 ## Remote Storage
 

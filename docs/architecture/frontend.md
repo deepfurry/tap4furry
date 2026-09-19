@@ -1,4 +1,4 @@
-# GoFurry International — Frontend Architecture
+# Tap4Furry — Frontend Architecture
 
 ## Public Web
 
@@ -104,7 +104,7 @@ Visual styling:
 
 Use Base UI as headless React primitives.
 
-Build GoFurry-owned components on top with SCSS Modules.
+Build Tap4Furry-owned components on top with SCSS Modules.
 
 Shared primitives may include:
 
@@ -152,8 +152,8 @@ OpenAPI
   ↓
 Orval
   ↓
-@gofurry/api-client/public
-@gofurry/api-client/admin
+@tap4furry/api-client/public
+@tap4furry/api-client/admin
 ```
 
 No duplicate hand-written transport models.
@@ -161,10 +161,10 @@ No duplicate hand-written transport models.
 ## Same-origin Browser API
 
 ```text
-gofurry.com/api/*
+tap4furry.com/api/*
 → Public API
 
-admin.gofurry.com/api/*
+admin.tap4furry.com/api/*
 → Admin API
 ```
 

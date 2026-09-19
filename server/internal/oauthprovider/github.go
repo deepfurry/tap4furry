@@ -4,7 +4,7 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
 )
 
 func (p *provider) githubIdentity(ctx context.Context, token string) (auth.ProviderIdentity, error) {

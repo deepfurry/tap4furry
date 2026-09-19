@@ -1,5 +1,5 @@
 import { useState, type SubmitEvent } from 'react';
-import { linkOAuthProvider, reauthenticateOAuthProvider, unlinkOAuthProvider, reauthenticate, type AuthMethods, type Me, type OAuthProvider } from '@gofurry/api-client/public';
+import { linkOAuthProvider, reauthenticateOAuthProvider, unlinkOAuthProvider, reauthenticate, type AuthMethods, type Me, type OAuthProvider } from '@tap4furry/api-client/public';
 import { authenticatedRequest } from '../lib/security';
 import styles from './Account.module.scss';
 

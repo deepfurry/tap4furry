@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/config"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -19,7 +19,7 @@ func TestAdminCookieAndCSRFDomains(t *testing.T) {
 		if cookie.Secure != secure || cookie.SameSite != "Strict" || !cookie.HTTPOnly || cookie.Path != "/" || cookie.Domain != "" {
 			t.Fatal("Admin cookie flags failed")
 		}
-		name := "gofurry_admin_session"
+		name := "tap4furry_admin_session"
 		if secure {
 			name = "__Host-" + name
 		}

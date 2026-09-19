@@ -1,5 +1,5 @@
 import { useEffect, useState, type SubmitEvent } from 'react';
-import { changePassword, listSessions, getAuthMethods, requestEmailVerification, revokeSession, revokeOtherSessions, type Me, type Session, type AuthMethods } from '@gofurry/api-client/public';
+import { changePassword, listSessions, getAuthMethods, requestEmailVerification, revokeSession, revokeOtherSessions, type Me, type Session, type AuthMethods } from '@tap4furry/api-client/public';
 import AuthenticationMethods from './AuthenticationMethods';
 import { authenticatedRequest, validPassword } from '../lib/security';
 import styles from './Account.module.scss';

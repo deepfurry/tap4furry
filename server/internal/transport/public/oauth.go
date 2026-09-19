@@ -4,16 +4,16 @@ import (
 	"errors"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/public/generated"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/transport/public/generated"
 	"github.com/gofiber/fiber/v3"
 )
 
 func (h *Handler) flowCookie(provider auth.Provider, value string, clear bool) *fiber.Cookie {
 	cookie := h.cookie(value, time.Now().UTC().Add(auth.OAuthLifetime), clear)
-	cookie.Name = "__Host-gofurry_oauth_" + string(provider)
+	cookie.Name = "__Host-tap4furry_oauth_" + string(provider)
 	if !cookie.Secure {
-		cookie.Name = "gofurry_oauth_" + string(provider)
+		cookie.Name = "tap4furry_oauth_" + string(provider)
 	}
 	if !clear {
 		cookie.MaxAge = int(auth.OAuthLifetime.Seconds())

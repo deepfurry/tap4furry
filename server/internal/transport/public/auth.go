@@ -9,9 +9,9 @@ import (
 	"time"
 	"unicode/utf8"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/identity"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/public/generated"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/identity"
+	"github.com/deepfurry/tap4furry/server/internal/transport/public/generated"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -33,9 +33,9 @@ func (h *Handler) cookie(token string, expires time.Time, clear bool) *fiber.Coo
 	// Unknown environments fail closed. Only explicit local environments may
 	// use the separate insecure development cookie.
 	secure := h.options.Environment != "development" && h.options.Environment != "test"
-	name := "__Host-gofurry_session"
+	name := "__Host-tap4furry_session"
 	if !secure {
-		name = "gofurry_session"
+		name = "tap4furry_session"
 	}
 	cookie := &fiber.Cookie{Name: name, Value: token, Path: "/", Secure: secure, HTTPOnly: true, SameSite: "Lax", Expires: expires}
 	if clear {

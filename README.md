@@ -1,9 +1,13 @@
-# GoFurry Platform
+# Tap4Furry
 
 A discovery and exchange platform for the furry ecosystem, centered on resource
-knowledge. P0-0 established the engineering foundation; P0-1A/B add local accounts,
-public profiles, session security, email verification and password recovery.
-Production authentication still requires the remaining P0-1 phases and mail delivery.
+knowledge. P0-1 Identity/Auth implementation complete; P0-2 Taxonomy & Resource Core
+next. Human OAuth/Admin acceptance and production mail/deployment sign-off remain
+separate gates.
+
+Canonical repository: [deepfurry/tap4furry](https://github.com/deepfurry/tap4furry).
+Future production origins are `https://tap4furry.com` and
+`https://admin.tap4furry.com`, each with same-origin `/api/*` routing.
 
 ## Development
 
@@ -37,7 +41,10 @@ separate terminals, `pnpm dev:api`, `pnpm dev:admin-api`, `pnpm dev:worker`,
 `dev` is the current integration branch; `main` is a stable release snapshot.
 Publishing, merging to `main`, tagging and releasing require explicit instruction.
 
-Start with [AGENTS.md](AGENTS.md), the [P0-1B specification](docs/implementation/p0-1b-session-security-verification-recovery.md),
+`gfp_*` and `gfp:` are intentionally retained stable infrastructure identifiers and
+are not product-brand surfaces. BRAND-0 changes no database schema or infrastructure.
+
+Start with [AGENTS.md](AGENTS.md), the [BRAND-0 specification](docs/implementation/brand-0-gofurry-platform-to-tap4furry.md),
 [product overview](docs/product/PRODUCT.md) and [architecture](docs/architecture/ARCHITECTURE.md).
 See [CHANGELOG.md](CHANGELOG.md) and [deployment artifacts](deploy/README.md).
 

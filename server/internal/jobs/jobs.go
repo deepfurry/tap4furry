@@ -7,8 +7,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/database"
-	platformruntime "github.com/deepfurry/gofurry-platform/server/internal/runtime"
+	"github.com/deepfurry/tap4furry/server/internal/database"
+	platformruntime "github.com/deepfurry/tap4furry/server/internal/runtime"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/riverqueue/river"

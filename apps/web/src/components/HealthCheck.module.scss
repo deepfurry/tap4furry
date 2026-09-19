@@ -1,3 +1,3 @@
-@use '@gofurry/design/mixins.scss' as design;
+@use '@tap4furry/design/mixins.scss' as design;
 .button { @include design.action; }
-.status { color: var(--gfp-muted); }
+.status { color: var(--tap4furry-muted); }

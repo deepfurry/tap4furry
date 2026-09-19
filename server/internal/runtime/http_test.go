@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/health"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/public"
+	"github.com/deepfurry/tap4furry/server/internal/transport/health"
+	"github.com/deepfurry/tap4furry/server/internal/transport/public"
 	"github.com/gofiber/fiber/v3"
 )
 

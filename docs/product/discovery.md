@@ -1,4 +1,4 @@
-# GoFurry International — Discovery
+# Tap4Furry — Discovery
 
 ## Model
 

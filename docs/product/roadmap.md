@@ -1,4 +1,4 @@
-# GoFurry International — Product Roadmap
+# Tap4Furry — Product Roadmap
 
 ## P0 — Resource Platform
 

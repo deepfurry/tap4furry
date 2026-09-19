@@ -1,4 +1,4 @@
-# GoFurry International — CI/CD
+# Tap4Furry — CI/CD
 
 ## CI
 
@@ -71,14 +71,14 @@ fresh empty DB
 After merge to main:
 
 ```text
-gofurry-server:<git-sha>
-gofurry-web:<git-sha>
-gofurry-admin:<git-sha>
+tap4furry-server:<git-sha>
+tap4furry-web:<git-sha>
+tap4furry-admin:<git-sha>
 ```
 
 are built and pushed to GHCR.
 
-The GoFurry PostgreSQL runtime has a separate release lifecycle.
+The Tap4Furry PostgreSQL runtime has a separate release lifecycle.
 
 ## Production Deployment
 

@@ -14,9 +14,9 @@ import (
 	"unicode/utf8"
 	"uuid"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/identity"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/admin/generated"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/identity"
+	"github.com/deepfurry/tap4furry/server/internal/transport/admin/generated"
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -29,9 +29,9 @@ type actorKey struct{}
 
 func (h *Handler) cookie(token string, expires time.Time, clear bool) *fiber.Cookie {
 	secure := h.options.Environment != "development" && h.options.Environment != "test"
-	name := "__Host-gofurry_admin_session"
+	name := "__Host-tap4furry_admin_session"
 	if !secure {
-		name = "gofurry_admin_session"
+		name = "tap4furry_admin_session"
 	}
 	cookie := &fiber.Cookie{Name: name, Value: token, Path: "/", Secure: secure, HTTPOnly: true, SameSite: "Strict", Expires: expires}
 	if clear {

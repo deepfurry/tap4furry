@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/admin/generated"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/health"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/transport/admin/generated"
+	"github.com/deepfurry/tap4furry/server/internal/transport/health"
 	"github.com/gofiber/fiber/v3"
 )
 

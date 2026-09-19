@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/redis/go-redis/v9"
 	"golang.org/x/oauth2"
 )

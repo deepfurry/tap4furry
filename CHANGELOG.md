@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- Complete BRAND-0 repository branding for Tap4Furry (`deepfurry/tap4furry`),
+  including product UI/mail/docs, the Go module and `@tap4furry/*` workspace scope.
+- Rename Public/Admin/OAuth cookies, development-only secret defaults, runtime
+  binaries and four `tap4furry-*:local` images; use `tap4furry.com` and
+  `admin.tap4furry.com` for future production origin/callback contracts.
+- Retain `gfp_*` PostgreSQL identifiers, the `gfp:` Redis namespace, applied
+  migrations 1–5, private local inputs and the external easyhash dependency.
+  No infrastructure/data migration, deployment or compatibility aliases are added.
+
 - Complete P0-1D static moderator/editor/admin roles and operator-only bootstrap,
   with last-active-admin protection and transactional final-role session revocation.
 - Add independent password-only Admin authentication, current-role authorization,

@@ -13,8 +13,8 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/config"
 	"github.com/gofurry/easyhash"
 )
 

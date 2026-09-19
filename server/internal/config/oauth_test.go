@@ -16,7 +16,7 @@ func TestOAuthCredentialPairsAndCallbacks(t *testing.T) {
 			delete(base, prefix+suffix)
 		}
 	}
-	for _, origin := range []string{"http://localhost:4321", "https://gofurry.com"} {
+	for _, origin := range []string{"http://localhost:4321", "https://tap4furry.com"} {
 		base["PUBLIC_ORIGIN"] = origin
 		c, err := load("api", func(k string) string { return base[k] })
 		if err != nil || c.GoogleOAuth.Enabled() || c.GitHubOAuth.Enabled() {

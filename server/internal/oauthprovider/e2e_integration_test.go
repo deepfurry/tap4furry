@@ -16,13 +16,13 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/config"
-	"github.com/deepfurry/gofurry-platform/server/internal/database"
-	"github.com/deepfurry/gofurry-platform/server/internal/identity"
-	"github.com/deepfurry/gofurry-platform/server/internal/mail"
-	"github.com/deepfurry/gofurry-platform/server/internal/redisstore"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/public"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/database"
+	"github.com/deepfurry/tap4furry/server/internal/identity"
+	"github.com/deepfurry/tap4furry/server/internal/mail"
+	"github.com/deepfurry/tap4furry/server/internal/redisstore"
+	"github.com/deepfurry/tap4furry/server/internal/transport/public"
 	jose "github.com/go-jose/go-jose/v4"
 	"github.com/go-jose/go-jose/v4/jwt"
 	"github.com/gofiber/fiber/v3"
@@ -148,7 +148,7 @@ func TestIntegrationOAuthProviderE2E(t *testing.T) {
 			}
 			var session *http.Cookie
 			for _, cookie := range response.Cookies() {
-				if cookie.Name == "gofurry_session" {
+				if cookie.Name == "tap4furry_session" {
 					session = cookie
 				}
 			}

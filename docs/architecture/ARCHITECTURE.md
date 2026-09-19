@@ -1,4 +1,4 @@
-# GoFurry International — Architecture Overview
+# Tap4Furry — Architecture Overview
 
 ## Architecture Style
 
@@ -40,9 +40,9 @@ One backend codebase, one primary PostgreSQL database, multiple runtime processe
 Backend builds:
 
 ```text
-gofurry-api
-gofurry-admin
-gofurry-worker
+tap4furry-api
+tap4furry-admin
+tap4furry-worker
 ```
 
 They share Application/Domain code and do not call one another over HTTP.

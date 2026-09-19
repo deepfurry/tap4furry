@@ -8,6 +8,10 @@ Runtime processes read process environment only. The ignored developer launch in
 credentials. Never print, commit, overwrite with placeholders or remove them or their
 ignore rules. Public `.example` templates must contain only localhost placeholders.
 
+Tap4Furry branding does not rename `gfp_dev`, `gfp_ci`, PostgreSQL `gfp_*` roles
+or Redis `gfp:` keys. These are stable infrastructure identifiers. BRAND-0 runs
+existing smokes only on shared development; it applies no shared migrations.
+
 Shared development PostgreSQL/Redis are accessed using private local configuration.
 Only repository-owned Goose/River migrations on `gfp_dev` using the prepared migrator
 are allowed. No shared Infra SSH, container administration, cluster-role/Redis ACL

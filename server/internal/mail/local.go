@@ -74,10 +74,10 @@ func NewLocal(privateRoot, directory, origin string) (*Local, error) {
 }
 func (l *Local) Close() error { return l.directory.Close() }
 func (l *Local) SendEmailVerification(ctx context.Context, email, token string) error {
-	return l.send(ctx, email, token, "Verify your GoFurry email", "/verify-email")
+	return l.send(ctx, email, token, "Verify your Tap4Furry email", "/verify-email")
 }
 func (l *Local) SendPasswordReset(ctx context.Context, email, token string) error {
-	return l.send(ctx, email, token, "Reset your GoFurry password", "/reset-password")
+	return l.send(ctx, email, token, "Reset your Tap4Furry password", "/reset-password")
 }
 func (l *Local) send(ctx context.Context, email, token, subject, path string) error {
 	if ctx.Err() != nil || strings.ContainsAny(email, "\r\n") {

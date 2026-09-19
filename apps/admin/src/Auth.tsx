@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Navigate, useNavigate } from '@tanstack/react-router';
-import { getCsrf, getMe, listSessions, login, logout, reauthenticate, revokeSession, revokeOtherSessions } from '@gofurry/api-client/admin';
+import { getCsrf, getMe, listSessions, login, logout, reauthenticate, revokeSession, revokeOtherSessions } from '@tap4furry/api-client/admin';
 import styles from './Foundation.module.scss';
 
 export async function requireAdmin() {
@@ -38,7 +38,7 @@ export function Login() {
   }
   return <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-6 p-6">
     <section className={`${styles.panel} flex flex-col gap-6 p-6 sm:p-10`}>
-      <span className={styles.phase}>GoFurry Admin</span>
+      <span className={styles.phase}>Tap4Furry Admin</span>
       <h1>Sign in</h1>
       <p>Use your verified email and password to access your team workspace.</p>
       <form className="flex flex-col gap-5" onSubmit={submit}>
@@ -83,7 +83,7 @@ export function Workspace() {
     return <Navigate to="/login" replace />;
   }
   return <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 p-6 sm:p-10">
-    <header className="flex flex-wrap items-center justify-between gap-4"><div><span className={styles.phase}>GoFurry Admin</span><h1>Your workspace</h1></div><button className={`${styles.button} px-4 py-2`} disabled={mutation.isPending} onClick={() => mutation.mutate({ kind: 'logout' })}>Sign out</button></header>
+    <header className="flex flex-wrap items-center justify-between gap-4"><div><span className={styles.phase}>Tap4Furry Admin</span><h1>Your workspace</h1></div><button className={`${styles.button} px-4 py-2`} disabled={mutation.isPending} onClick={() => mutation.mutate({ kind: 'logout' })}>Sign out</button></header>
     {failure && <p role="alert">{errorMessage(failure)}</p>}
     <section className={`${styles.panel} flex flex-col gap-3 p-6`} aria-labelledby="account-heading">
       <h2 id="account-heading">Your account</h2>

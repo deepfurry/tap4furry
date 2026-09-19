@@ -1,4 +1,4 @@
-# GoFurry International — Trust, Safety, Privacy, and Moderation
+# Tap4Furry — Trust, Safety, Privacy, and Moderation
 
 ## Core Concepts
 

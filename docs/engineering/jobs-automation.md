@@ -1,4 +1,4 @@
-# GoFurry International — Jobs & Automation
+# Tap4Furry — Jobs & Automation
 
 ## Engine
 
@@ -26,7 +26,7 @@ Business truth remains in `app.*`, never in River tables.
 
 ## Worker
 
-`gofurry-worker` is a separate process but shares Application/Domain code.
+`tap4furry-worker` is a separate process but shares Application/Domain code.
 
 ```text
 River Job Adapter

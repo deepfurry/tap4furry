@@ -1,4 +1,4 @@
-# GoFurry International — Deployment Architecture
+# Tap4Furry — Deployment Architecture
 
 ## Topology
 
@@ -91,19 +91,19 @@ PostgreSQL and Redis are internal-only.
 ## Routing
 
 ```text
-gofurry.com/
+tap4furry.com/
 → Astro
 
-gofurry.com/api/*
+tap4furry.com/api/*
 → Public API
 
-admin.gofurry.com/
+admin.tap4furry.com/
 → Admin Web
 
-admin.gofurry.com/api/*
+admin.tap4furry.com/api/*
 → Admin API
 
-river.gofurry.com
+river.tap4furry.com
 → River UI
 ```
 
@@ -150,7 +150,7 @@ Admin: `no-store`.
 Maintain:
 
 ```text
-gofurry-postgres:<runtime-version>
+tap4furry-postgres:<runtime-version>
 ```
 
 Image and PGDATA have separate lifecycles.

@@ -1,8 +1,8 @@
-# GoFurry International — Product Overview
+# Tap4Furry — Product Overview
 
 > **A discovery and exchange platform for the furry ecosystem.**
 
-GoFurry International is a web-first public platform for discovering, understanding,
+Tap4Furry is a web-first public platform for discovering, understanding,
 organizing, contributing, and exchanging information about furry-related resources.
 
 It is intentionally lightweight, clean, fast, and low-maintenance.
@@ -13,7 +13,7 @@ not to become independent social products.
 
 ## Core User Value
 
-GoFurry should help users:
+Tap4Furry should help users:
 
 - **Find** furry-related resources quickly.
 - **Understand** what a resource is, who created it, where it comes from, and whether it is still available.
@@ -49,17 +49,17 @@ GoFurry should help users:
 
 ## Service Boundary
 
-GoFurry does **not** process payments, hold funds, provide escrow, guarantee transactions,
+Tap4Furry does **not** process payments, hold funds, provide escrow, guarantee transactions,
 verify delivery, or provide transaction insurance.
 
 Exchange helps users discover and contact one another. Transactions occur directly between users
 or through external services.
 
-GoFurry is not a general-purpose file host.
+Tap4Furry is not a general-purpose file host.
 
 ## Non-goals
 
-GoFurry is not intended to become:
+Tap4Furry is not intended to become:
 
 - an e-commerce/payment platform;
 - a generic social feed or friend graph;

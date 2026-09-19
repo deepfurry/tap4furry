@@ -93,7 +93,7 @@ need no edits to use the development default. Other processes do not need it.
 
 easyhash v1.2.0 hashes new passwords with explicit `WithArgon2id()`: 64 MiB memory,
 time cost 3, parallelism 2, library-default salt/key lengths. Its default Hash and
-DefaultPolicy prefer bcrypt, so GoFurry overrides the policy to Argon2id before
+DefaultPolicy prefer bcrypt, so Tap4Furry overrides the policy to Argon2id before
 `VerifyAndUpgrade`. Successful legacy/bcrypt verification upgrades with a CAS;
 concurrent upgrades retry verification once. Equal/stronger current Argon2id hashes
 are retained. Rehash does not change the actual password-change timestamp.
@@ -105,8 +105,8 @@ random bytes encoded with unpadded base64url; PostgreSQL stores only the SHA-256
 hash of that encoded token. Public sessions expire after 30 days absolute or 14
 days idle. Activity is touched at most every 10 minutes and never extends absolute
 expiry. Revoked/expired sessions and disabled/deleted accounts are rejected.
-Production uses `__Host-gofurry_session`, Secure, HttpOnly, SameSite=Lax, Path=/,
-without Domain. Local HTTP uses `gofurry_session`. Login always issues a new session;
+Production uses `__Host-tap4furry_session`, Secure, HttpOnly, SameSite=Lax, Path=/,
+without Domain. Local HTTP uses `tap4furry_session`. Login always issues a new session;
 logout revokes the current session and expires the same cookie. No browser storage
 contains credentials or session tokens. Auth/profile database work has a bounded
 request context; private responses use `Cache-Control: no-store`.
@@ -137,6 +137,11 @@ private JSON messages (`To`, `Subject`, `Link`) with random UUID filenames. Insp
 them privately on your workstation, never paste their contents into logs/reports or
 expose them through an HTTP route. Links target `PUBLIC_ORIGIN` and use a fragment.
 
+BRAND-0 renames session and OAuth browser-binding cookies without accepting legacy
+aliases. Sign in again after updating a local checkout. Existing PostgreSQL sessions
+are not migrated or purged. `gfp_*` database/role names and Redis `gfp:` keys remain
+stable infrastructure identifiers; no private input needs rewriting.
+
 Auth issues a challenge and commits before calling its consumer-owned mail interface.
 Only an easyhash hash is persisted. Verification expires in 24 hours, reset in 30
 minutes; issuing the same identity/purpose is limited to once per 60 seconds,
@@ -165,7 +170,7 @@ Passwords and CSRF exist only transiently in memory; session cookies remain Http
 
 | Setting | Development/test | Production |
 | --- | --- | --- |
-| `ADMIN_ORIGIN` | Development defaults to `http://localhost:5173`; test sets it explicitly | Exact HTTPS origin, normally `https://admin.gofurry.com` |
+| `ADMIN_ORIGIN` | Development defaults to `http://localhost:5173`; test sets it explicitly | Exact HTTPS origin, normally `https://admin.tap4furry.com` |
 | `ADMIN_CSRF_SECRET` | Separate public development default | Explicit private >=32 bytes, different from Public CSRF |
 | `AUTH_THROTTLE_SECRET` | Public development default | Explicit private >=32 bytes, shared between API and Admin |
 
@@ -197,8 +202,8 @@ on each request, so a session never serves as a cached role grant.
 
 Admin shares `app.sessions` but requires `kind=admin`, `auth_method=password`.
 Absolute expiry is 8h, idle 1h, touch at most every 5m. Production cookie is
-`__Host-gofurry_admin_session` (Secure, HttpOnly, Strict, Path=/, no Domain); local
-HTTP uses `gofurry_admin_session`. No Public session exchange or OAuth login exists
+`__Host-tap4furry_admin_session` (Secure, HttpOnly, Strict, Path=/, no Domain); local
+HTTP uses `tap4furry_admin_session`. No Public session exchange or OAuth login exists
 on Admin. Normal logout/revocation affects its own kind only. Password reset/change
 revoke both kinds atomically and issue exactly one replacement Public session.
 
@@ -326,8 +331,8 @@ No callback environment variables or browser provider SDKs are used.
 
 | Provider | Development callback | Future production callback |
 | --- | --- | --- |
-| Google | `http://localhost:4321/api/auth/oauth/google/callback` | `https://gofurry.com/api/auth/oauth/google/callback` |
-| GitHub | `http://localhost:4321/api/auth/oauth/github/callback` | `https://gofurry.com/api/auth/oauth/github/callback` |
+| Google | `http://localhost:4321/api/auth/oauth/google/callback` | `https://tap4furry.com/api/auth/oauth/google/callback` |
+| GitHub | `http://localhost:4321/api/auth/oauth/github/callback` | `https://tap4furry.com/api/auth/oauth/github/callback` |
 
 Both callbacks are derived exclusively from `PUBLIC_ORIGIN`. Configure those exact
 URLs privately with the corresponding provider. Google requests only `openid email
@@ -341,7 +346,8 @@ The runtime never changes ACLs. CI adds GETDEL only to its disposable runtime ro
 TTL inspection/forced expiry use its separate local test inspector. State has 256
 random bits, keys contain its SHA-256 digest and flows expire in ten minutes. A
 short-lived HttpOnly SameSite=Lax cookie binds each provider flow to its browser.
-The production cookie uses the `__Host-` prefix and Secure. Callback consumes state
+Binding cookies are `tap4furry_oauth_google` / `tap4furry_oauth_github` locally;
+production adds the `__Host-` prefix and Secure. Callback consumes state
 once, including denial/invalid-flow paths, and redirects only to `/account` or
 `/login?oauth_error=<fixed-code>` (account errors remain on `/account`). Do not add
 access logs containing OAuth callback query strings or authorization headers.
@@ -358,12 +364,13 @@ Provider subjects, not email, select accounts. Email collisions require signing 
 the existing account and linking explicitly. An OAuth-only account has an ordinary
 email identity but no password. Its password reset request is an enumeration-safe
 no-op; it can verify email, edit its profile and manage sessions normally. Google
-third-party emails remain locally unverified until GoFurry verification succeeds;
+third-party emails remain locally unverified until Tap4Furry verification succeeds;
 verified Gmail/Workspace emails and selected verified GitHub emails are trusted.
 Provider profile updates never overwrite the user's edited profile.
 
-After disposable acceptance run `pnpm migrate:dev`, `pnpm smoke:dev`,
-`pnpm smoke:auth:dev` and `pnpm smoke:oauth:dev`. The OAuth smoke prints only provider
+After disposable acceptance, phases adding migrations run `pnpm migrate:dev`.
+BRAND-0 applies no shared migration. Run `pnpm smoke:dev`, `pnpm smoke:auth:dev`,
+`pnpm smoke:oauth:dev` and `pnpm smoke:admin:dev`. The OAuth smoke prints only provider
 names and boolean outcomes: it neither prints URLs/credentials nor exchanges real
 codes. Missing pairs/callback or Redis capabilities are stop conditions. No shared
 server administration or cluster-role changes are permitted.

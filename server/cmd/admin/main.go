@@ -8,14 +8,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/auth"
-	"github.com/deepfurry/gofurry-platform/server/internal/config"
-	"github.com/deepfurry/gofurry-platform/server/internal/database"
-	"github.com/deepfurry/gofurry-platform/server/internal/mail"
-	"github.com/deepfurry/gofurry-platform/server/internal/redisstore"
-	platformruntime "github.com/deepfurry/gofurry-platform/server/internal/runtime"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/admin"
-	"github.com/deepfurry/gofurry-platform/server/internal/transport/health"
+	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/database"
+	"github.com/deepfurry/tap4furry/server/internal/mail"
+	"github.com/deepfurry/tap4furry/server/internal/redisstore"
+	platformruntime "github.com/deepfurry/tap4furry/server/internal/runtime"
+	"github.com/deepfurry/tap4furry/server/internal/transport/admin"
+	"github.com/deepfurry/tap4furry/server/internal/transport/health"
 	"github.com/gofiber/fiber/v3"
 )
 

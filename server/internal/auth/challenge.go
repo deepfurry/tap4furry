@@ -8,8 +8,8 @@ import (
 	"time"
 	"uuid"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/database"
-	"github.com/deepfurry/gofurry-platform/server/internal/database/sqlc"
+	"github.com/deepfurry/tap4furry/server/internal/database"
+	"github.com/deepfurry/tap4furry/server/internal/database/sqlc"
 	"github.com/gofurry/easyhash"
 	"github.com/jackc/pgx/v5"
 )

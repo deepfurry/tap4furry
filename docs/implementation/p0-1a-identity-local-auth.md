@@ -1,6 +1,6 @@
 # P0-1A — Identity Core + Email/Password + Public Session
 
-**Repository:** `deepfurry/gofurry-platform`  
+**Repository:** `deepfurry/tap4furry`\
 **Target branch:** `dev`  
 **Release snapshot branch:** `main`  
 **Phase:** P0-1A  
@@ -12,7 +12,7 @@
 
 P0-1A is the first real product-domain phase after P0-0.
 
-Its goal is to establish the minimum durable identity and local-authentication system required for later GoFurry Platform product work:
+Its goal is to establish the minimum durable identity and local-authentication system required for later Tap4Furry product work:
 
 ```text
 Auth Identity
@@ -609,7 +609,7 @@ sessions.id
 
 Do not add a third-party UUID library for application IDs.
 
-If an indirect dependency already includes `github.com/google/uuid`, do not use it for GoFurry business ID generation.
+If an indirect dependency already includes `github.com/google/uuid`, do not use it for Tap4Furry business ID generation.
 
 Inspect the actual installed Go 1.27 standard-library UUID API and use the real supported interface rather than guessing an import path/function name.
 
@@ -687,7 +687,7 @@ easyhash.Hash(password)
 
 because the current high-level default is bcrypt.
 
-GoFurry explicitly requires Argon2id.
+Tap4Furry explicitly requires Argon2id.
 
 Use the current equivalent of:
 
@@ -701,7 +701,7 @@ or the actual current Argon2id option exposed by the library.
 
 Use the library's high-level migration path.
 
-Build a GoFurry password policy based on the current easyhash policy API:
+Build a Tap4Furry password policy based on the current easyhash policy API:
 
 ```text
 PreferredAlgorithm = Argon2id
@@ -802,7 +802,7 @@ On authenticated request:
 Production public cookie:
 
 ```text
-__Host-gofurry_session
+__Host-tap4furry_session
 Secure
 HttpOnly
 SameSite=Lax
@@ -815,7 +815,7 @@ Development/test over local HTTP cannot use a Secure `__Host-` cookie.
 Use a separate development cookie name, for example:
 
 ```text
-gofurry_session
+tap4furry_session
 ```
 
 Production configuration must never silently downgrade Secure/`__Host-` semantics.
@@ -939,7 +939,7 @@ Flow:
 1. normalize email;
 2. lookup local identity + user + credential;
 3. unknown identity follows dummy Argon2 verification path;
-4. verify with GoFurry easyhash Argon2id policy;
+4. verify with Tap4Furry easyhash Argon2id policy;
 5. reject disabled/deleted account;
 6. CAS-upgrade hash when required;
 7. create public session;
@@ -1170,7 +1170,7 @@ page may be added while preserving Web-first/public-content architecture.
 Use:
 
 ```text
-@gofurry/api-client/public
+@tap4furry/api-client/public
 ```
 
 Do not hand-write duplicate DTOs.

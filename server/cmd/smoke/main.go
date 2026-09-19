@@ -9,11 +9,11 @@ import (
 	"os"
 	"time"
 
-	"github.com/deepfurry/gofurry-platform/server/internal/config"
-	"github.com/deepfurry/gofurry-platform/server/internal/database"
-	"github.com/deepfurry/gofurry-platform/server/internal/jobs"
-	"github.com/deepfurry/gofurry-platform/server/internal/redisstore"
-	platformruntime "github.com/deepfurry/gofurry-platform/server/internal/runtime"
+	"github.com/deepfurry/tap4furry/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/database"
+	"github.com/deepfurry/tap4furry/server/internal/jobs"
+	"github.com/deepfurry/tap4furry/server/internal/redisstore"
+	platformruntime "github.com/deepfurry/tap4furry/server/internal/runtime"
 )
 
 func main() {

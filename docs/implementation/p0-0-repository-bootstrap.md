@@ -1,6 +1,6 @@
 # P0-0 — Repository Bootstrap & Engineering Foundation
 
-**Repository:** `deepfurry/gofurry-platform`
+**Repository:** `deepfurry/tap4furry`
 **Target branch:** `dev`
 **Release snapshot branch:** `main`
 **Phase:** P0-0
@@ -8,7 +8,7 @@
 
 ## 1. Goal
 
-P0-0 establishes the executable engineering foundation for GoFurry Platform before any product-domain implementation begins.
+P0-0 establishes the executable engineering foundation for Tap4Furry before any product-domain implementation begins.
 
 At completion the repository must have:
 
@@ -86,7 +86,7 @@ Do not:
 - modify its Docker services;
 - modify PostgreSQL cluster roles;
 - modify Redis ACLs;
-- touch other GoFurry databases;
+- touch databases outside `gfp_dev`;
 - change Tailscale/server/security-group configuration.
 
 P0-0 **may** use the prepared `gfp_migrator` credentials to run repository-owned Goose and River migrations against `gfp_dev`.
@@ -446,7 +446,7 @@ Preserve existing ignored `.local` files.
 Approximate target:
 
 ```text
-gofurry-platform/
+tap4furry/
 │
 ├── .agents/
 │   ├── architecture.md
@@ -764,8 +764,8 @@ src/generated/admin/
 Expose stable facades:
 
 ```text
-@gofurry/api-client/public
-@gofurry/api-client/admin
+@tap4furry/api-client/public
+@tap4furry/api-client/admin
 ```
 
 Apps must not import deep generated paths.
@@ -804,7 +804,7 @@ server/go.mod
 Module path:
 
 ```text
-github.com/deepfurry/gofurry-platform/server
+github.com/deepfurry/tap4furry/server
 ```
 
 Go 1.27 minimum.
@@ -1169,9 +1169,9 @@ P0-0 creates buildable artifacts, not production deployment.
 One multi-stage image containing:
 
 ```text
-gofurry-api
-gofurry-admin
-gofurry-worker
+tap4furry-api
+tap4furry-admin
+tap4furry-worker
 ```
 
 Runtime command chooses the binary.
@@ -1194,7 +1194,7 @@ Create:
 deploy/postgres/Dockerfile
 ```
 
-Represent the future GoFurry-controlled PostgreSQL runtime.
+Represent the future Tap4Furry-controlled PostgreSQL runtime.
 
 P0-0 requires PostgreSQL 18.x and `pg_trgm` availability.
 
@@ -1503,7 +1503,7 @@ behave according to contract.
 server image                PASS
 web image                   PASS
 admin image                 PASS
-GoFurry PostgreSQL runtime  PASS
+Tap4Furry PostgreSQL runtime  PASS
 ```
 
 ### Forbidden dependency audit

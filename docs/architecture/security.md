@@ -1,4 +1,4 @@
-# GoFurry International — Authentication & Security Architecture
+# Tap4Furry — Authentication & Security Architecture
 
 ## Authentication Model
 
@@ -31,6 +31,9 @@ Use Authorization Code flows with state and PKCE where applicable.
 
 Temporary OAuth flow state belongs in Redis with short TTL and one-time consumption.
 
+The `gfp:` Redis namespace remains a stable infrastructure contract after BRAND-0;
+it is independent of the Tap4Furry product and browser-cookie names.
+
 Do not retain provider access/refresh tokens unless a future feature explicitly requires provider API access.
 
 ## Account Linking
@@ -60,8 +63,8 @@ Use opaque server-side sessions.
 Cookies:
 
 ```text
-__Host-gofurry_session
-__Host-gofurry_admin_session
+__Host-tap4furry_session
+__Host-tap4furry_admin_session
 ```
 
 Properties:
@@ -182,12 +185,12 @@ Production deployment target (operator-provided; not a local implementation depe
 ```text
 Cloudflare Access
 + mandatory MFA
-+ GoFurry Admin Login
++ Tap4Furry Admin Login
 + separate Admin Session
-+ GoFurry Admin Authorization
++ Tap4Furry Admin Authorization
 ```
 
-Cloudflare identity is not GoFurry authorization.
+Cloudflare identity is not Tap4Furry authorization.
 
 Public sessions are never accepted as Admin sessions.
 
@@ -219,7 +222,7 @@ Only owner `adminctl` grants/revokes static roles. A transaction advisory lock b
 the User lock protects the last-active-admin invariant across concurrent operators.
 Role events and final-privileged-role Admin-session revocation commit together.
 Admin runtime has no role mutation privilege or route. Cloudflare identity, if
-provisioned later, cannot replace these GoFurry role checks.
+provisioned later, cannot replace these Tap4Furry role checks.
 
 ## Auth throttling (P0-1D)
 
@@ -282,8 +285,8 @@ Do not log passwords, hashes, raw session tokens, CSRF tokens, OAuth codes/token
 Browser API is same-origin:
 
 ```text
-gofurry.com/api/*
-admin.gofurry.com/api/*
+tap4furry.com/api/*
+admin.tap4furry.com/api/*
 ```
 
 Do not open broad CORS in P0.
@@ -306,7 +309,7 @@ their User even when upstream email changes. New subjects never auto-link by ema
 an existing canonical email requires explicit linking from an authenticated account.
 New OAuth Users have User/Profile/email/provider identity rows and no password row.
 Only verified Gmail/Workspace Google email is authoritative; other Google email
-uses normal GoFurry verification. GitHub chooses primary verified email, then a
+uses normal Tap4Furry verification. GitHub chooses primary verified email, then a
 verified fallback, and refuses new-account creation without one.
 
 Auth owns transactions plus provider/flow interfaces; the adapter returns validated

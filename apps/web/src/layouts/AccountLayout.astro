@@ -1,5 +1,5 @@
 ---
-import '@gofurry/design/global.scss';
+import '@tap4furry/design/global.scss';
 import '../styles/layout.css';
 import '../styles/page.scss';
 interface Props { title: string; description: string }
@@ -14,13 +14,13 @@ Astro.response.headers.set('Cache-Control', 'no-store');
     <meta name="viewport" content="width=device-width" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="referrer" content="no-referrer" />
-    <title>{title} · GoFurry</title>
+    <title>{title} · Tap4Furry</title>
     <meta name="description" content={description} />
   </head>
   <body>
     <main class="mx-auto flex min-h-screen max-w-2xl flex-col gap-6 p-6 sm:py-12">
       <nav aria-label="Main navigation" class="flex flex-wrap gap-6">
-        <a href="/">GoFurry</a><a href="/account">Account</a>
+        <a href="/">Tap4Furry</a><a href="/account">Account</a>
       </nav>
       <section class="foundation flex flex-col gap-6 p-6 sm:p-10">
         <h1>{title}</h1><p>{description}</p><slot />

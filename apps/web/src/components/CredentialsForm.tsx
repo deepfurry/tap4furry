@@ -1,5 +1,5 @@
 import { useState, type SubmitEvent } from 'react';
-import { login, register } from '@gofurry/api-client/public';
+import { login, register } from '@tap4furry/api-client/public';
 import styles from './Account.module.scss';
 
 export default function CredentialsForm({ mode }: { mode: 'login' | 'register' }) {
