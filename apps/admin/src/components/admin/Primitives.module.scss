@@ -1,0 +1,33 @@
+@use '@tap4furry/design/mixins.scss' as design;
+.panel {
+  @include design.surface;
+}
+.button {
+  @include design.action;
+  cursor: pointer;
+}
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+.badge {
+  border: 1px solid var(--tap4furry-accent);
+  border-radius: 0.35rem;
+  font-size: 0.8rem;
+}
+.label {
+  font-weight: 600;
+}
+.empty {
+  border: 1px dashed var(--tap4furry-accent);
+  border-radius: 0.5rem;
+}
+.dialog {
+  color: var(--tap4furry-text);
+  background: var(--tap4furry-background);
+  border: 1px solid var(--tap4furry-accent);
+  border-radius: 0.8rem;
+}
+.dialog::backdrop {
+  background: rgb(0 0 0 / 65%);
+}

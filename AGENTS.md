@@ -4,7 +4,7 @@ A multi-process modular monolith for furry resource discovery and exchange. P0-0
 established infrastructure; P0-1A/B/C/D add identity, local authentication, session
 security, account recovery, explicit Google/GitHub linking and isolated Admin auth.
 MAIL-0 adds Resend; P0-2A adds Resource/Taxonomy schema and domain primitives.
-P0-2B adds anonymous Resource reads and Astro SSR; curation remains P0-2C.
+P0-2B adds anonymous Resource reads and Astro SSR; P0-2C adds Admin curation.
 
 ## Start here
 
@@ -30,6 +30,7 @@ names retain their original identity.
 - `packages/api-client`, `packages/design`: generated clients and shared styling.
 - `server/cmd`: process composition and developer commands; one `server/go.mod`.
 - `server/internal`: transport, config, database, Redis, Jobs and runtime boundaries.
+- `server/internal/curation`: canonical Resource/Taxonomy mutation transactions.
 - `contracts/openapi`: authoritative Public/Admin APIs.
 - `server/db/migrations`, `server/db/queries`: application schema and SQL sources.
 - `deploy`: build artifacts; `.github/workflows`: disposable-infrastructure CI.
@@ -56,6 +57,15 @@ are pattern references only and never override this repository.
   Resource grants; Public API is SELECT-only, Admin has explicit column-level DML.
 - Public reads filter visibility/Source rights/Relation endpoints in SQL and fail
   closed on missing canonical translations. Internal governance fields stay private.
+- P0-2C also stays at version 6 with unchanged grants. Curation locks actor User,
+  revalidates Admin session/current capabilities in the same READ COMMITTED transaction,
+  then locks canonical parents and checks Resource CAS. No-op preserves revision/time.
+  All relation writes take fixed graph advisory lock then UUID-ordered endpoints,
+  check directed cycles per type and bump both endpoints. Use DB transaction timestamps.
+- Moderator inspects; Editor curates; Admin governs rights, restricted/removed states,
+  retirement and soft deletion. Source removal changes availability; no parent hard-delete
+  or restore. Admin React has real editor routes, explicit conflict reload and dirty guards;
+  successful mutations refetch, never retry or optimistically reconstruct canonical state.
 - Resource pages are Astro SSR without islands. Only server helpers read
   `API_INTERNAL_ORIGIN`; no credentials are forwarded. Markdown.astro is the sole
   audited sanitized HTML sink. Errors are no-store/noindex; success uses short shared cache.

@@ -6,6 +6,7 @@ package generated
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
@@ -20,8 +21,13 @@ const (
 	ADMINUNAUTHENTICATED    ApiErrorCode = "ADMIN_UNAUTHENTICATED"
 	AUTHRATELIMITED         ApiErrorCode = "AUTH_RATE_LIMITED"
 	CSRFINVALID             ApiErrorCode = "CSRF_INVALID"
+	CURATIONCONFLICT        ApiErrorCode = "CURATION_CONFLICT"
+	CURATIONINUSE           ApiErrorCode = "CURATION_IN_USE"
+	CURATIONNOTFOUND        ApiErrorCode = "CURATION_NOT_FOUND"
+	CURATIONRELATIONCYCLE   ApiErrorCode = "CURATION_RELATION_CYCLE"
 	INTERNALERROR           ApiErrorCode = "INTERNAL_ERROR"
 	ORIGINFORBIDDEN         ApiErrorCode = "ORIGIN_FORBIDDEN"
+	RESOURCEVERSIONCONFLICT ApiErrorCode = "RESOURCE_VERSION_CONFLICT"
 	VALIDATIONERROR         ApiErrorCode = "VALIDATION_ERROR"
 )
 
@@ -40,11 +46,99 @@ func (e ApiErrorCode) Valid() bool {
 		return true
 	case CSRFINVALID:
 		return true
+	case CURATIONCONFLICT:
+		return true
+	case CURATIONINUSE:
+		return true
+	case CURATIONNOTFOUND:
+		return true
+	case CURATIONRELATIONCYCLE:
+		return true
 	case INTERNALERROR:
 		return true
 	case ORIGINFORBIDDEN:
 		return true
+	case RESOURCEVERSIONCONFLICT:
+		return true
 	case VALIDATIONERROR:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AvailabilityState.
+const (
+	AvailabilityStateActive      AvailabilityState = "active"
+	AvailabilityStateBroken      AvailabilityState = "broken"
+	AvailabilityStateRemoved     AvailabilityState = "removed"
+	AvailabilityStateRestricted  AvailabilityState = "restricted"
+	AvailabilityStateUnavailable AvailabilityState = "unavailable"
+)
+
+// Valid indicates whether the value is a known member of the AvailabilityState enum.
+func (e AvailabilityState) Valid() bool {
+	switch e {
+	case AvailabilityStateActive:
+		return true
+	case AvailabilityStateBroken:
+		return true
+	case AvailabilityStateRemoved:
+		return true
+	case AvailabilityStateRestricted:
+		return true
+	case AvailabilityStateUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContentRating.
+const (
+	Explicit ContentRating = "explicit"
+	General  ContentRating = "general"
+	Mature   ContentRating = "mature"
+)
+
+// Valid indicates whether the value is a known member of the ContentRating enum.
+func (e ContentRating) Valid() bool {
+	switch e {
+	case Explicit:
+		return true
+	case General:
+		return true
+	case Mature:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for Lifecycle.
+const (
+	LifecycleActive       Lifecycle = "active"
+	LifecycleArchived     Lifecycle = "archived"
+	LifecycleDelisted     Lifecycle = "delisted"
+	LifecycleDiscontinued Lifecycle = "discontinued"
+	LifecycleInactive     Lifecycle = "inactive"
+	LifecycleUnknown      Lifecycle = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the Lifecycle enum.
+func (e Lifecycle) Valid() bool {
+	switch e {
+	case LifecycleActive:
+		return true
+	case LifecycleArchived:
+		return true
+	case LifecycleDelisted:
+		return true
+	case LifecycleDiscontinued:
+		return true
+	case LifecycleInactive:
+		return true
+	case LifecycleUnknown:
 		return true
 	default:
 		return false
@@ -60,6 +154,33 @@ const (
 func (e LiveStatus) Valid() bool {
 	switch e {
 	case Alive:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for PublicationState.
+const (
+	PublicationStateDraft      PublicationState = "draft"
+	PublicationStatePending    PublicationState = "pending"
+	PublicationStatePublished  PublicationState = "published"
+	PublicationStateRemoved    PublicationState = "removed"
+	PublicationStateRestricted PublicationState = "restricted"
+)
+
+// Valid indicates whether the value is a known member of the PublicationState enum.
+func (e PublicationState) Valid() bool {
+	switch e {
+	case PublicationStateDraft:
+		return true
+	case PublicationStatePending:
+		return true
+	case PublicationStatePublished:
+		return true
+	case PublicationStateRemoved:
+		return true
+	case PublicationStateRestricted:
 		return true
 	default:
 		return false
@@ -123,6 +244,81 @@ func (e ReadyStatus) Valid() bool {
 	}
 }
 
+// Defines values for RelationDirection.
+const (
+	Incoming  RelationDirection = "incoming"
+	Outgoing  RelationDirection = "outgoing"
+	Symmetric RelationDirection = "symmetric"
+)
+
+// Valid indicates whether the value is a known member of the RelationDirection enum.
+func (e RelationDirection) Valid() bool {
+	switch e {
+	case Incoming:
+		return true
+	case Outgoing:
+		return true
+	case Symmetric:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RelationType.
+const (
+	DerivedFrom RelationType = "derived_from"
+	PartOf      RelationType = "part_of"
+	RelatedTo   RelationType = "related_to"
+	SuccessorOf RelationType = "successor_of"
+)
+
+// Valid indicates whether the value is a known member of the RelationType enum.
+func (e RelationType) Valid() bool {
+	switch e {
+	case DerivedFrom:
+		return true
+	case PartOf:
+		return true
+	case RelatedTo:
+		return true
+	case SuccessorOf:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RightsStatus.
+const (
+	RightsStatusConfirmed        RightsStatus = "confirmed"
+	RightsStatusCreatorProvided  RightsStatus = "creator_provided"
+	RightsStatusDisputed         RightsStatus = "disputed"
+	RightsStatusRemovedByRequest RightsStatus = "removed_by_request"
+	RightsStatusRightsReview     RightsStatus = "rights_review"
+	RightsStatusUnknown          RightsStatus = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the RightsStatus enum.
+func (e RightsStatus) Valid() bool {
+	switch e {
+	case RightsStatusConfirmed:
+		return true
+	case RightsStatusCreatorProvided:
+		return true
+	case RightsStatusDisputed:
+		return true
+	case RightsStatusRemovedByRequest:
+		return true
+	case RightsStatusRightsReview:
+		return true
+	case RightsStatusUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for Role.
 const (
 	Admin     Role = "admin"
@@ -144,6 +340,63 @@ func (e Role) Valid() bool {
 	}
 }
 
+// Defines values for SourceType.
+const (
+	SourceTypeArchive   SourceType = "archive"
+	SourceTypeCommunity SourceType = "community"
+	SourceTypeExternal  SourceType = "external"
+	SourceTypeMirror    SourceType = "mirror"
+	SourceTypeOfficial  SourceType = "official"
+	SourceTypeStore     SourceType = "store"
+	SourceTypeUnknown   SourceType = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the SourceType enum.
+func (e SourceType) Valid() bool {
+	switch e {
+	case SourceTypeArchive:
+		return true
+	case SourceTypeCommunity:
+		return true
+	case SourceTypeExternal:
+		return true
+	case SourceTypeMirror:
+		return true
+	case SourceTypeOfficial:
+		return true
+	case SourceTypeStore:
+		return true
+	case SourceTypeUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for TaxonomyState.
+const (
+	TaxonomyStateActive  TaxonomyState = "active"
+	TaxonomyStateRetired TaxonomyState = "retired"
+)
+
+// Valid indicates whether the value is a known member of the TaxonomyState enum.
+func (e TaxonomyState) Valid() bool {
+	switch e {
+	case TaxonomyStateActive:
+		return true
+	case TaxonomyStateRetired:
+		return true
+	default:
+		return false
+	}
+}
+
+// AddRelation defines model for AddRelation.
+type AddRelation struct {
+	RelationType     RelationType `json:"relation_type"`
+	TargetResourceId string       `json:"target_resource_id"`
+}
+
 // AdminMe defines model for AdminMe.
 type AdminMe struct {
 	AuthenticatedAt time.Time `json:"authenticated_at"`
@@ -161,6 +414,38 @@ type ApiError struct {
 // ApiErrorCode defines model for ApiError.Code.
 type ApiErrorCode string
 
+// AvailabilityState defines model for AvailabilityState.
+type AvailabilityState string
+
+// ContentRating defines model for ContentRating.
+type ContentRating string
+
+// CreateResource defines model for CreateResource.
+type CreateResource struct {
+	CategoryId    string                    `json:"category_id"`
+	ContentRating ContentRating             `json:"content_rating"`
+	DefaultLocale string                    `json:"default_locale"`
+	Lifecycle     *Lifecycle                `json:"lifecycle,omitempty"`
+	Localization  ResourceLocalizationInput `json:"localization"`
+	Slug          string                    `json:"slug"`
+}
+
+// CreateSource defines model for CreateSource.
+type CreateSource struct {
+	AvailabilityState AvailabilityState `json:"availability_state"`
+	IsPrimary         bool              `json:"is_primary"`
+	Label             *string           `json:"label,omitempty"`
+	SourceType        SourceType        `json:"source_type"`
+	Url               string            `json:"url"`
+}
+
+// CreateTaxonomy defines model for CreateTaxonomy.
+type CreateTaxonomy struct {
+	DefaultLocale string                    `json:"default_locale"`
+	Localization  TaxonomyLocalizationInput `json:"localization"`
+	Slug          string                    `json:"slug"`
+}
+
 // Credentials defines model for Credentials.
 type Credentials struct {
 	Email    string  `json:"email"`
@@ -172,6 +457,20 @@ type CsrfToken struct {
 	CsrfToken string `json:"csrf_token"`
 }
 
+// EntityID defines model for EntityID.
+type EntityID struct {
+	Id string `json:"id"`
+}
+
+// ExternalID defines model for ExternalID.
+type ExternalID struct {
+	ExternalId string `json:"external_id"`
+	Namespace  string `json:"namespace"`
+}
+
+// Lifecycle defines model for Lifecycle.
+type Lifecycle string
+
 // Live defines model for Live.
 type Live struct {
 	Status LiveStatus `json:"status"`
@@ -179,6 +478,33 @@ type Live struct {
 
 // LiveStatus defines model for Live.Status.
 type LiveStatus string
+
+// PatchResource defines model for PatchResource.
+type PatchResource struct {
+	CategoryId    *string        `json:"category_id,omitempty"`
+	ContentRating *ContentRating `json:"content_rating,omitempty"`
+	DefaultLocale *string        `json:"default_locale,omitempty"`
+	Lifecycle     *Lifecycle     `json:"lifecycle,omitempty"`
+	Slug          *string        `json:"slug,omitempty"`
+}
+
+// PatchSource defines model for PatchSource.
+type PatchSource struct {
+	AvailabilityState *AvailabilityState `json:"availability_state,omitempty"`
+	IsPrimary         *bool              `json:"is_primary,omitempty"`
+	Label             *string            `json:"label,omitempty"`
+	SourceType        *SourceType        `json:"source_type,omitempty"`
+	Url               *string            `json:"url,omitempty"`
+}
+
+// PatchTaxonomy defines model for PatchTaxonomy.
+type PatchTaxonomy struct {
+	DefaultLocale *string        `json:"default_locale,omitempty"`
+	State         *TaxonomyState `json:"state,omitempty"`
+}
+
+// PublicationState defines model for PublicationState.
+type PublicationState string
 
 // Ready defines model for Ready.
 type Ready struct {
@@ -201,6 +527,94 @@ type Reauthentication struct {
 	Password *string `json:"password,omitempty"`
 }
 
+// Relation defines model for Relation.
+type Relation struct {
+	Direction RelationDirection `json:"direction"`
+	Id        string            `json:"id"`
+	Other     struct {
+		Id               string           `json:"id"`
+		Name             string           `json:"name"`
+		PublicationState PublicationState `json:"publication_state"`
+		Slug             string           `json:"slug"`
+	} `json:"other"`
+	RelationType     RelationType `json:"relation_type"`
+	SourceResourceId string       `json:"source_resource_id"`
+	TargetResourceId string       `json:"target_resource_id"`
+}
+
+// RelationDirection defines model for Relation.Direction.
+type RelationDirection string
+
+// RelationType defines model for RelationType.
+type RelationType string
+
+// ResourceDetail defines model for ResourceDetail.
+type ResourceDetail struct {
+	Category         TaxonomySummary        `json:"category"`
+	ContentRating    ContentRating          `json:"content_rating"`
+	CreatedAt        time.Time              `json:"created_at"`
+	DefaultLocale    string                 `json:"default_locale"`
+	ExternalIds      []ExternalID           `json:"external_ids"`
+	Id               string                 `json:"id"`
+	Lifecycle        Lifecycle              `json:"lifecycle"`
+	Localizations    []ResourceLocalization `json:"localizations"`
+	PublicationState PublicationState       `json:"publication_state"`
+	PublishedAt      *time.Time             `json:"published_at"`
+	Relations        []Relation             `json:"relations"`
+	Slug             string                 `json:"slug"`
+	Sources          []Source               `json:"sources"`
+	Tags             []TaxonomySummary      `json:"tags"`
+	UpdatedAt        time.Time              `json:"updated_at"`
+	Version          int64                  `json:"version"`
+}
+
+// ResourceList defines model for ResourceList.
+type ResourceList struct {
+	HasNext  bool               `json:"has_next"`
+	Items    []ResourceListItem `json:"items"`
+	Page     int64              `json:"page"`
+	PageSize int64              `json:"page_size"`
+}
+
+// ResourceListItem defines model for ResourceListItem.
+type ResourceListItem struct {
+	Category         TaxonomySummary  `json:"category"`
+	ContentRating    ContentRating    `json:"content_rating"`
+	DefaultLocale    string           `json:"default_locale"`
+	Id               string           `json:"id"`
+	Lifecycle        Lifecycle        `json:"lifecycle"`
+	Name             string           `json:"name"`
+	PublicationState PublicationState `json:"publication_state"`
+	PublishedAt      *time.Time       `json:"published_at"`
+	Slug             string           `json:"slug"`
+	UpdatedAt        time.Time        `json:"updated_at"`
+	Version          int64            `json:"version"`
+}
+
+// ResourceLocalization defines model for ResourceLocalization.
+type ResourceLocalization struct {
+	Description *string `json:"description"`
+	Locale      string  `json:"locale"`
+	Name        string  `json:"name"`
+	Summary     *string `json:"summary"`
+}
+
+// ResourceLocalizationInput defines model for ResourceLocalizationInput.
+type ResourceLocalizationInput struct {
+	Description *string `json:"description,omitempty"`
+	Name        string  `json:"name"`
+	Summary     *string `json:"summary,omitempty"`
+}
+
+// ResourceRevision defines model for ResourceRevision.
+type ResourceRevision struct {
+	Id      string `json:"id"`
+	Version int64  `json:"version"`
+}
+
+// RightsStatus defines model for RightsStatus.
+type RightsStatus string
+
 // Role defines model for Role.
 type Role string
 
@@ -218,6 +632,83 @@ type Session struct {
 // SessionList defines model for SessionList.
 type SessionList struct {
 	Sessions []Session `json:"sessions"`
+}
+
+// SetExternalIDs defines model for SetExternalIDs.
+type SetExternalIDs struct {
+	Items []ExternalID `json:"items"`
+}
+
+// SetPublication defines model for SetPublication.
+type SetPublication struct {
+	State PublicationState `json:"state"`
+}
+
+// SetResourceTags defines model for SetResourceTags.
+type SetResourceTags struct {
+	TagIds []string `json:"tag_ids"`
+}
+
+// SetSourceRights defines model for SetSourceRights.
+type SetSourceRights struct {
+	RightsStatus RightsStatus `json:"rights_status"`
+}
+
+// Source defines model for Source.
+type Source struct {
+	AvailabilityState AvailabilityState `json:"availability_state"`
+	CreatedAt         time.Time         `json:"created_at"`
+	Id                string            `json:"id"`
+	IsPrimary         bool              `json:"is_primary"`
+	Label             *string           `json:"label"`
+	RightsStatus      RightsStatus      `json:"rights_status"`
+	SourceType        SourceType        `json:"source_type"`
+	UpdatedAt         time.Time         `json:"updated_at"`
+	Url               string            `json:"url"`
+}
+
+// SourceType defines model for SourceType.
+type SourceType string
+
+// TaxonomyDetail defines model for TaxonomyDetail.
+type TaxonomyDetail struct {
+	CreatedAt     time.Time              `json:"created_at"`
+	DefaultLocale string                 `json:"default_locale"`
+	Id            string                 `json:"id"`
+	Localizations []TaxonomyLocalization `json:"localizations"`
+	Slug          string                 `json:"slug"`
+	State         TaxonomyState          `json:"state"`
+	UpdatedAt     time.Time              `json:"updated_at"`
+}
+
+// TaxonomyList defines model for TaxonomyList.
+type TaxonomyList struct {
+	Items []TaxonomySummary `json:"items"`
+}
+
+// TaxonomyLocalization defines model for TaxonomyLocalization.
+type TaxonomyLocalization struct {
+	Description *string `json:"description"`
+	Locale      string  `json:"locale"`
+	Name        string  `json:"name"`
+}
+
+// TaxonomyLocalizationInput defines model for TaxonomyLocalizationInput.
+type TaxonomyLocalizationInput struct {
+	Description *string `json:"description,omitempty"`
+	Name        string  `json:"name"`
+}
+
+// TaxonomyState defines model for TaxonomyState.
+type TaxonomyState string
+
+// TaxonomySummary defines model for TaxonomySummary.
+type TaxonomySummary struct {
+	DefaultLocale string        `json:"default_locale"`
+	Id            string        `json:"id"`
+	Name          string        `json:"name"`
+	Slug          string        `json:"slug"`
+	State         TaxonomyState `json:"state"`
 }
 
 // CSRF defines model for CSRF.
@@ -239,6 +730,31 @@ type ReauthenticateParams struct {
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
 }
 
+// CreateCategoryParams defines parameters for CreateCategory.
+type CreateCategoryParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// DeleteCategoryParams defines parameters for DeleteCategory.
+type DeleteCategoryParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// PatchCategoryParams defines parameters for PatchCategory.
+type PatchCategoryParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// DeleteCategoryLocalizationParams defines parameters for DeleteCategoryLocalization.
+type DeleteCategoryLocalizationParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// PutCategoryLocalizationParams defines parameters for PutCategoryLocalization.
+type PutCategoryLocalizationParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
 // RevokeOtherSessionsParams defines parameters for RevokeOtherSessions.
 type RevokeOtherSessionsParams struct {
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
@@ -249,11 +765,170 @@ type RevokeSessionParams struct {
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
 }
 
+// ListResourcesParams defines parameters for ListResources.
+type ListResourcesParams struct {
+	Page             *int64            `form:"page,omitempty" json:"page,omitempty"`
+	PageSize         *int64            `form:"page_size,omitempty" json:"page_size,omitempty"`
+	PublicationState *PublicationState `form:"publication_state,omitempty" json:"publication_state,omitempty"`
+	CategoryId       *string           `form:"category_id,omitempty" json:"category_id,omitempty"`
+	Slug             *string           `form:"slug,omitempty" json:"slug,omitempty"`
+}
+
+// CreateResourceParams defines parameters for CreateResource.
+type CreateResourceParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// DeleteResourceParams defines parameters for DeleteResource.
+type DeleteResourceParams struct {
+	ExpectedVersion int64 `form:"expected_version" json:"expected_version"`
+	XCSRFToken      CSRF  `json:"X-CSRF-Token"`
+}
+
+// PatchResourceParams defines parameters for PatchResource.
+type PatchResourceParams struct {
+	ExpectedVersion int64 `form:"expected_version" json:"expected_version"`
+	XCSRFToken      CSRF  `json:"X-CSRF-Token"`
+}
+
+// SetResourceExternalIDsParams defines parameters for SetResourceExternalIDs.
+type SetResourceExternalIDsParams struct {
+	ExpectedVersion int64 `form:"expected_version" json:"expected_version"`
+	XCSRFToken      CSRF  `json:"X-CSRF-Token"`
+}
+
+// DeleteResourceLocalizationParams defines parameters for DeleteResourceLocalization.
+type DeleteResourceLocalizationParams struct {
+	ExpectedVersion int64 `form:"expected_version" json:"expected_version"`
+	XCSRFToken      CSRF  `json:"X-CSRF-Token"`
+}
+
+// PutResourceLocalizationParams defines parameters for PutResourceLocalization.
+type PutResourceLocalizationParams struct {
+	ExpectedVersion int64 `form:"expected_version" json:"expected_version"`
+	XCSRFToken      CSRF  `json:"X-CSRF-Token"`
+}
+
+// SetPublicationParams defines parameters for SetPublication.
+type SetPublicationParams struct {
+	ExpectedVersion int64 `form:"expected_version" json:"expected_version"`
+	XCSRFToken      CSRF  `json:"X-CSRF-Token"`
+}
+
+// AddRelationParams defines parameters for AddRelation.
+type AddRelationParams struct {
+	ExpectedVersion int64 `form:"expected_version" json:"expected_version"`
+	XCSRFToken      CSRF  `json:"X-CSRF-Token"`
+}
+
+// DeleteRelationParams defines parameters for DeleteRelation.
+type DeleteRelationParams struct {
+	ExpectedVersion int64 `form:"expected_version" json:"expected_version"`
+	XCSRFToken      CSRF  `json:"X-CSRF-Token"`
+}
+
+// CreateSourceParams defines parameters for CreateSource.
+type CreateSourceParams struct {
+	ExpectedVersion int64 `form:"expected_version" json:"expected_version"`
+	XCSRFToken      CSRF  `json:"X-CSRF-Token"`
+}
+
+// PatchSourceParams defines parameters for PatchSource.
+type PatchSourceParams struct {
+	ExpectedVersion int64 `form:"expected_version" json:"expected_version"`
+	XCSRFToken      CSRF  `json:"X-CSRF-Token"`
+}
+
+// SetSourceRightsParams defines parameters for SetSourceRights.
+type SetSourceRightsParams struct {
+	ExpectedVersion int64 `form:"expected_version" json:"expected_version"`
+	XCSRFToken      CSRF  `json:"X-CSRF-Token"`
+}
+
+// SetResourceTagsParams defines parameters for SetResourceTags.
+type SetResourceTagsParams struct {
+	ExpectedVersion int64 `form:"expected_version" json:"expected_version"`
+	XCSRFToken      CSRF  `json:"X-CSRF-Token"`
+}
+
+// CreateTagParams defines parameters for CreateTag.
+type CreateTagParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// DeleteTagParams defines parameters for DeleteTag.
+type DeleteTagParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// PatchTagParams defines parameters for PatchTag.
+type PatchTagParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// DeleteTagLocalizationParams defines parameters for DeleteTagLocalization.
+type DeleteTagLocalizationParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// PutTagLocalizationParams defines parameters for PutTagLocalization.
+type PutTagLocalizationParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
 // LoginJSONRequestBody defines body for Login for application/json ContentType.
 type LoginJSONRequestBody = Credentials
 
 // ReauthenticateJSONRequestBody defines body for Reauthenticate for application/json ContentType.
 type ReauthenticateJSONRequestBody = Reauthentication
+
+// CreateCategoryJSONRequestBody defines body for CreateCategory for application/json ContentType.
+type CreateCategoryJSONRequestBody = CreateTaxonomy
+
+// PatchCategoryJSONRequestBody defines body for PatchCategory for application/json ContentType.
+type PatchCategoryJSONRequestBody = PatchTaxonomy
+
+// PutCategoryLocalizationJSONRequestBody defines body for PutCategoryLocalization for application/json ContentType.
+type PutCategoryLocalizationJSONRequestBody = TaxonomyLocalizationInput
+
+// CreateResourceJSONRequestBody defines body for CreateResource for application/json ContentType.
+type CreateResourceJSONRequestBody = CreateResource
+
+// PatchResourceJSONRequestBody defines body for PatchResource for application/json ContentType.
+type PatchResourceJSONRequestBody = PatchResource
+
+// SetResourceExternalIDsJSONRequestBody defines body for SetResourceExternalIDs for application/json ContentType.
+type SetResourceExternalIDsJSONRequestBody = SetExternalIDs
+
+// PutResourceLocalizationJSONRequestBody defines body for PutResourceLocalization for application/json ContentType.
+type PutResourceLocalizationJSONRequestBody = ResourceLocalizationInput
+
+// SetPublicationJSONRequestBody defines body for SetPublication for application/json ContentType.
+type SetPublicationJSONRequestBody = SetPublication
+
+// AddRelationJSONRequestBody defines body for AddRelation for application/json ContentType.
+type AddRelationJSONRequestBody = AddRelation
+
+// CreateSourceJSONRequestBody defines body for CreateSource for application/json ContentType.
+type CreateSourceJSONRequestBody = CreateSource
+
+// PatchSourceJSONRequestBody defines body for PatchSource for application/json ContentType.
+type PatchSourceJSONRequestBody = PatchSource
+
+// SetSourceRightsJSONRequestBody defines body for SetSourceRights for application/json ContentType.
+type SetSourceRightsJSONRequestBody = SetSourceRights
+
+// SetResourceTagsJSONRequestBody defines body for SetResourceTags for application/json ContentType.
+type SetResourceTagsJSONRequestBody = SetResourceTags
+
+// CreateTagJSONRequestBody defines body for CreateTag for application/json ContentType.
+type CreateTagJSONRequestBody = CreateTaxonomy
+
+// PatchTagJSONRequestBody defines body for PatchTag for application/json ContentType.
+type PatchTagJSONRequestBody = PatchTaxonomy
+
+// PutTagLocalizationJSONRequestBody defines body for PutTagLocalization for application/json ContentType.
+type PutTagLocalizationJSONRequestBody = TaxonomyLocalizationInput
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -269,6 +944,27 @@ type ServerInterface interface {
 
 	// (POST /auth/reauthenticate)
 	Reauthenticate(c fiber.Ctx, params ReauthenticateParams) error
+
+	// (GET /categories)
+	ListCategories(c fiber.Ctx) error
+
+	// (POST /categories)
+	CreateCategory(c fiber.Ctx, params CreateCategoryParams) error
+
+	// (DELETE /categories/{category_id})
+	DeleteCategory(c fiber.Ctx, categoryId string, params DeleteCategoryParams) error
+
+	// (GET /categories/{category_id})
+	GetCategory(c fiber.Ctx, categoryId string) error
+
+	// (PATCH /categories/{category_id})
+	PatchCategory(c fiber.Ctx, categoryId string, params PatchCategoryParams) error
+
+	// (DELETE /categories/{category_id}/localizations/{locale})
+	DeleteCategoryLocalization(c fiber.Ctx, categoryId string, locale string, params DeleteCategoryLocalizationParams) error
+
+	// (PUT /categories/{category_id}/localizations/{locale})
+	PutCategoryLocalization(c fiber.Ctx, categoryId string, locale string, params PutCategoryLocalizationParams) error
 
 	// (GET /health/live)
 	GetLive(c fiber.Ctx) error
@@ -287,6 +983,72 @@ type ServerInterface interface {
 
 	// (DELETE /me/sessions/{session_id})
 	RevokeSession(c fiber.Ctx, sessionId string, params RevokeSessionParams) error
+
+	// (GET /resources)
+	ListResources(c fiber.Ctx, params ListResourcesParams) error
+
+	// (POST /resources)
+	CreateResource(c fiber.Ctx, params CreateResourceParams) error
+
+	// (DELETE /resources/{resource_id})
+	DeleteResource(c fiber.Ctx, resourceId string, params DeleteResourceParams) error
+
+	// (GET /resources/{resource_id})
+	GetResource(c fiber.Ctx, resourceId string) error
+
+	// (PATCH /resources/{resource_id})
+	PatchResource(c fiber.Ctx, resourceId string, params PatchResourceParams) error
+
+	// (PUT /resources/{resource_id}/external-ids)
+	SetResourceExternalIDs(c fiber.Ctx, resourceId string, params SetResourceExternalIDsParams) error
+
+	// (DELETE /resources/{resource_id}/localizations/{locale})
+	DeleteResourceLocalization(c fiber.Ctx, resourceId string, locale string, params DeleteResourceLocalizationParams) error
+
+	// (PUT /resources/{resource_id}/localizations/{locale})
+	PutResourceLocalization(c fiber.Ctx, resourceId string, locale string, params PutResourceLocalizationParams) error
+
+	// (PUT /resources/{resource_id}/publication)
+	SetPublication(c fiber.Ctx, resourceId string, params SetPublicationParams) error
+
+	// (POST /resources/{resource_id}/relations)
+	AddRelation(c fiber.Ctx, resourceId string, params AddRelationParams) error
+
+	// (DELETE /resources/{resource_id}/relations/{relation_id})
+	DeleteRelation(c fiber.Ctx, resourceId string, relationId string, params DeleteRelationParams) error
+
+	// (POST /resources/{resource_id}/sources)
+	CreateSource(c fiber.Ctx, resourceId string, params CreateSourceParams) error
+
+	// (PATCH /resources/{resource_id}/sources/{source_id})
+	PatchSource(c fiber.Ctx, resourceId string, sourceId string, params PatchSourceParams) error
+
+	// (PUT /resources/{resource_id}/sources/{source_id}/rights)
+	SetSourceRights(c fiber.Ctx, resourceId string, sourceId string, params SetSourceRightsParams) error
+
+	// (PUT /resources/{resource_id}/tags)
+	SetResourceTags(c fiber.Ctx, resourceId string, params SetResourceTagsParams) error
+
+	// (GET /tags)
+	ListTags(c fiber.Ctx) error
+
+	// (POST /tags)
+	CreateTag(c fiber.Ctx, params CreateTagParams) error
+
+	// (DELETE /tags/{tag_id})
+	DeleteTag(c fiber.Ctx, tagId string, params DeleteTagParams) error
+
+	// (GET /tags/{tag_id})
+	GetTag(c fiber.Ctx, tagId string) error
+
+	// (PATCH /tags/{tag_id})
+	PatchTag(c fiber.Ctx, tagId string, params PatchTagParams) error
+
+	// (DELETE /tags/{tag_id}/localizations/{locale})
+	DeleteTagLocalization(c fiber.Ctx, tagId string, locale string, params DeleteTagLocalizationParams) error
+
+	// (PUT /tags/{tag_id}/localizations/{locale})
+	PutTagLocalization(c fiber.Ctx, tagId string, locale string, params PutTagLocalizationParams) error
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -411,6 +1173,326 @@ func (siw *ServerInterfaceWrapper) Reauthenticate(c fiber.Ctx) error {
 
 	handler := func(c fiber.Ctx) error {
 		return siw.Handler.Reauthenticate(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// ListCategories operation middleware
+func (siw *ServerInterfaceWrapper) ListCategories(c fiber.Ctx) error {
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.ListCategories(c)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// CreateCategory operation middleware
+func (siw *ServerInterfaceWrapper) CreateCategory(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateCategoryParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.CreateCategory(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// DeleteCategory operation middleware
+func (siw *ServerInterfaceWrapper) DeleteCategory(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "category_id" -------------
+	var categoryId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "category_id", c.Params("category_id"), &categoryId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter category_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteCategoryParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.DeleteCategory(c, categoryId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// GetCategory operation middleware
+func (siw *ServerInterfaceWrapper) GetCategory(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "category_id" -------------
+	var categoryId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "category_id", c.Params("category_id"), &categoryId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter category_id: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.GetCategory(c, categoryId)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// PatchCategory operation middleware
+func (siw *ServerInterfaceWrapper) PatchCategory(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "category_id" -------------
+	var categoryId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "category_id", c.Params("category_id"), &categoryId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter category_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PatchCategoryParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.PatchCategory(c, categoryId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// DeleteCategoryLocalization operation middleware
+func (siw *ServerInterfaceWrapper) DeleteCategoryLocalization(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "category_id" -------------
+	var categoryId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "category_id", c.Params("category_id"), &categoryId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter category_id: %w", err).Error())
+	}
+
+	// ------------- Path parameter "locale" -------------
+	var locale string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "locale", c.Params("locale"), &locale, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter locale: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteCategoryLocalizationParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.DeleteCategoryLocalization(c, categoryId, locale, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// PutCategoryLocalization operation middleware
+func (siw *ServerInterfaceWrapper) PutCategoryLocalization(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "category_id" -------------
+	var categoryId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "category_id", c.Params("category_id"), &categoryId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter category_id: %w", err).Error())
+	}
+
+	// ------------- Path parameter "locale" -------------
+	var locale string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "locale", c.Params("locale"), &locale, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter locale: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PutCategoryLocalizationParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.PutCategoryLocalization(c, categoryId, locale, params)
 	}
 
 	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
@@ -594,6 +1676,1297 @@ func (siw *ServerInterfaceWrapper) RevokeSession(c fiber.Ctx) error {
 	return handler(c)
 }
 
+// ListResources operation middleware
+func (siw *ServerInterfaceWrapper) ListResources(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListResourcesParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", query, &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page_size" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page_size", query, &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page_size: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "publication_state" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "publication_state", query, &params.PublicationState, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter publication_state: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "category_id" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "category_id", query, &params.CategoryId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter category_id: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "slug" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "slug", query, &params.Slug, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter slug: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.ListResources(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// CreateResource operation middleware
+func (siw *ServerInterfaceWrapper) CreateResource(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateResourceParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.CreateResource(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// DeleteResource operation middleware
+func (siw *ServerInterfaceWrapper) DeleteResource(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "resource_id" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resource_id", c.Params("resource_id"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteResourceParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Required query parameter "expected_version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "expected_version", query, &params.ExpectedVersion, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter expected_version: %w", err).Error())
+	}
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.DeleteResource(c, resourceId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// GetResource operation middleware
+func (siw *ServerInterfaceWrapper) GetResource(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "resource_id" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resource_id", c.Params("resource_id"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.GetResource(c, resourceId)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// PatchResource operation middleware
+func (siw *ServerInterfaceWrapper) PatchResource(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "resource_id" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resource_id", c.Params("resource_id"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PatchResourceParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Required query parameter "expected_version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "expected_version", query, &params.ExpectedVersion, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter expected_version: %w", err).Error())
+	}
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.PatchResource(c, resourceId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// SetResourceExternalIDs operation middleware
+func (siw *ServerInterfaceWrapper) SetResourceExternalIDs(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "resource_id" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resource_id", c.Params("resource_id"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SetResourceExternalIDsParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Required query parameter "expected_version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "expected_version", query, &params.ExpectedVersion, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter expected_version: %w", err).Error())
+	}
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.SetResourceExternalIDs(c, resourceId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// DeleteResourceLocalization operation middleware
+func (siw *ServerInterfaceWrapper) DeleteResourceLocalization(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "resource_id" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resource_id", c.Params("resource_id"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// ------------- Path parameter "locale" -------------
+	var locale string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "locale", c.Params("locale"), &locale, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter locale: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteResourceLocalizationParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Required query parameter "expected_version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "expected_version", query, &params.ExpectedVersion, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter expected_version: %w", err).Error())
+	}
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.DeleteResourceLocalization(c, resourceId, locale, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// PutResourceLocalization operation middleware
+func (siw *ServerInterfaceWrapper) PutResourceLocalization(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "resource_id" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resource_id", c.Params("resource_id"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// ------------- Path parameter "locale" -------------
+	var locale string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "locale", c.Params("locale"), &locale, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter locale: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PutResourceLocalizationParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Required query parameter "expected_version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "expected_version", query, &params.ExpectedVersion, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter expected_version: %w", err).Error())
+	}
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.PutResourceLocalization(c, resourceId, locale, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// SetPublication operation middleware
+func (siw *ServerInterfaceWrapper) SetPublication(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "resource_id" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resource_id", c.Params("resource_id"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SetPublicationParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Required query parameter "expected_version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "expected_version", query, &params.ExpectedVersion, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter expected_version: %w", err).Error())
+	}
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.SetPublication(c, resourceId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// AddRelation operation middleware
+func (siw *ServerInterfaceWrapper) AddRelation(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "resource_id" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resource_id", c.Params("resource_id"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params AddRelationParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Required query parameter "expected_version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "expected_version", query, &params.ExpectedVersion, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter expected_version: %w", err).Error())
+	}
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.AddRelation(c, resourceId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// DeleteRelation operation middleware
+func (siw *ServerInterfaceWrapper) DeleteRelation(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "resource_id" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resource_id", c.Params("resource_id"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// ------------- Path parameter "relation_id" -------------
+	var relationId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "relation_id", c.Params("relation_id"), &relationId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter relation_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteRelationParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Required query parameter "expected_version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "expected_version", query, &params.ExpectedVersion, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter expected_version: %w", err).Error())
+	}
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.DeleteRelation(c, resourceId, relationId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// CreateSource operation middleware
+func (siw *ServerInterfaceWrapper) CreateSource(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "resource_id" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resource_id", c.Params("resource_id"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateSourceParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Required query parameter "expected_version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "expected_version", query, &params.ExpectedVersion, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter expected_version: %w", err).Error())
+	}
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.CreateSource(c, resourceId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// PatchSource operation middleware
+func (siw *ServerInterfaceWrapper) PatchSource(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "resource_id" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resource_id", c.Params("resource_id"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// ------------- Path parameter "source_id" -------------
+	var sourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "source_id", c.Params("source_id"), &sourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter source_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PatchSourceParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Required query parameter "expected_version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "expected_version", query, &params.ExpectedVersion, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter expected_version: %w", err).Error())
+	}
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.PatchSource(c, resourceId, sourceId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// SetSourceRights operation middleware
+func (siw *ServerInterfaceWrapper) SetSourceRights(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "resource_id" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resource_id", c.Params("resource_id"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// ------------- Path parameter "source_id" -------------
+	var sourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "source_id", c.Params("source_id"), &sourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter source_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SetSourceRightsParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Required query parameter "expected_version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "expected_version", query, &params.ExpectedVersion, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter expected_version: %w", err).Error())
+	}
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.SetSourceRights(c, resourceId, sourceId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// SetResourceTags operation middleware
+func (siw *ServerInterfaceWrapper) SetResourceTags(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "resource_id" -------------
+	var resourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "resource_id", c.Params("resource_id"), &resourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SetResourceTagsParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Required query parameter "expected_version" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, true, "expected_version", query, &params.ExpectedVersion, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter expected_version: %w", err).Error())
+	}
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.SetResourceTags(c, resourceId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// ListTags operation middleware
+func (siw *ServerInterfaceWrapper) ListTags(c fiber.Ctx) error {
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.ListTags(c)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// CreateTag operation middleware
+func (siw *ServerInterfaceWrapper) CreateTag(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateTagParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.CreateTag(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// DeleteTag operation middleware
+func (siw *ServerInterfaceWrapper) DeleteTag(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "tag_id" -------------
+	var tagId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "tag_id", c.Params("tag_id"), &tagId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter tag_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteTagParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.DeleteTag(c, tagId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// GetTag operation middleware
+func (siw *ServerInterfaceWrapper) GetTag(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "tag_id" -------------
+	var tagId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "tag_id", c.Params("tag_id"), &tagId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter tag_id: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.GetTag(c, tagId)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// PatchTag operation middleware
+func (siw *ServerInterfaceWrapper) PatchTag(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "tag_id" -------------
+	var tagId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "tag_id", c.Params("tag_id"), &tagId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter tag_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PatchTagParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.PatchTag(c, tagId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// DeleteTagLocalization operation middleware
+func (siw *ServerInterfaceWrapper) DeleteTagLocalization(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "tag_id" -------------
+	var tagId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "tag_id", c.Params("tag_id"), &tagId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter tag_id: %w", err).Error())
+	}
+
+	// ------------- Path parameter "locale" -------------
+	var locale string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "locale", c.Params("locale"), &locale, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter locale: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DeleteTagLocalizationParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.DeleteTagLocalization(c, tagId, locale, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// PutTagLocalization operation middleware
+func (siw *ServerInterfaceWrapper) PutTagLocalization(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "tag_id" -------------
+	var tagId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "tag_id", c.Params("tag_id"), &tagId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter tag_id: %w", err).Error())
+	}
+
+	// ------------- Path parameter "locale" -------------
+	var locale string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "locale", c.Params("locale"), &locale, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter locale: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params PutTagLocalizationParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.PutTagLocalization(c, tagId, locale, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
 // FiberServerOptions provides options for the Fiber server.
 type FiberServerOptions struct {
 	BaseURL            string
@@ -636,5 +3009,63 @@ func RegisterHandlersWithOptions(router fiber.Router, si ServerInterface, option
 	router.Get(options.BaseURL+"/health/live", wrapper.GetLive)
 
 	router.Get(options.BaseURL+"/health/ready", wrapper.GetReady)
+
+	router.Get(options.BaseURL+"/resources", wrapper.ListResources)
+
+	router.Post(options.BaseURL+"/resources", wrapper.CreateResource)
+
+	router.Delete(options.BaseURL+"/resources/:resource_id", wrapper.DeleteResource)
+
+	router.Get(options.BaseURL+"/resources/:resource_id", wrapper.GetResource)
+
+	router.Patch(options.BaseURL+"/resources/:resource_id", wrapper.PatchResource)
+
+	router.Delete(options.BaseURL+"/resources/:resource_id/localizations/:locale", wrapper.DeleteResourceLocalization)
+
+	router.Put(options.BaseURL+"/resources/:resource_id/localizations/:locale", wrapper.PutResourceLocalization)
+
+	router.Put(options.BaseURL+"/resources/:resource_id/tags", wrapper.SetResourceTags)
+
+	router.Put(options.BaseURL+"/resources/:resource_id/external-ids", wrapper.SetResourceExternalIDs)
+
+	router.Post(options.BaseURL+"/resources/:resource_id/sources", wrapper.CreateSource)
+
+	router.Patch(options.BaseURL+"/resources/:resource_id/sources/:source_id", wrapper.PatchSource)
+
+	router.Put(options.BaseURL+"/resources/:resource_id/sources/:source_id/rights", wrapper.SetSourceRights)
+
+	router.Post(options.BaseURL+"/resources/:resource_id/relations", wrapper.AddRelation)
+
+	router.Delete(options.BaseURL+"/resources/:resource_id/relations/:relation_id", wrapper.DeleteRelation)
+
+	router.Put(options.BaseURL+"/resources/:resource_id/publication", wrapper.SetPublication)
+
+	router.Get(options.BaseURL+"/categories", wrapper.ListCategories)
+
+	router.Post(options.BaseURL+"/categories", wrapper.CreateCategory)
+
+	router.Delete(options.BaseURL+"/categories/:category_id", wrapper.DeleteCategory)
+
+	router.Get(options.BaseURL+"/categories/:category_id", wrapper.GetCategory)
+
+	router.Patch(options.BaseURL+"/categories/:category_id", wrapper.PatchCategory)
+
+	router.Delete(options.BaseURL+"/categories/:category_id/localizations/:locale", wrapper.DeleteCategoryLocalization)
+
+	router.Put(options.BaseURL+"/categories/:category_id/localizations/:locale", wrapper.PutCategoryLocalization)
+
+	router.Get(options.BaseURL+"/tags", wrapper.ListTags)
+
+	router.Post(options.BaseURL+"/tags", wrapper.CreateTag)
+
+	router.Delete(options.BaseURL+"/tags/:tag_id", wrapper.DeleteTag)
+
+	router.Get(options.BaseURL+"/tags/:tag_id", wrapper.GetTag)
+
+	router.Patch(options.BaseURL+"/tags/:tag_id", wrapper.PatchTag)
+
+	router.Delete(options.BaseURL+"/tags/:tag_id/localizations/:locale", wrapper.DeleteTagLocalization)
+
+	router.Put(options.BaseURL+"/tags/:tag_id/localizations/:locale", wrapper.PutTagLocalization)
 
 }

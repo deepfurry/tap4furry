@@ -18,7 +18,9 @@ import (
 
 	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/deepfurry/tap4furry/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/curation"
 	"github.com/deepfurry/tap4furry/server/internal/database"
+	"github.com/deepfurry/tap4furry/server/internal/database/curationcheck"
 	"github.com/deepfurry/tap4furry/server/internal/identity"
 	"github.com/deepfurry/tap4furry/server/internal/mail"
 	"github.com/deepfurry/tap4furry/server/internal/redisstore"
@@ -57,7 +59,7 @@ func run() (result error) {
 	if cfg.Environment != "development" {
 		return errors.New("Admin smoke requires development")
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 90*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 180*time.Second)
 	defer cancel()
 	open := func(raw, role string) (*pgxpool.Pool, error) {
 		pool, err := database.Open(ctx, raw)
@@ -145,10 +147,10 @@ func run() (result error) {
 		return err
 	}
 	defer func() { _ = apiThrottle.ClearSubject(context.Background(), auth.RegistrationLimit, email) }()
-	app := fiber.New()
-	admin.Register(app, nil, admin.Options{Auth: adminAuth, Environment: cfg.Environment, AdminOrigin: cfg.AdminOrigin, CSRFSecret: cfg.AdminCSRFSecret})
+	app := fiber.New(fiber.Config{BodyLimit: 256 * 1024})
+	admin.Register(app, nil, admin.Options{Auth: adminAuth, Curation: curation.New(adminPool), ResourcePool: adminPool, Environment: cfg.Environment, AdminOrigin: cfg.AdminOrigin, CSRFSecret: cfg.AdminCSRFSecret})
 	pub := fiber.New()
-	public.Register(pub, nil, publicAuth, identity.New(api), public.Options{Environment: "development", PublicOrigin: "http://localhost:4321", CSRFSecret: config.DevelopmentCSRFSecret})
+	public.Register(pub, nil, publicAuth, identity.New(api), public.Options{Environment: "development", PublicOrigin: "http://localhost:4321", CSRFSecret: config.DevelopmentCSRFSecret, ResourcePool: api})
 	var request func(*fiber.App, string, string, any, *http.Cookie, int) (map[string]any, *http.Cookie, error)
 	request = func(target *fiber.App, method, path string, body any, cookie *http.Cookie, status int) (map[string]any, *http.Cookie, error) {
 		payload, _ := json.Marshal(body)
@@ -258,6 +260,10 @@ func run() (result error) {
 		return err
 	}
 	fmt.Println("Real Admin identities/grants, verified fixture, login/me/CSRF/reauth, sessions, cookie isolation and final-role revocation passed (private values withheld)")
+	if err = curationcheck.Run(ctx, app, pub, owner, operator, email, password, cfg.AdminOrigin); err != nil {
+		return err
+	}
+	fmt.Println("Admin curation capabilities, complete Resource graph, governance, Admin-to-Public lifecycle and Goose 6 passed; temporary graph cleaned (private values withheld)")
 	return nil
 }
 func cleanup(pool *pgxpool.Pool, email string) error {

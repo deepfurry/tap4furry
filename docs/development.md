@@ -426,6 +426,34 @@ DELETE grant, shared server administration or production user deletion is involv
 
 ## Disposable CI and containers
 
+P0-2C extends `pnpm smoke:admin:dev` with canonical Resource graph curation and the
+Admin→Public Draft/Published/Restricted/Removed/Republished/Soft-deleted lifecycle.
+The existing randomly owned verified account starts Moderator (reads only), gains
+Editor for ordinary curation, and gains Admin for governance. Real Admin CSRF/session
+and RoleOperator paths are used; owner cleanup removes only the temporary graph and
+account, including fixture roles. Private inputs and response tokens are never printed.
+There is no `smoke:curation:dev`, new migration or shared infrastructure administration.
+
+Admin `/` redirects to `/resources`; Account/session/reauthentication is `/account`.
+Resource detail has Overview, Localizations, Tags, Sources, Relations and External IDs
+as real routes. Mutation success refetches canonical state. A version conflict keeps
+the local form and requires explicit Reload; dirty Overview/localization forms block
+route navigation and beforeunload. Soft-delete requires typing the exact slug.
+Published Resource links point to the local Public Web in Vite development and the
+canonical production Public origin in built assets.
+
+Disposable curation tests require `CI=true`, `GFP_DISPOSABLE_INFRA=1` and
+`GFP_CURATION_INTEGRATION=1`, then run:
+
+```text
+go -C server test -count=1 -timeout=3m -run TestIntegrationCuration ./internal/transport/public
+```
+
+They use fixed loopback `gfp_ci`, prepared runtime identities and no developer URLs.
+They cover application/HTTP capability, actor-lock revoke races, CAS/no-op/rollback,
+taxonomy, sources, per-type cycles, concurrent graph edits and Public lifecycle.
+The existing `pnpm integration:ci` includes this gate and all previous regressions.
+
 GitHub Actions provisions fresh PostgreSQL 18 and Redis 8 service containers. It
 never loads private files or uses Tailscale. `integration:ci` requires `CI=true` and
 `GFP_DISPOSABLE_INFRA=1`, uses fixed loopback endpoints and creates `gfp_ci` plus

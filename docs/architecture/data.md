@@ -178,6 +178,16 @@ UGC may simply store original language and original text.
 
 ## Resource Core
 
+P0-2C adds canonical mutation orchestration without changing migration 6 or runtime
+grants. `curation.sql` and `admin_resource.sql` own explicit write/read models.
+Application locks actor User, rechecks Admin session/current capabilities, then
+locks canonical targets. Resource-owned edits use expected-version CAS; identical
+canonical state leaves version and updated_at unchanged. All canonical writes use
+transaction_timestamp(). Relation graph advisory locking serializes per-type cycle
+decisions, and deterministic endpoint locks protect two Resource revision bumps.
+Admin description input is capped at 50,000 Unicode characters in Application and
+OpenAPI; the existing database column stays unchanged.
+
 P0-2B keeps schema version 6 and migrations 1–6 unchanged. Its dedicated read model
 selects only public columns. Published/non-deleted Resources with a non-deleted
 Category are visible regardless of lifecycle/rating; linked retired taxonomy stays

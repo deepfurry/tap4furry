@@ -42,10 +42,29 @@
   translation; deleting the current default is rejected while holding the parent lock.
   Resource-owned knowledge edits bump `version` once per logical transaction and
   endpoint; stale CAS aborts all child writes. Category/Tag edits do not bump Resources.
-- Future curation uses Editorial for ordinary canonical edits; Administration is
+- P0-2C curation uses Editorial for ordinary canonical edits; Administration is
   required for retiring taxonomy, restricted/removed Resources, soft deletion and
   rights-status mutations. Moderator has no canonical write capability. `gfp_admin`
-  is a database identity, distinct from the product's `admin` role. No new roles/API.
+  is a database identity, distinct from the product's `admin` role. No new roles.
+
+## P0-2C canonical curation
+
+- `internal/curation` owns canonical mutation transactions, using existing Auth's
+  User-first lock/session/live-role checks. Transport actor caching never substitutes
+  for transaction-time capability revalidation. Reads use `admin_resource.sql`.
+- Mutations use READ COMMITTED, PostgreSQL transaction timestamps and Resource CAS.
+  True no-op does not bump version/time. Stale/conflicting child writes fully roll back.
+- Relations use a fixed graph advisory xact lock before UUID-ordered Resource locks;
+  directed cycles are checked per relation_type, and changes bump both endpoints once.
+- Editor handles ordinary edits and draft/pending/published transitions; Admin is
+  required on either side of restricted/removed transitions, rights, retirement and
+  soft deletion. No Source hard-delete, restore, bulk actions or fuzzy search.
+- Admin routes require AdminAccess, no-store and five-second deadlines. Unsafe
+  requests require exact ADMIN_ORIGIN plus session-bound CSRF. Fiber ceiling is
+  256 KiB; Auth's strict 8 KiB decoder is unchanged. Description limit is 50,000
+  Unicode characters in Application/OpenAPI without a database schema change.
+- React uses real editor subroutes, no automatic mutation retries/optimistic writes,
+  explicit conflict reload preserving local form, dirty guards and typed soft deletion.
 
 ## P0-2B anonymous reads
 

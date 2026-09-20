@@ -5,7 +5,7 @@ Public/Admin are distinct transport and security boundaries, sharing one Go modu
 ```text
 apps/web / apps/admin → generated API clients → Public/Admin transport
                                                 ↓
-                                       auth / identity
+                                   auth / identity / curation
                                                 ↓
                                            sqlc / pgx
                                                 ↓
@@ -15,7 +15,7 @@ worker → jobs adapter → shared Application/Domain (when implemented)
 
 P0-1A/B/C/D add local/OAuth auth, PostgreSQL sessions, recovery, basic profiles and isolated Admin auth to P0-0 infrastructure.
 P0-2A adds pure `taxonomy` and `resource` domain packages alongside `auth` and `identity`.
-P0-2B adds anonymous Public read HTTP/SSR; complete mutation use cases remain P0-2C. `cmd/*` composes dependencies, signals and
+P0-2B adds anonymous Public read HTTP/SSR; P0-2C implements canonical Admin curation. `cmd/*` composes dependencies, signals and
 bounded cleanup; reusable behavior lives in `internal/`.
 
 Auth owns the challenge-mail interface; `internal/mail` implements post-commit local
@@ -43,6 +43,21 @@ Worker never calls Public/Admin HTTP. Application/domain code must not import Fi
 transport DTOs, Redis or River. River types stay inside Jobs infrastructure and its
 objects live in `river`; business data lives in `app`. PostgreSQL is canonical,
 Redis holds disposable state. No ORM, AutoMigrate, vectors, MongoDB or message broker.
+
+`curation.App` owns READ COMMITTED canonical mutations. Auth's transaction capability
+primitive locks the actor User and rechecks the active Admin session and live roles.
+Resource CAS is checked under the parent lock before child diffs; changes bump once,
+no-ops preserve version and updated_at. Graph writes additionally use one fixed
+advisory xact lock and UUID-ordered endpoint locks, with separate directed-type DAG
+checks. Taxonomy row locks serialize binding/retirement/deletion decisions. All
+canonical timestamps use transaction_timestamp(); migrations and grants stay at 6.
+Admin read snapshots use purpose-built sqlc, without rebuilding domain objects.
+
+Admin React routes separate Resources, six editor tabs, Taxonomy and Account.
+Static capability helpers only guide UX; the backend is authoritative. Mutations
+have no retries or optimistic updates, and refetch canonical snapshots after success.
+Version conflicts preserve drafts until explicit reload; dirty forms block navigation
+and unload. Shared native dialog primitives protect typed soft deletion.
 
 Resource Core is ten relational tables in `app`, owned by Goose migration 6. Domain
 primitives normalize locale/text/URLs and canonicalize symmetric relations without

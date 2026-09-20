@@ -142,3 +142,22 @@ Read DTOs never expose publication_state/version/deleted_at/rights_status/create
 Resource lists sort published_at DESC then id DESC, fetch page_size+1 with overflow-safe
 offset and return has_next without counts. Detail child reads share a read-only
 repeatable-read snapshot so concurrent visibility changes cannot split the graph.
+
+## P0-2C writes (schema and grants frozen at 6)
+
+No migration, new index or grant accompanies curation. `curation.sql` contains only
+purpose-built queries using the existing precise Admin DML. Canonical timestamps
+come from transaction_timestamp(). The actor User is locked before all target locks;
+Auth rechecks active Admin session and current static capabilities in READ COMMITTED.
+Resource parent locks and expected_version comparisons precede owned child diffs.
+The final compare-and-bump remains inside the transaction, including soft deletion;
+no-op leaves all revision/timestamp values unchanged. A changed relation increments
+both endpoints exactly once, after fixed advisory graph lock and UUID row lock order.
+Recursive cycle checks traverse only the same directed relation_type.
+
+Category/Tag mutations and new bindings lock taxonomy parents. Existing retired
+bindings may remain; new retired/deleted bindings fail. Default translations must
+exist before switching, and the current default cannot be deleted. In-use checks
+prevent taxonomy soft deletion while non-deleted Resources reference it. Sources
+are retained via availability=removed; setting primary clears the previous primary
+in the same transaction. External IDs remain globally unique and never auto-transfer.

@@ -137,6 +137,547 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Ready'
+  /resources:
+    get:
+      operationId: "listResources"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"page","in":"query","required":false,"schema":{"type":"integer","format":"int64","minimum":1,"default":1}},{"name":"page_size","in":"query","required":false,"schema":{"type":"integer","format":"int64","minimum":1,"maximum":100,"default":50}},{"name":"publication_state","in":"query","required":false,"schema":{"$ref":"#/components/schemas/PublicationState"}},{"name":"category_id","in":"query","required":false,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"slug","in":"query","required":false,"schema":{"type":"string","maxLength":80}}]
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceList"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+    post:
+      operationId: "createResource"
+      security: [{"AdminSession":[]}]
+      parameters: [{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/CreateResource"}
+      responses:
+        201:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceRevision"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /resources/{resource_id}:
+    get:
+      operationId: "getResource"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"resource_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}}]
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceDetail"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+    patch:
+      operationId: "patchResource"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"resource_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"expected_version","in":"query","required":true,"schema":{"type":"integer","format":"int64","minimum":1}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/PatchResource"}
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceRevision"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+    delete:
+      operationId: "deleteResource"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"resource_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"expected_version","in":"query","required":true,"schema":{"type":"integer","format":"int64","minimum":1}},{"$ref":"#/components/parameters/CSRF"}]
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceRevision"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /resources/{resource_id}/localizations/{locale}:
+    put:
+      operationId: "putResourceLocalization"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"resource_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"locale","in":"path","required":true,"schema":{"type":"string","maxLength":64}},{"name":"expected_version","in":"query","required":true,"schema":{"type":"integer","format":"int64","minimum":1}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/ResourceLocalizationInput"}
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceRevision"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+    delete:
+      operationId: "deleteResourceLocalization"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"resource_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"locale","in":"path","required":true,"schema":{"type":"string","maxLength":64}},{"name":"expected_version","in":"query","required":true,"schema":{"type":"integer","format":"int64","minimum":1}},{"$ref":"#/components/parameters/CSRF"}]
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceRevision"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /resources/{resource_id}/tags:
+    put:
+      operationId: "setResourceTags"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"resource_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"expected_version","in":"query","required":true,"schema":{"type":"integer","format":"int64","minimum":1}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/SetResourceTags"}
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceRevision"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /resources/{resource_id}/external-ids:
+    put:
+      operationId: "setResourceExternalIDs"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"resource_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"expected_version","in":"query","required":true,"schema":{"type":"integer","format":"int64","minimum":1}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/SetExternalIDs"}
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceRevision"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /resources/{resource_id}/sources:
+    post:
+      operationId: "createSource"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"resource_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"expected_version","in":"query","required":true,"schema":{"type":"integer","format":"int64","minimum":1}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/CreateSource"}
+      responses:
+        201:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceRevision"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /resources/{resource_id}/sources/{source_id}:
+    patch:
+      operationId: "patchSource"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"resource_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"source_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"expected_version","in":"query","required":true,"schema":{"type":"integer","format":"int64","minimum":1}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/PatchSource"}
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceRevision"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /resources/{resource_id}/sources/{source_id}/rights:
+    put:
+      operationId: "setSourceRights"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"resource_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"source_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"expected_version","in":"query","required":true,"schema":{"type":"integer","format":"int64","minimum":1}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/SetSourceRights"}
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceRevision"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /resources/{resource_id}/relations:
+    post:
+      operationId: "addRelation"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"resource_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"expected_version","in":"query","required":true,"schema":{"type":"integer","format":"int64","minimum":1}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/AddRelation"}
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceRevision"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /resources/{resource_id}/relations/{relation_id}:
+    delete:
+      operationId: "deleteRelation"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"resource_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"relation_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"expected_version","in":"query","required":true,"schema":{"type":"integer","format":"int64","minimum":1}},{"$ref":"#/components/parameters/CSRF"}]
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceRevision"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /resources/{resource_id}/publication:
+    put:
+      operationId: "setPublication"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"resource_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"expected_version","in":"query","required":true,"schema":{"type":"integer","format":"int64","minimum":1}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/SetPublication"}
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ResourceRevision"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /categories:
+    get:
+      operationId: "listCategories"
+      security: [{"AdminSession":[]}]
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/TaxonomyList"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+    post:
+      operationId: "createCategory"
+      security: [{"AdminSession":[]}]
+      parameters: [{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/CreateTaxonomy"}
+      responses:
+        201:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/EntityID"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /categories/{category_id}:
+    get:
+      operationId: "getCategory"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"category_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}}]
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/TaxonomyDetail"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+    patch:
+      operationId: "patchCategory"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"category_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/PatchTaxonomy"}
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/EntityID"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+    delete:
+      operationId: "deleteCategory"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"category_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"$ref":"#/components/parameters/CSRF"}]
+      responses:
+        204:
+          description: "Mutation complete."
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /categories/{category_id}/localizations/{locale}:
+    put:
+      operationId: "putCategoryLocalization"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"category_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"locale","in":"path","required":true,"schema":{"type":"string","maxLength":64}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/TaxonomyLocalizationInput"}
+      responses:
+        204:
+          description: "Mutation complete."
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+    delete:
+      operationId: "deleteCategoryLocalization"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"category_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"locale","in":"path","required":true,"schema":{"type":"string","maxLength":64}},{"$ref":"#/components/parameters/CSRF"}]
+      responses:
+        204:
+          description: "Mutation complete."
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /tags:
+    get:
+      operationId: "listTags"
+      security: [{"AdminSession":[]}]
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/TaxonomyList"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+    post:
+      operationId: "createTag"
+      security: [{"AdminSession":[]}]
+      parameters: [{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/CreateTaxonomy"}
+      responses:
+        201:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/EntityID"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /tags/{tag_id}:
+    get:
+      operationId: "getTag"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"tag_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}}]
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/TaxonomyDetail"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+    patch:
+      operationId: "patchTag"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"tag_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/PatchTaxonomy"}
+      responses:
+        200:
+          description: "Canonical result; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/EntityID"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+    delete:
+      operationId: "deleteTag"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"tag_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"$ref":"#/components/parameters/CSRF"}]
+      responses:
+        204:
+          description: "Mutation complete."
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+  /tags/{tag_id}/localizations/{locale}:
+    put:
+      operationId: "putTagLocalization"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"tag_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"locale","in":"path","required":true,"schema":{"type":"string","maxLength":64}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/TaxonomyLocalizationInput"}
+      responses:
+        204:
+          description: "Mutation complete."
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
+    delete:
+      operationId: "deleteTagLocalization"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"tag_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"locale","in":"path","required":true,"schema":{"type":"string","maxLength":64}},{"$ref":"#/components/parameters/CSRF"}]
+      responses:
+        204:
+          description: "Mutation complete."
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        500: {"$ref":"#/components/responses/Error"}
 components:
   securitySchemes:
     AdminSession:
@@ -165,6 +706,473 @@ components:
         application/json:
           schema: {$ref: '#/components/schemas/ApiError'}
   schemas:
+    PublicationState:
+      type: "string"
+      enum: ["draft","pending","published","restricted","removed"]
+    Lifecycle:
+      type: "string"
+      enum: ["active","inactive","discontinued","delisted","archived","unknown"]
+    ContentRating:
+      type: "string"
+      enum: ["general","mature","explicit"]
+    TaxonomyState:
+      type: "string"
+      enum: ["active","retired"]
+    SourceType:
+      type: "string"
+      enum: ["official","store","archive","mirror","community","external","unknown"]
+    AvailabilityState:
+      type: "string"
+      enum: ["active","unavailable","broken","removed","restricted"]
+    RightsStatus:
+      type: "string"
+      enum: ["unknown","creator_provided","confirmed","disputed","rights_review","removed_by_request"]
+    RelationType:
+      type: "string"
+      enum: ["part_of","successor_of","derived_from","related_to"]
+    ResourceRevision:
+      type: "object"
+      additionalProperties: false
+      required: ["id","version"]
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        version:
+          type: "integer"
+          format: "int64"
+          minimum: 1
+    EntityID:
+      type: "object"
+      additionalProperties: false
+      required: ["id"]
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+    ResourceLocalizationInput:
+      type: "object"
+      additionalProperties: false
+      required: ["name"]
+      properties:
+        name:
+          type: "string"
+          maxLength: 160
+          minLength: 1
+        summary:
+          type: "string"
+          maxLength: 500
+          nullable: true
+        description:
+          type: "string"
+          maxLength: 50000
+          nullable: true
+    TaxonomyLocalizationInput:
+      type: "object"
+      additionalProperties: false
+      required: ["name"]
+      properties:
+        name:
+          type: "string"
+          maxLength: 80
+          minLength: 1
+        description:
+          type: "string"
+          maxLength: 500
+          nullable: true
+    ResourceLocalization:
+      type: "object"
+      additionalProperties: false
+      required: ["locale","name","summary","description"]
+      properties:
+        locale:
+          type: "string"
+          maxLength: 64
+        name:
+          type: "string"
+          maxLength: 160
+        summary:
+          type: "string"
+          maxLength: 500
+          nullable: true
+        description:
+          type: "string"
+          maxLength: 50000
+          nullable: true
+    TaxonomyLocalization:
+      type: "object"
+      additionalProperties: false
+      required: ["locale","name","description"]
+      properties:
+        locale:
+          type: "string"
+          maxLength: 64
+        name:
+          type: "string"
+          maxLength: 80
+        description:
+          type: "string"
+          maxLength: 500
+          nullable: true
+    TaxonomySummary:
+      type: "object"
+      additionalProperties: false
+      required: ["id","slug","name","default_locale","state"]
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        slug:
+          type: "string"
+          maxLength: 64
+        name:
+          type: "string"
+          maxLength: 80
+        default_locale:
+          type: "string"
+          maxLength: 64
+        state: {"$ref":"#/components/schemas/TaxonomyState"}
+    TaxonomyDetail:
+      type: "object"
+      additionalProperties: false
+      required: ["id","slug","default_locale","state","localizations","created_at","updated_at"]
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        slug:
+          type: "string"
+          maxLength: 64
+        default_locale:
+          type: "string"
+          maxLength: 64
+        state: {"$ref":"#/components/schemas/TaxonomyState"}
+        localizations:
+          type: "array"
+          items: {"$ref":"#/components/schemas/TaxonomyLocalization"}
+        created_at:
+          type: "string"
+          format: "date-time"
+        updated_at:
+          type: "string"
+          format: "date-time"
+    TaxonomyList:
+      type: "object"
+      additionalProperties: false
+      required: ["items"]
+      properties:
+        items:
+          type: "array"
+          items: {"$ref":"#/components/schemas/TaxonomySummary"}
+    CreateTaxonomy:
+      type: "object"
+      additionalProperties: false
+      required: ["slug","default_locale","localization"]
+      properties:
+        slug:
+          type: "string"
+          maxLength: 64
+          pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+        default_locale:
+          type: "string"
+          maxLength: 64
+        localization: {"$ref":"#/components/schemas/TaxonomyLocalizationInput"}
+    PatchTaxonomy:
+      type: "object"
+      additionalProperties: false
+      properties:
+        default_locale:
+          type: "string"
+          maxLength: 64
+        state: {"$ref":"#/components/schemas/TaxonomyState"}
+    CreateResource:
+      type: "object"
+      additionalProperties: false
+      required: ["slug","default_locale","category_id","content_rating","localization"]
+      properties:
+        slug:
+          type: "string"
+          maxLength: 80
+          pattern: "^[a-z0-9]+(-[a-z0-9]+)*$"
+        default_locale:
+          type: "string"
+          maxLength: 64
+        category_id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        content_rating: {"$ref":"#/components/schemas/ContentRating"}
+        lifecycle: {"$ref":"#/components/schemas/Lifecycle"}
+        localization: {"$ref":"#/components/schemas/ResourceLocalizationInput"}
+    PatchResource:
+      type: "object"
+      additionalProperties: false
+      properties:
+        slug:
+          type: "string"
+          maxLength: 80
+        default_locale:
+          type: "string"
+          maxLength: 64
+        category_id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        lifecycle: {"$ref":"#/components/schemas/Lifecycle"}
+        content_rating: {"$ref":"#/components/schemas/ContentRating"}
+    SetResourceTags:
+      type: "object"
+      additionalProperties: false
+      required: ["tag_ids"]
+      properties:
+        tag_ids:
+          type: "array"
+          items:
+            type: "string"
+            format: "uuid"
+            x-go-type: "string"
+    ExternalID:
+      type: "object"
+      additionalProperties: false
+      required: ["namespace","external_id"]
+      properties:
+        namespace:
+          type: "string"
+          maxLength: 64
+          pattern: "^[a-z0-9]+([._-][a-z0-9]+)*$"
+        external_id:
+          type: "string"
+          maxLength: 512
+          minLength: 1
+    SetExternalIDs:
+      type: "object"
+      additionalProperties: false
+      required: ["items"]
+      properties:
+        items:
+          type: "array"
+          items: {"$ref":"#/components/schemas/ExternalID"}
+    CreateSource:
+      type: "object"
+      additionalProperties: false
+      required: ["url","source_type","availability_state","is_primary"]
+      properties:
+        url:
+          type: "string"
+          maxLength: 2048
+        label:
+          type: "string"
+          maxLength: 80
+          nullable: true
+        source_type: {"$ref":"#/components/schemas/SourceType"}
+        availability_state: {"$ref":"#/components/schemas/AvailabilityState"}
+        is_primary:
+          type: "boolean"
+    PatchSource:
+      type: "object"
+      additionalProperties: false
+      properties:
+        url:
+          type: "string"
+          maxLength: 2048
+        label:
+          type: "string"
+          maxLength: 80
+          nullable: true
+        source_type: {"$ref":"#/components/schemas/SourceType"}
+        availability_state: {"$ref":"#/components/schemas/AvailabilityState"}
+        is_primary:
+          type: "boolean"
+    Source:
+      type: "object"
+      additionalProperties: false
+      required: ["id","url","label","source_type","availability_state","rights_status","is_primary","created_at","updated_at"]
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        url:
+          type: "string"
+          maxLength: 2048
+        label:
+          type: "string"
+          maxLength: 80
+          nullable: true
+        source_type: {"$ref":"#/components/schemas/SourceType"}
+        availability_state: {"$ref":"#/components/schemas/AvailabilityState"}
+        rights_status: {"$ref":"#/components/schemas/RightsStatus"}
+        is_primary:
+          type: "boolean"
+        created_at:
+          type: "string"
+          format: "date-time"
+        updated_at:
+          type: "string"
+          format: "date-time"
+    SetSourceRights:
+      type: "object"
+      additionalProperties: false
+      required: ["rights_status"]
+      properties:
+        rights_status: {"$ref":"#/components/schemas/RightsStatus"}
+    AddRelation:
+      type: "object"
+      additionalProperties: false
+      required: ["target_resource_id","relation_type"]
+      properties:
+        target_resource_id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        relation_type: {"$ref":"#/components/schemas/RelationType"}
+    Relation:
+      type: "object"
+      additionalProperties: false
+      required: ["id","source_resource_id","target_resource_id","relation_type","direction","other"]
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        source_resource_id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        target_resource_id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        relation_type: {"$ref":"#/components/schemas/RelationType"}
+        direction:
+          type: "string"
+          enum: ["outgoing","incoming","symmetric"]
+        other:
+          type: "object"
+          additionalProperties: false
+          required: ["id","slug","name","publication_state"]
+          properties:
+            id:
+              type: "string"
+              format: "uuid"
+              x-go-type: "string"
+            slug:
+              type: "string"
+              maxLength: 80
+            name:
+              type: "string"
+              maxLength: 160
+            publication_state: {"$ref":"#/components/schemas/PublicationState"}
+    SetPublication:
+      type: "object"
+      additionalProperties: false
+      required: ["state"]
+      properties:
+        state: {"$ref":"#/components/schemas/PublicationState"}
+    ResourceListItem:
+      type: "object"
+      additionalProperties: false
+      required: ["id","slug","default_locale","category","publication_state","lifecycle","content_rating","version","published_at","updated_at","name"]
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        slug:
+          type: "string"
+          maxLength: 80
+        default_locale:
+          type: "string"
+          maxLength: 64
+        category: {"$ref":"#/components/schemas/TaxonomySummary"}
+        publication_state: {"$ref":"#/components/schemas/PublicationState"}
+        lifecycle: {"$ref":"#/components/schemas/Lifecycle"}
+        content_rating: {"$ref":"#/components/schemas/ContentRating"}
+        version:
+          type: "integer"
+          format: "int64"
+          minimum: 1
+        published_at:
+          type: "string"
+          format: "date-time"
+          nullable: true
+        updated_at:
+          type: "string"
+          format: "date-time"
+        name:
+          type: "string"
+          maxLength: 160
+    ResourceList:
+      type: "object"
+      additionalProperties: false
+      required: ["items","page","page_size","has_next"]
+      properties:
+        items:
+          type: "array"
+          items: {"$ref":"#/components/schemas/ResourceListItem"}
+        page:
+          type: "integer"
+          format: "int64"
+          minimum: 1
+        page_size:
+          type: "integer"
+          format: "int64"
+          minimum: 1
+          maximum: 100
+        has_next:
+          type: "boolean"
+    ResourceDetail:
+      type: "object"
+      additionalProperties: false
+      required: ["id","slug","default_locale","category","publication_state","lifecycle","content_rating","version","published_at","updated_at","localizations","tags","sources","relations","external_ids","created_at"]
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        slug:
+          type: "string"
+          maxLength: 80
+        default_locale:
+          type: "string"
+          maxLength: 64
+        category: {"$ref":"#/components/schemas/TaxonomySummary"}
+        publication_state: {"$ref":"#/components/schemas/PublicationState"}
+        lifecycle: {"$ref":"#/components/schemas/Lifecycle"}
+        content_rating: {"$ref":"#/components/schemas/ContentRating"}
+        version:
+          type: "integer"
+          format: "int64"
+          minimum: 1
+        published_at:
+          type: "string"
+          format: "date-time"
+          nullable: true
+        updated_at:
+          type: "string"
+          format: "date-time"
+        localizations:
+          type: "array"
+          items: {"$ref":"#/components/schemas/ResourceLocalization"}
+        tags:
+          type: "array"
+          items: {"$ref":"#/components/schemas/TaxonomySummary"}
+        sources:
+          type: "array"
+          items: {"$ref":"#/components/schemas/Source"}
+        relations:
+          type: "array"
+          items: {"$ref":"#/components/schemas/Relation"}
+        external_ids:
+          type: "array"
+          items: {"$ref":"#/components/schemas/ExternalID"}
+        created_at:
+          type: "string"
+          format: "date-time"
     Credentials:
       type: object
       additionalProperties: false
@@ -225,7 +1233,7 @@ components:
       properties:
         code:
           type: string
-          enum: [VALIDATION_ERROR, ADMIN_INVALID_CREDENTIALS, ADMIN_UNAUTHENTICATED, ADMIN_FORBIDDEN, ADMIN_SESSION_NOT_FOUND, ORIGIN_FORBIDDEN, CSRF_INVALID, AUTH_RATE_LIMITED, INTERNAL_ERROR]
+          enum: [VALIDATION_ERROR, ADMIN_INVALID_CREDENTIALS, ADMIN_UNAUTHENTICATED, ADMIN_FORBIDDEN, ADMIN_SESSION_NOT_FOUND, ORIGIN_FORBIDDEN, CSRF_INVALID, AUTH_RATE_LIMITED, CURATION_NOT_FOUND, RESOURCE_VERSION_CONFLICT, CURATION_CONFLICT, CURATION_IN_USE, CURATION_RELATION_CYCLE, INTERNAL_ERROR]
         message: {type: string}
     Live:
       type: object

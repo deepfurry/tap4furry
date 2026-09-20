@@ -15,7 +15,9 @@ import (
 	"uuid"
 
 	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/curation"
 	"github.com/deepfurry/tap4furry/server/internal/identity"
+	"github.com/deepfurry/tap4furry/server/internal/resource"
 	"github.com/deepfurry/tap4furry/server/internal/transport/admin/generated"
 	"github.com/gofiber/fiber/v3"
 )
@@ -220,8 +222,18 @@ func (h *Handler) RevokeOtherSessions(c fiber.Ctx, _ generated.RevokeOtherSessio
 func respondError(c fiber.Ctx, err error) error {
 	status, code, message := 500, generated.INTERNALERROR, "The request could not be completed."
 	switch {
-	case errors.Is(err, identity.ErrValidation):
+	case errors.Is(err, identity.ErrValidation), errors.Is(err, curation.ErrValidation):
 		status, code, message = 400, generated.VALIDATIONERROR, "Check the supplied fields."
+	case errors.Is(err, curation.ErrNotFound):
+		status, code, message = 404, generated.CURATIONNOTFOUND, "Curation entity not found."
+	case errors.Is(err, resource.ErrVersionConflict):
+		status, code, message = 409, generated.RESOURCEVERSIONCONFLICT, "Resource has changed. Reload the latest version before saving."
+	case errors.Is(err, curation.ErrConflict):
+		status, code, message = 409, generated.CURATIONCONFLICT, "Canonical identity is already in use."
+	case errors.Is(err, curation.ErrInUse):
+		status, code, message = 409, generated.CURATIONINUSE, "Taxonomy is still in use."
+	case errors.Is(err, curation.ErrRelationCycle):
+		status, code, message = 409, generated.CURATIONRELATIONCYCLE, "Relation would create a cycle."
 	case errors.Is(err, auth.ErrAdminCredentials):
 		status, code, message = 401, generated.ADMININVALIDCREDENTIALS, "Admin sign-in could not be verified."
 	case errors.Is(err, auth.ErrAdminUnauthenticated):

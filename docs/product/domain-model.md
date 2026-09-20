@@ -27,7 +27,7 @@ Admin
 
 P0-2A implements Resource/Taxonomy data foundations; P0-2B adds anonymous public
 reads and SSR Resource pages. The broader entity map remains product direction;
-Admin curation, Contribution, Search and Exchange are not implemented yet.
+P0-2C now adds Admin curation. Contribution, Search and Exchange remain future work.
 
 ```text
 User
@@ -172,16 +172,21 @@ descriptions render without raw HTML or images; Resource images remain Media wor
 
 Relations store only `part_of`, `successor_of`, `derived_from` and `related_to`.
 Directed edges retain direction and reads derive inverse semantics. `related_to`
-stores smaller UUID→larger UUID; self-edges are forbidden. P0-2C will own directed
-cycle prevention. No actor ownership, duplicate merge or source-as-relation model.
+stores smaller UUID→larger UUID; self-edges are forbidden. P0-2C owns directed
+cycle prevention per relation type under one graph lock. No actor ownership,
+duplicate merge or source-as-relation model.
 
 External IDs use a lowercase stable namespace and an opaque trimmed identifier;
 `(namespace, external_id)` is globally unique. Several distinct IDs may share a
 namespace on one Resource. No provider snapshots or synchronization state is stored.
 
-Future canonical editing uses Editorial (`editor`/`admin`), not `moderator`.
+Canonical editing uses Editorial (`editor`/`admin`); `moderator` can inspect the graph.
 Retiring taxonomy, restricted/removed Resource states, soft deletion and rights
-status changes require Administration. P0-2A adds no new role or Admin CRUD surface.
+status changes require Administration. P0-2C uses the existing static roles and grants.
+All Resources start Draft; first publication permanently freezes slug and preserves
+published_at through later state changes. Restricted/Removed recovery remains
+Admin-only. Sources use availability removal, while Resources/Category/Tag soft-delete
+without a restore surface. Taxonomy cannot be deleted while used by live Resources.
 
 ## Identity
 

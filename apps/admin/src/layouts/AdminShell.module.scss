@@ -1,0 +1,72 @@
+.shell {
+  input,
+  textarea,
+  select {
+    color: inherit;
+    background: var(--tap4furry-background);
+    border: 1px solid var(--tap4furry-accent);
+    border-radius: 0.4rem;
+    padding: 0.6rem 0.75rem;
+    font: inherit;
+    min-width: 0;
+  }
+  textarea {
+    resize: vertical;
+    min-height: 8rem;
+  }
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible,
+  a:focus-visible {
+    outline: 2px solid var(--tap4furry-accent);
+    outline-offset: 3px;
+  }
+  :disabled {
+    opacity: 0.6;
+  }
+  h1,
+  h2,
+  h3,
+  p {
+    margin: 0;
+  }
+  h1 {
+    font-size: 1.8rem;
+  }
+  h2 {
+    font-size: 1.15rem;
+  }
+  small {
+    opacity: 0.8;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+  }
+  th,
+  td {
+    padding: 0.8rem;
+    border-bottom: 1px solid color-mix(in srgb, var(--tap4furry-accent) 25%, transparent);
+  }
+  a[data-status='active'] {
+    font-weight: 700;
+    text-decoration-thickness: 2px;
+  }
+}
+.header {
+  border-bottom: 1px solid var(--tap4furry-accent);
+}
+.brand {
+  text-decoration: none;
+  font-weight: 750;
+  font-size: 1.25rem;
+  span {
+    font-weight: 400;
+    font-size: 0.9rem;
+  }
+}
+.notice {
+  border-left: 3px solid var(--tap4furry-accent);
+  padding-left: 1rem;
+}

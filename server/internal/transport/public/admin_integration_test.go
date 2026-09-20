@@ -20,6 +20,7 @@ import (
 
 	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/deepfurry/tap4furry/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/curation"
 	"github.com/deepfurry/tap4furry/server/internal/database"
 	"github.com/deepfurry/tap4furry/server/internal/mail"
 	"github.com/deepfurry/tap4furry/server/internal/redisstore"
@@ -85,6 +86,8 @@ type adminFixture struct {
 	store     *redisstore.Store
 	throttle  *redisstore.AuthThrottle
 	gate      *authQueryGate
+	curation  *curation.App
+	adminPool *pgxpool.Pool
 }
 
 func newAdminFixture(t *testing.T) *adminFixture {
@@ -121,10 +124,11 @@ func newAdminFixture(t *testing.T) *adminFixture {
 		t.Fatal("Public throttle fixture failed")
 	}
 	f.app = fiber.New()
-	Register(f.app, nil, f.auth, f.identity, Options{Environment: "test", PublicOrigin: testOrigin, CSRFSecret: config.DevelopmentCSRFSecret})
-	app := fiber.New()
-	admin.Register(app, health.New(func(context.Context) error { return nil }, store.Ping), admin.Options{Auth: aa, Environment: "test", AdminOrigin: adminOrigin, CSRFSecret: config.DevelopmentAdminCSRFSecret})
-	return &adminFixture{fixture: f, adminApp: app, adminAuth: aa, operator: auth.NewRoleOperator(f.owner), store: store, throttle: throttle, gate: gate}
+	Register(f.app, nil, f.auth, f.identity, Options{Environment: "test", PublicOrigin: testOrigin, CSRFSecret: config.DevelopmentCSRFSecret, ResourcePool: f.api})
+	app := fiber.New(fiber.Config{BodyLimit: 256 * 1024})
+	curator := curation.New(pool)
+	admin.Register(app, health.New(func(context.Context) error { return nil }, store.Ping), admin.Options{Auth: aa, Curation: curator, ResourcePool: pool, Environment: "test", AdminOrigin: adminOrigin, CSRFSecret: config.DevelopmentAdminCSRFSecret})
+	return &adminFixture{fixture: f, adminApp: app, adminAuth: aa, operator: auth.NewRoleOperator(f.owner), store: store, throttle: throttle, gate: gate, curation: curator, adminPool: pool}
 }
 func (f *adminFixture) eligible(role auth.Role) (string, string, *http.Cookie) {
 	id, email, cookie := f.register()

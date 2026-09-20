@@ -10,6 +10,7 @@ import (
 
 	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/deepfurry/tap4furry/server/internal/config"
+	"github.com/deepfurry/tap4furry/server/internal/curation"
 	"github.com/deepfurry/tap4furry/server/internal/database"
 	"github.com/deepfurry/tap4furry/server/internal/mail"
 	"github.com/deepfurry/tap4furry/server/internal/redisstore"
@@ -53,7 +54,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	app := fiber.New(fiber.Config{ReadTimeout: 5 * time.Second, WriteTimeout: 5 * time.Second, IdleTimeout: 30 * time.Second, BodyLimit: 8192})
-	admin.Register(app, checker, admin.Options{Auth: authentication, Environment: c.Environment, AdminOrigin: c.AdminOrigin, CSRFSecret: c.AdminCSRFSecret})
+	app := fiber.New(fiber.Config{ReadTimeout: 5 * time.Second, WriteTimeout: 5 * time.Second, IdleTimeout: 30 * time.Second, BodyLimit: 256 * 1024})
+	admin.Register(app, checker, admin.Options{Auth: authentication, Curation: curation.New(pool), ResourcePool: pool, Environment: c.Environment, AdminOrigin: c.AdminOrigin, CSRFSecret: c.AdminCSRFSecret})
 	return platformruntime.HTTP(ctx, app, c.HTTPAddr, checker, logger)
 }

@@ -17,6 +17,7 @@ run('go', ['test', '-count=1', '-timeout=2m', '-run', 'TestIntegrationResourceMi
 for (const service of ['api', 'admin', 'migrator', 'worker']) run('go', ['run', './cmd/smoke', '-service', service, '-database', 'gfp_ci'], { cwd, env: serviceEnv(service) });
 run('go', ['test', '-count=1', '-timeout=3m', '-run', 'TestIntegration', './internal/transport/public', './internal/redisstore', './internal/oauthprovider'], { cwd, env: { ...env, GFP_AUTH_INTEGRATION: '1' } });
 run('go', ['test', '-count=1', '-timeout=3m', '-run', 'TestIntegrationPublic', './internal/transport/public'], { cwd, env: { ...env, GFP_PUBLIC_READ_INTEGRATION: '1' } });
+run('go', ['test', '-count=1', '-timeout=3m', '-run', 'TestIntegrationCuration', './internal/transport/public'], { cwd, env: { ...env, GFP_CURATION_INTEGRATION: '1' } });
 run('go', ['test', '-count=1', '-timeout=3m', '-run', 'TestIntegration', './internal/database/resourcecheck'], { cwd, env: resourceEnv });
 for (const role of ['api', 'admin', 'worker', 'migrator', 'readonly']) resourceEnv[`RESOURCE_SMOKE_${role.toUpperCase()}_DATABASE_URL`] = serviceEnv(role).DATABASE_URL;
 run('go', ['run', './cmd/resource-smoke', '-database', 'gfp_ci'], { cwd, env: resourceEnv });

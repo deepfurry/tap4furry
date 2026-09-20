@@ -5,6 +5,382 @@
  * Separate password-only Admin authentication with current static roles. Unsafe requests require exact ADMIN_ORIGIN; session mutations also require an Admin session-bound CSRF header. Auth responses are no-store. Public sessions are never accepted.
  * OpenAPI spec version: 0.1.0
  */
+export type PublicationState =
+  (typeof PublicationState)[keyof typeof PublicationState];
+
+export const PublicationState = {
+  draft: "draft",
+  pending: "pending",
+  published: "published",
+  restricted: "restricted",
+  removed: "removed",
+} as const;
+
+export type Lifecycle = (typeof Lifecycle)[keyof typeof Lifecycle];
+
+export const Lifecycle = {
+  active: "active",
+  inactive: "inactive",
+  discontinued: "discontinued",
+  delisted: "delisted",
+  archived: "archived",
+  unknown: "unknown",
+} as const;
+
+export type ContentRating = (typeof ContentRating)[keyof typeof ContentRating];
+
+export const ContentRating = {
+  general: "general",
+  mature: "mature",
+  explicit: "explicit",
+} as const;
+
+export type TaxonomyState = (typeof TaxonomyState)[keyof typeof TaxonomyState];
+
+export const TaxonomyState = {
+  active: "active",
+  retired: "retired",
+} as const;
+
+export type SourceType = (typeof SourceType)[keyof typeof SourceType];
+
+export const SourceType = {
+  official: "official",
+  store: "store",
+  archive: "archive",
+  mirror: "mirror",
+  community: "community",
+  external: "external",
+  unknown: "unknown",
+} as const;
+
+export type AvailabilityState =
+  (typeof AvailabilityState)[keyof typeof AvailabilityState];
+
+export const AvailabilityState = {
+  active: "active",
+  unavailable: "unavailable",
+  broken: "broken",
+  removed: "removed",
+  restricted: "restricted",
+} as const;
+
+export type RightsStatus = (typeof RightsStatus)[keyof typeof RightsStatus];
+
+export const RightsStatus = {
+  unknown: "unknown",
+  creator_provided: "creator_provided",
+  confirmed: "confirmed",
+  disputed: "disputed",
+  rights_review: "rights_review",
+  removed_by_request: "removed_by_request",
+} as const;
+
+export type RelationType = (typeof RelationType)[keyof typeof RelationType];
+
+export const RelationType = {
+  part_of: "part_of",
+  successor_of: "successor_of",
+  derived_from: "derived_from",
+  related_to: "related_to",
+} as const;
+
+export interface ResourceRevision {
+  id: string;
+  /** @minimum 1 */
+  version: number;
+}
+
+export interface EntityID {
+  id: string;
+}
+
+export interface ResourceLocalizationInput {
+  /**
+   * @minLength 1
+   * @maxLength 160
+   */
+  name: string;
+  /**
+   * @maxLength 500
+   * @nullable
+   */
+  summary?: string | null;
+  /**
+   * @maxLength 50000
+   * @nullable
+   */
+  description?: string | null;
+}
+
+export interface TaxonomyLocalizationInput {
+  /**
+   * @minLength 1
+   * @maxLength 80
+   */
+  name: string;
+  /**
+   * @maxLength 500
+   * @nullable
+   */
+  description?: string | null;
+}
+
+export interface ResourceLocalization {
+  /** @maxLength 64 */
+  locale: string;
+  /** @maxLength 160 */
+  name: string;
+  /**
+   * @maxLength 500
+   * @nullable
+   */
+  summary: string | null;
+  /**
+   * @maxLength 50000
+   * @nullable
+   */
+  description: string | null;
+}
+
+export interface TaxonomyLocalization {
+  /** @maxLength 64 */
+  locale: string;
+  /** @maxLength 80 */
+  name: string;
+  /**
+   * @maxLength 500
+   * @nullable
+   */
+  description: string | null;
+}
+
+export interface TaxonomySummary {
+  id: string;
+  /** @maxLength 64 */
+  slug: string;
+  /** @maxLength 80 */
+  name: string;
+  /** @maxLength 64 */
+  default_locale: string;
+  state: TaxonomyState;
+}
+
+export interface TaxonomyDetail {
+  id: string;
+  /** @maxLength 64 */
+  slug: string;
+  /** @maxLength 64 */
+  default_locale: string;
+  state: TaxonomyState;
+  localizations: TaxonomyLocalization[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TaxonomyList {
+  items: TaxonomySummary[];
+}
+
+export interface CreateTaxonomy {
+  /**
+   * @maxLength 64
+   * @pattern ^[a-z0-9]+(-[a-z0-9]+)*$
+   */
+  slug: string;
+  /** @maxLength 64 */
+  default_locale: string;
+  localization: TaxonomyLocalizationInput;
+}
+
+export interface PatchTaxonomy {
+  /** @maxLength 64 */
+  default_locale?: string;
+  state?: TaxonomyState;
+}
+
+export interface CreateResource {
+  /**
+   * @maxLength 80
+   * @pattern ^[a-z0-9]+(-[a-z0-9]+)*$
+   */
+  slug: string;
+  /** @maxLength 64 */
+  default_locale: string;
+  category_id: string;
+  content_rating: ContentRating;
+  lifecycle?: Lifecycle;
+  localization: ResourceLocalizationInput;
+}
+
+export interface PatchResource {
+  /** @maxLength 80 */
+  slug?: string;
+  /** @maxLength 64 */
+  default_locale?: string;
+  category_id?: string;
+  lifecycle?: Lifecycle;
+  content_rating?: ContentRating;
+}
+
+export interface SetResourceTags {
+  tag_ids: string[];
+}
+
+export interface ExternalID {
+  /**
+   * @maxLength 64
+   * @pattern ^[a-z0-9]+([._-][a-z0-9]+)*$
+   */
+  namespace: string;
+  /**
+   * @minLength 1
+   * @maxLength 512
+   */
+  external_id: string;
+}
+
+export interface SetExternalIDs {
+  items: ExternalID[];
+}
+
+export interface CreateSource {
+  /** @maxLength 2048 */
+  url: string;
+  /**
+   * @maxLength 80
+   * @nullable
+   */
+  label?: string | null;
+  source_type: SourceType;
+  availability_state: AvailabilityState;
+  is_primary: boolean;
+}
+
+export interface PatchSource {
+  /** @maxLength 2048 */
+  url?: string;
+  /**
+   * @maxLength 80
+   * @nullable
+   */
+  label?: string | null;
+  source_type?: SourceType;
+  availability_state?: AvailabilityState;
+  is_primary?: boolean;
+}
+
+export interface Source {
+  id: string;
+  /** @maxLength 2048 */
+  url: string;
+  /**
+   * @maxLength 80
+   * @nullable
+   */
+  label: string | null;
+  source_type: SourceType;
+  availability_state: AvailabilityState;
+  rights_status: RightsStatus;
+  is_primary: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SetSourceRights {
+  rights_status: RightsStatus;
+}
+
+export interface AddRelation {
+  target_resource_id: string;
+  relation_type: RelationType;
+}
+
+export type RelationDirection =
+  (typeof RelationDirection)[keyof typeof RelationDirection];
+
+export const RelationDirection = {
+  outgoing: "outgoing",
+  incoming: "incoming",
+  symmetric: "symmetric",
+} as const;
+
+export type RelationOther = {
+  id: string;
+  /** @maxLength 80 */
+  slug: string;
+  /** @maxLength 160 */
+  name: string;
+  publication_state: PublicationState;
+};
+
+export interface Relation {
+  id: string;
+  source_resource_id: string;
+  target_resource_id: string;
+  relation_type: RelationType;
+  direction: RelationDirection;
+  other: RelationOther;
+}
+
+export interface SetPublication {
+  state: PublicationState;
+}
+
+export interface ResourceListItem {
+  id: string;
+  /** @maxLength 80 */
+  slug: string;
+  /** @maxLength 64 */
+  default_locale: string;
+  category: TaxonomySummary;
+  publication_state: PublicationState;
+  lifecycle: Lifecycle;
+  content_rating: ContentRating;
+  /** @minimum 1 */
+  version: number;
+  /** @nullable */
+  published_at: string | null;
+  updated_at: string;
+  /** @maxLength 160 */
+  name: string;
+}
+
+export interface ResourceList {
+  items: ResourceListItem[];
+  /** @minimum 1 */
+  page: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size: number;
+  has_next: boolean;
+}
+
+export interface ResourceDetail {
+  id: string;
+  /** @maxLength 80 */
+  slug: string;
+  /** @maxLength 64 */
+  default_locale: string;
+  category: TaxonomySummary;
+  publication_state: PublicationState;
+  lifecycle: Lifecycle;
+  content_rating: ContentRating;
+  /** @minimum 1 */
+  version: number;
+  /** @nullable */
+  published_at: string | null;
+  updated_at: string;
+  localizations: ResourceLocalization[];
+  tags: TaxonomySummary[];
+  sources: Source[];
+  relations: Relation[];
+  external_ids: ExternalID[];
+  created_at: string;
+}
+
 export interface Credentials {
   /** @maxLength 254 */
   email: string;
@@ -67,6 +443,11 @@ export const ApiErrorCode = {
   ORIGIN_FORBIDDEN: "ORIGIN_FORBIDDEN",
   CSRF_INVALID: "CSRF_INVALID",
   AUTH_RATE_LIMITED: "AUTH_RATE_LIMITED",
+  CURATION_NOT_FOUND: "CURATION_NOT_FOUND",
+  RESOURCE_VERSION_CONFLICT: "RESOURCE_VERSION_CONFLICT",
+  CURATION_CONFLICT: "CURATION_CONFLICT",
+  CURATION_IN_USE: "CURATION_IN_USE",
+  CURATION_RELATION_CYCLE: "CURATION_RELATION_CYCLE",
   INTERNAL_ERROR: "INTERNAL_ERROR",
 } as const;
 
@@ -124,6 +505,108 @@ export type AuthenticatedResponse = AdminMe;
 export type ErrorResponse = ApiError;
 
 export type CsrfParameter = string;
+
+export type ListResourcesParams = {
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+  publication_state?: PublicationState;
+  category_id?: string;
+  /**
+   * @maxLength 80
+   */
+  slug?: string;
+};
+
+export type PatchResourceParams = {
+  /**
+   * @minimum 1
+   */
+  expected_version: number;
+};
+
+export type DeleteResourceParams = {
+  /**
+   * @minimum 1
+   */
+  expected_version: number;
+};
+
+export type PutResourceLocalizationParams = {
+  /**
+   * @minimum 1
+   */
+  expected_version: number;
+};
+
+export type DeleteResourceLocalizationParams = {
+  /**
+   * @minimum 1
+   */
+  expected_version: number;
+};
+
+export type SetResourceTagsParams = {
+  /**
+   * @minimum 1
+   */
+  expected_version: number;
+};
+
+export type SetResourceExternalIDsParams = {
+  /**
+   * @minimum 1
+   */
+  expected_version: number;
+};
+
+export type CreateSourceParams = {
+  /**
+   * @minimum 1
+   */
+  expected_version: number;
+};
+
+export type PatchSourceParams = {
+  /**
+   * @minimum 1
+   */
+  expected_version: number;
+};
+
+export type SetSourceRightsParams = {
+  /**
+   * @minimum 1
+   */
+  expected_version: number;
+};
+
+export type AddRelationParams = {
+  /**
+   * @minimum 1
+   */
+  expected_version: number;
+};
+
+export type DeleteRelationParams = {
+  /**
+   * @minimum 1
+   */
+  expected_version: number;
+};
+
+export type SetPublicationParams = {
+  /**
+   * @minimum 1
+   */
+  expected_version: number;
+};
 
 export type loginResponse200 = {
   data: AuthenticatedResponse;
@@ -713,4 +1196,2852 @@ export const getReady = async (
 
   const data: getReadyResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as getReadyResponse;
+};
+
+export type listResourcesResponse200 = {
+  data: ResourceList;
+  status: 200;
+};
+
+export type listResourcesResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type listResourcesResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type listResourcesResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type listResourcesResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type listResourcesResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type listResourcesResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type listResourcesResponseSuccess = listResourcesResponse200 & {
+  headers: Headers;
+};
+export type listResourcesResponseError = (
+  | listResourcesResponse400
+  | listResourcesResponse401
+  | listResourcesResponse403
+  | listResourcesResponse404
+  | listResourcesResponse409
+  | listResourcesResponse500
+) & {
+  headers: Headers;
+};
+
+export type listResourcesResponse =
+  listResourcesResponseSuccess | listResourcesResponseError;
+
+export const getListResourcesUrl = (params?: ListResourcesParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/resources?${stringifiedParams}`
+    : `/api/resources`;
+};
+
+export const listResources = async (
+  params?: ListResourcesParams,
+  options?: RequestInit,
+): Promise<listResourcesResponse> => {
+  const res = await fetch(getListResourcesUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listResourcesResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listResourcesResponse;
+};
+
+export type createResourceResponse201 = {
+  data: ResourceRevision;
+  status: 201;
+};
+
+export type createResourceResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type createResourceResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type createResourceResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type createResourceResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type createResourceResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type createResourceResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type createResourceResponseSuccess = createResourceResponse201 & {
+  headers: Headers;
+};
+export type createResourceResponseError = (
+  | createResourceResponse400
+  | createResourceResponse401
+  | createResourceResponse403
+  | createResourceResponse404
+  | createResourceResponse409
+  | createResourceResponse500
+) & {
+  headers: Headers;
+};
+
+export type createResourceResponse =
+  createResourceResponseSuccess | createResourceResponseError;
+
+export const getCreateResourceUrl = () => {
+  return `/api/resources`;
+};
+
+export const createResource = async (
+  createResourceBody: CreateResource,
+  options?: RequestInit,
+): Promise<createResourceResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getCreateResourceUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(createResourceBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createResourceResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createResourceResponse;
+};
+
+export type getResourceResponse200 = {
+  data: ResourceDetail;
+  status: 200;
+};
+
+export type getResourceResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type getResourceResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type getResourceResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type getResourceResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type getResourceResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type getResourceResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type getResourceResponseSuccess = getResourceResponse200 & {
+  headers: Headers;
+};
+export type getResourceResponseError = (
+  | getResourceResponse400
+  | getResourceResponse401
+  | getResourceResponse403
+  | getResourceResponse404
+  | getResourceResponse409
+  | getResourceResponse500
+) & {
+  headers: Headers;
+};
+
+export type getResourceResponse =
+  getResourceResponseSuccess | getResourceResponseError;
+
+export const getGetResourceUrl = (resourceId: string) => {
+  return `/api/resources/${resourceId}`;
+};
+
+export const getResource = async (
+  resourceId: string,
+  options?: RequestInit,
+): Promise<getResourceResponse> => {
+  const res = await fetch(getGetResourceUrl(resourceId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getResourceResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getResourceResponse;
+};
+
+export type patchResourceResponse200 = {
+  data: ResourceRevision;
+  status: 200;
+};
+
+export type patchResourceResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type patchResourceResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type patchResourceResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type patchResourceResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type patchResourceResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type patchResourceResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type patchResourceResponseSuccess = patchResourceResponse200 & {
+  headers: Headers;
+};
+export type patchResourceResponseError = (
+  | patchResourceResponse400
+  | patchResourceResponse401
+  | patchResourceResponse403
+  | patchResourceResponse404
+  | patchResourceResponse409
+  | patchResourceResponse500
+) & {
+  headers: Headers;
+};
+
+export type patchResourceResponse =
+  patchResourceResponseSuccess | patchResourceResponseError;
+
+export const getPatchResourceUrl = (
+  resourceId: string,
+  params: PatchResourceParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/resources/${resourceId}?${stringifiedParams}`
+    : `/api/resources/${resourceId}`;
+};
+
+export const patchResource = async (
+  resourceId: string,
+  patchResourceBody: PatchResource,
+  params: PatchResourceParams,
+  options?: RequestInit,
+): Promise<patchResourceResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getPatchResourceUrl(resourceId, params), {
+    ...options,
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(patchResourceBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: patchResourceResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as patchResourceResponse;
+};
+
+export type deleteResourceResponse200 = {
+  data: ResourceRevision;
+  status: 200;
+};
+
+export type deleteResourceResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type deleteResourceResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type deleteResourceResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type deleteResourceResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type deleteResourceResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type deleteResourceResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type deleteResourceResponseSuccess = deleteResourceResponse200 & {
+  headers: Headers;
+};
+export type deleteResourceResponseError = (
+  | deleteResourceResponse400
+  | deleteResourceResponse401
+  | deleteResourceResponse403
+  | deleteResourceResponse404
+  | deleteResourceResponse409
+  | deleteResourceResponse500
+) & {
+  headers: Headers;
+};
+
+export type deleteResourceResponse =
+  deleteResourceResponseSuccess | deleteResourceResponseError;
+
+export const getDeleteResourceUrl = (
+  resourceId: string,
+  params: DeleteResourceParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/resources/${resourceId}?${stringifiedParams}`
+    : `/api/resources/${resourceId}`;
+};
+
+export const deleteResource = async (
+  resourceId: string,
+  params: DeleteResourceParams,
+  options?: RequestInit,
+): Promise<deleteResourceResponse> => {
+  const res = await fetch(getDeleteResourceUrl(resourceId, params), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteResourceResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteResourceResponse;
+};
+
+export type putResourceLocalizationResponse200 = {
+  data: ResourceRevision;
+  status: 200;
+};
+
+export type putResourceLocalizationResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type putResourceLocalizationResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type putResourceLocalizationResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type putResourceLocalizationResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type putResourceLocalizationResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type putResourceLocalizationResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type putResourceLocalizationResponseSuccess =
+  putResourceLocalizationResponse200 & {
+    headers: Headers;
+  };
+export type putResourceLocalizationResponseError = (
+  | putResourceLocalizationResponse400
+  | putResourceLocalizationResponse401
+  | putResourceLocalizationResponse403
+  | putResourceLocalizationResponse404
+  | putResourceLocalizationResponse409
+  | putResourceLocalizationResponse500
+) & {
+  headers: Headers;
+};
+
+export type putResourceLocalizationResponse =
+  putResourceLocalizationResponseSuccess | putResourceLocalizationResponseError;
+
+export const getPutResourceLocalizationUrl = (
+  resourceId: string,
+  locale: string,
+  params: PutResourceLocalizationParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/resources/${resourceId}/localizations/${locale}?${stringifiedParams}`
+    : `/api/resources/${resourceId}/localizations/${locale}`;
+};
+
+export const putResourceLocalization = async (
+  resourceId: string,
+  locale: string,
+  resourceLocalizationInput: ResourceLocalizationInput,
+  params: PutResourceLocalizationParams,
+  options?: RequestInit,
+): Promise<putResourceLocalizationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(
+    getPutResourceLocalizationUrl(resourceId, locale, params),
+    {
+      ...options,
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        ...getHeaders(options?.headers),
+      },
+      body: JSON.stringify(resourceLocalizationInput),
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: putResourceLocalizationResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as putResourceLocalizationResponse;
+};
+
+export type deleteResourceLocalizationResponse200 = {
+  data: ResourceRevision;
+  status: 200;
+};
+
+export type deleteResourceLocalizationResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type deleteResourceLocalizationResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type deleteResourceLocalizationResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type deleteResourceLocalizationResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type deleteResourceLocalizationResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type deleteResourceLocalizationResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type deleteResourceLocalizationResponseSuccess =
+  deleteResourceLocalizationResponse200 & {
+    headers: Headers;
+  };
+export type deleteResourceLocalizationResponseError = (
+  | deleteResourceLocalizationResponse400
+  | deleteResourceLocalizationResponse401
+  | deleteResourceLocalizationResponse403
+  | deleteResourceLocalizationResponse404
+  | deleteResourceLocalizationResponse409
+  | deleteResourceLocalizationResponse500
+) & {
+  headers: Headers;
+};
+
+export type deleteResourceLocalizationResponse =
+  | deleteResourceLocalizationResponseSuccess
+  | deleteResourceLocalizationResponseError;
+
+export const getDeleteResourceLocalizationUrl = (
+  resourceId: string,
+  locale: string,
+  params: DeleteResourceLocalizationParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/resources/${resourceId}/localizations/${locale}?${stringifiedParams}`
+    : `/api/resources/${resourceId}/localizations/${locale}`;
+};
+
+export const deleteResourceLocalization = async (
+  resourceId: string,
+  locale: string,
+  params: DeleteResourceLocalizationParams,
+  options?: RequestInit,
+): Promise<deleteResourceLocalizationResponse> => {
+  const res = await fetch(
+    getDeleteResourceLocalizationUrl(resourceId, locale, params),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteResourceLocalizationResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteResourceLocalizationResponse;
+};
+
+export type setResourceTagsResponse200 = {
+  data: ResourceRevision;
+  status: 200;
+};
+
+export type setResourceTagsResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type setResourceTagsResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type setResourceTagsResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type setResourceTagsResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type setResourceTagsResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type setResourceTagsResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type setResourceTagsResponseSuccess = setResourceTagsResponse200 & {
+  headers: Headers;
+};
+export type setResourceTagsResponseError = (
+  | setResourceTagsResponse400
+  | setResourceTagsResponse401
+  | setResourceTagsResponse403
+  | setResourceTagsResponse404
+  | setResourceTagsResponse409
+  | setResourceTagsResponse500
+) & {
+  headers: Headers;
+};
+
+export type setResourceTagsResponse =
+  setResourceTagsResponseSuccess | setResourceTagsResponseError;
+
+export const getSetResourceTagsUrl = (
+  resourceId: string,
+  params: SetResourceTagsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/resources/${resourceId}/tags?${stringifiedParams}`
+    : `/api/resources/${resourceId}/tags`;
+};
+
+export const setResourceTags = async (
+  resourceId: string,
+  setResourceTagsBody: SetResourceTags,
+  params: SetResourceTagsParams,
+  options?: RequestInit,
+): Promise<setResourceTagsResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getSetResourceTagsUrl(resourceId, params), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(setResourceTagsBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: setResourceTagsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as setResourceTagsResponse;
+};
+
+export type setResourceExternalIDsResponse200 = {
+  data: ResourceRevision;
+  status: 200;
+};
+
+export type setResourceExternalIDsResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type setResourceExternalIDsResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type setResourceExternalIDsResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type setResourceExternalIDsResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type setResourceExternalIDsResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type setResourceExternalIDsResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type setResourceExternalIDsResponseSuccess =
+  setResourceExternalIDsResponse200 & {
+    headers: Headers;
+  };
+export type setResourceExternalIDsResponseError = (
+  | setResourceExternalIDsResponse400
+  | setResourceExternalIDsResponse401
+  | setResourceExternalIDsResponse403
+  | setResourceExternalIDsResponse404
+  | setResourceExternalIDsResponse409
+  | setResourceExternalIDsResponse500
+) & {
+  headers: Headers;
+};
+
+export type setResourceExternalIDsResponse =
+  setResourceExternalIDsResponseSuccess | setResourceExternalIDsResponseError;
+
+export const getSetResourceExternalIDsUrl = (
+  resourceId: string,
+  params: SetResourceExternalIDsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/resources/${resourceId}/external-ids?${stringifiedParams}`
+    : `/api/resources/${resourceId}/external-ids`;
+};
+
+export const setResourceExternalIDs = async (
+  resourceId: string,
+  setExternalIDs: SetExternalIDs,
+  params: SetResourceExternalIDsParams,
+  options?: RequestInit,
+): Promise<setResourceExternalIDsResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getSetResourceExternalIDsUrl(resourceId, params), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(setExternalIDs),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: setResourceExternalIDsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as setResourceExternalIDsResponse;
+};
+
+export type createSourceResponse201 = {
+  data: ResourceRevision;
+  status: 201;
+};
+
+export type createSourceResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type createSourceResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type createSourceResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type createSourceResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type createSourceResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type createSourceResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type createSourceResponseSuccess = createSourceResponse201 & {
+  headers: Headers;
+};
+export type createSourceResponseError = (
+  | createSourceResponse400
+  | createSourceResponse401
+  | createSourceResponse403
+  | createSourceResponse404
+  | createSourceResponse409
+  | createSourceResponse500
+) & {
+  headers: Headers;
+};
+
+export type createSourceResponse =
+  createSourceResponseSuccess | createSourceResponseError;
+
+export const getCreateSourceUrl = (
+  resourceId: string,
+  params: CreateSourceParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/resources/${resourceId}/sources?${stringifiedParams}`
+    : `/api/resources/${resourceId}/sources`;
+};
+
+export const createSource = async (
+  resourceId: string,
+  createSourceBody: CreateSource,
+  params: CreateSourceParams,
+  options?: RequestInit,
+): Promise<createSourceResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getCreateSourceUrl(resourceId, params), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(createSourceBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createSourceResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createSourceResponse;
+};
+
+export type patchSourceResponse200 = {
+  data: ResourceRevision;
+  status: 200;
+};
+
+export type patchSourceResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type patchSourceResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type patchSourceResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type patchSourceResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type patchSourceResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type patchSourceResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type patchSourceResponseSuccess = patchSourceResponse200 & {
+  headers: Headers;
+};
+export type patchSourceResponseError = (
+  | patchSourceResponse400
+  | patchSourceResponse401
+  | patchSourceResponse403
+  | patchSourceResponse404
+  | patchSourceResponse409
+  | patchSourceResponse500
+) & {
+  headers: Headers;
+};
+
+export type patchSourceResponse =
+  patchSourceResponseSuccess | patchSourceResponseError;
+
+export const getPatchSourceUrl = (
+  resourceId: string,
+  sourceId: string,
+  params: PatchSourceParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/resources/${resourceId}/sources/${sourceId}?${stringifiedParams}`
+    : `/api/resources/${resourceId}/sources/${sourceId}`;
+};
+
+export const patchSource = async (
+  resourceId: string,
+  sourceId: string,
+  patchSourceBody: PatchSource,
+  params: PatchSourceParams,
+  options?: RequestInit,
+): Promise<patchSourceResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getPatchSourceUrl(resourceId, sourceId, params), {
+    ...options,
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(patchSourceBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: patchSourceResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as patchSourceResponse;
+};
+
+export type setSourceRightsResponse200 = {
+  data: ResourceRevision;
+  status: 200;
+};
+
+export type setSourceRightsResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type setSourceRightsResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type setSourceRightsResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type setSourceRightsResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type setSourceRightsResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type setSourceRightsResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type setSourceRightsResponseSuccess = setSourceRightsResponse200 & {
+  headers: Headers;
+};
+export type setSourceRightsResponseError = (
+  | setSourceRightsResponse400
+  | setSourceRightsResponse401
+  | setSourceRightsResponse403
+  | setSourceRightsResponse404
+  | setSourceRightsResponse409
+  | setSourceRightsResponse500
+) & {
+  headers: Headers;
+};
+
+export type setSourceRightsResponse =
+  setSourceRightsResponseSuccess | setSourceRightsResponseError;
+
+export const getSetSourceRightsUrl = (
+  resourceId: string,
+  sourceId: string,
+  params: SetSourceRightsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/resources/${resourceId}/sources/${sourceId}/rights?${stringifiedParams}`
+    : `/api/resources/${resourceId}/sources/${sourceId}/rights`;
+};
+
+export const setSourceRights = async (
+  resourceId: string,
+  sourceId: string,
+  setSourceRightsBody: SetSourceRights,
+  params: SetSourceRightsParams,
+  options?: RequestInit,
+): Promise<setSourceRightsResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getSetSourceRightsUrl(resourceId, sourceId, params), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(setSourceRightsBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: setSourceRightsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as setSourceRightsResponse;
+};
+
+export type addRelationResponse200 = {
+  data: ResourceRevision;
+  status: 200;
+};
+
+export type addRelationResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type addRelationResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type addRelationResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type addRelationResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type addRelationResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type addRelationResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type addRelationResponseSuccess = addRelationResponse200 & {
+  headers: Headers;
+};
+export type addRelationResponseError = (
+  | addRelationResponse400
+  | addRelationResponse401
+  | addRelationResponse403
+  | addRelationResponse404
+  | addRelationResponse409
+  | addRelationResponse500
+) & {
+  headers: Headers;
+};
+
+export type addRelationResponse =
+  addRelationResponseSuccess | addRelationResponseError;
+
+export const getAddRelationUrl = (
+  resourceId: string,
+  params: AddRelationParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/resources/${resourceId}/relations?${stringifiedParams}`
+    : `/api/resources/${resourceId}/relations`;
+};
+
+export const addRelation = async (
+  resourceId: string,
+  addRelationBody: AddRelation,
+  params: AddRelationParams,
+  options?: RequestInit,
+): Promise<addRelationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getAddRelationUrl(resourceId, params), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(addRelationBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: addRelationResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as addRelationResponse;
+};
+
+export type deleteRelationResponse200 = {
+  data: ResourceRevision;
+  status: 200;
+};
+
+export type deleteRelationResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type deleteRelationResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type deleteRelationResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type deleteRelationResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type deleteRelationResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type deleteRelationResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type deleteRelationResponseSuccess = deleteRelationResponse200 & {
+  headers: Headers;
+};
+export type deleteRelationResponseError = (
+  | deleteRelationResponse400
+  | deleteRelationResponse401
+  | deleteRelationResponse403
+  | deleteRelationResponse404
+  | deleteRelationResponse409
+  | deleteRelationResponse500
+) & {
+  headers: Headers;
+};
+
+export type deleteRelationResponse =
+  deleteRelationResponseSuccess | deleteRelationResponseError;
+
+export const getDeleteRelationUrl = (
+  resourceId: string,
+  relationId: string,
+  params: DeleteRelationParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/resources/${resourceId}/relations/${relationId}?${stringifiedParams}`
+    : `/api/resources/${resourceId}/relations/${relationId}`;
+};
+
+export const deleteRelation = async (
+  resourceId: string,
+  relationId: string,
+  params: DeleteRelationParams,
+  options?: RequestInit,
+): Promise<deleteRelationResponse> => {
+  const res = await fetch(
+    getDeleteRelationUrl(resourceId, relationId, params),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteRelationResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteRelationResponse;
+};
+
+export type setPublicationResponse200 = {
+  data: ResourceRevision;
+  status: 200;
+};
+
+export type setPublicationResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type setPublicationResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type setPublicationResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type setPublicationResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type setPublicationResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type setPublicationResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type setPublicationResponseSuccess = setPublicationResponse200 & {
+  headers: Headers;
+};
+export type setPublicationResponseError = (
+  | setPublicationResponse400
+  | setPublicationResponse401
+  | setPublicationResponse403
+  | setPublicationResponse404
+  | setPublicationResponse409
+  | setPublicationResponse500
+) & {
+  headers: Headers;
+};
+
+export type setPublicationResponse =
+  setPublicationResponseSuccess | setPublicationResponseError;
+
+export const getSetPublicationUrl = (
+  resourceId: string,
+  params: SetPublicationParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/resources/${resourceId}/publication?${stringifiedParams}`
+    : `/api/resources/${resourceId}/publication`;
+};
+
+export const setPublication = async (
+  resourceId: string,
+  setPublicationBody: SetPublication,
+  params: SetPublicationParams,
+  options?: RequestInit,
+): Promise<setPublicationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getSetPublicationUrl(resourceId, params), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(setPublicationBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: setPublicationResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as setPublicationResponse;
+};
+
+export type listCategoriesResponse200 = {
+  data: TaxonomyList;
+  status: 200;
+};
+
+export type listCategoriesResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type listCategoriesResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type listCategoriesResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type listCategoriesResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type listCategoriesResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type listCategoriesResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type listCategoriesResponseSuccess = listCategoriesResponse200 & {
+  headers: Headers;
+};
+export type listCategoriesResponseError = (
+  | listCategoriesResponse400
+  | listCategoriesResponse401
+  | listCategoriesResponse403
+  | listCategoriesResponse404
+  | listCategoriesResponse409
+  | listCategoriesResponse500
+) & {
+  headers: Headers;
+};
+
+export type listCategoriesResponse =
+  listCategoriesResponseSuccess | listCategoriesResponseError;
+
+export const getListCategoriesUrl = () => {
+  return `/api/categories`;
+};
+
+export const listCategories = async (
+  options?: RequestInit,
+): Promise<listCategoriesResponse> => {
+  const res = await fetch(getListCategoriesUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listCategoriesResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listCategoriesResponse;
+};
+
+export type createCategoryResponse201 = {
+  data: EntityID;
+  status: 201;
+};
+
+export type createCategoryResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type createCategoryResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type createCategoryResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type createCategoryResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type createCategoryResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type createCategoryResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type createCategoryResponseSuccess = createCategoryResponse201 & {
+  headers: Headers;
+};
+export type createCategoryResponseError = (
+  | createCategoryResponse400
+  | createCategoryResponse401
+  | createCategoryResponse403
+  | createCategoryResponse404
+  | createCategoryResponse409
+  | createCategoryResponse500
+) & {
+  headers: Headers;
+};
+
+export type createCategoryResponse =
+  createCategoryResponseSuccess | createCategoryResponseError;
+
+export const getCreateCategoryUrl = () => {
+  return `/api/categories`;
+};
+
+export const createCategory = async (
+  createTaxonomy: CreateTaxonomy,
+  options?: RequestInit,
+): Promise<createCategoryResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getCreateCategoryUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(createTaxonomy),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createCategoryResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createCategoryResponse;
+};
+
+export type getCategoryResponse200 = {
+  data: TaxonomyDetail;
+  status: 200;
+};
+
+export type getCategoryResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type getCategoryResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type getCategoryResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type getCategoryResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type getCategoryResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type getCategoryResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type getCategoryResponseSuccess = getCategoryResponse200 & {
+  headers: Headers;
+};
+export type getCategoryResponseError = (
+  | getCategoryResponse400
+  | getCategoryResponse401
+  | getCategoryResponse403
+  | getCategoryResponse404
+  | getCategoryResponse409
+  | getCategoryResponse500
+) & {
+  headers: Headers;
+};
+
+export type getCategoryResponse =
+  getCategoryResponseSuccess | getCategoryResponseError;
+
+export const getGetCategoryUrl = (categoryId: string) => {
+  return `/api/categories/${categoryId}`;
+};
+
+export const getCategory = async (
+  categoryId: string,
+  options?: RequestInit,
+): Promise<getCategoryResponse> => {
+  const res = await fetch(getGetCategoryUrl(categoryId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getCategoryResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getCategoryResponse;
+};
+
+export type patchCategoryResponse200 = {
+  data: EntityID;
+  status: 200;
+};
+
+export type patchCategoryResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type patchCategoryResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type patchCategoryResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type patchCategoryResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type patchCategoryResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type patchCategoryResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type patchCategoryResponseSuccess = patchCategoryResponse200 & {
+  headers: Headers;
+};
+export type patchCategoryResponseError = (
+  | patchCategoryResponse400
+  | patchCategoryResponse401
+  | patchCategoryResponse403
+  | patchCategoryResponse404
+  | patchCategoryResponse409
+  | patchCategoryResponse500
+) & {
+  headers: Headers;
+};
+
+export type patchCategoryResponse =
+  patchCategoryResponseSuccess | patchCategoryResponseError;
+
+export const getPatchCategoryUrl = (categoryId: string) => {
+  return `/api/categories/${categoryId}`;
+};
+
+export const patchCategory = async (
+  categoryId: string,
+  patchTaxonomy: PatchTaxonomy,
+  options?: RequestInit,
+): Promise<patchCategoryResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getPatchCategoryUrl(categoryId), {
+    ...options,
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(patchTaxonomy),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: patchCategoryResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as patchCategoryResponse;
+};
+
+export type deleteCategoryResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteCategoryResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type deleteCategoryResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type deleteCategoryResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type deleteCategoryResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type deleteCategoryResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type deleteCategoryResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type deleteCategoryResponseSuccess = deleteCategoryResponse204 & {
+  headers: Headers;
+};
+export type deleteCategoryResponseError = (
+  | deleteCategoryResponse400
+  | deleteCategoryResponse401
+  | deleteCategoryResponse403
+  | deleteCategoryResponse404
+  | deleteCategoryResponse409
+  | deleteCategoryResponse500
+) & {
+  headers: Headers;
+};
+
+export type deleteCategoryResponse =
+  deleteCategoryResponseSuccess | deleteCategoryResponseError;
+
+export const getDeleteCategoryUrl = (categoryId: string) => {
+  return `/api/categories/${categoryId}`;
+};
+
+export const deleteCategory = async (
+  categoryId: string,
+  options?: RequestInit,
+): Promise<deleteCategoryResponse> => {
+  const res = await fetch(getDeleteCategoryUrl(categoryId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteCategoryResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteCategoryResponse;
+};
+
+export type putCategoryLocalizationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type putCategoryLocalizationResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type putCategoryLocalizationResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type putCategoryLocalizationResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type putCategoryLocalizationResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type putCategoryLocalizationResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type putCategoryLocalizationResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type putCategoryLocalizationResponseSuccess =
+  putCategoryLocalizationResponse204 & {
+    headers: Headers;
+  };
+export type putCategoryLocalizationResponseError = (
+  | putCategoryLocalizationResponse400
+  | putCategoryLocalizationResponse401
+  | putCategoryLocalizationResponse403
+  | putCategoryLocalizationResponse404
+  | putCategoryLocalizationResponse409
+  | putCategoryLocalizationResponse500
+) & {
+  headers: Headers;
+};
+
+export type putCategoryLocalizationResponse =
+  putCategoryLocalizationResponseSuccess | putCategoryLocalizationResponseError;
+
+export const getPutCategoryLocalizationUrl = (
+  categoryId: string,
+  locale: string,
+) => {
+  return `/api/categories/${categoryId}/localizations/${locale}`;
+};
+
+export const putCategoryLocalization = async (
+  categoryId: string,
+  locale: string,
+  taxonomyLocalizationInput: TaxonomyLocalizationInput,
+  options?: RequestInit,
+): Promise<putCategoryLocalizationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getPutCategoryLocalizationUrl(categoryId, locale), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(taxonomyLocalizationInput),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: putCategoryLocalizationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as putCategoryLocalizationResponse;
+};
+
+export type deleteCategoryLocalizationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteCategoryLocalizationResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type deleteCategoryLocalizationResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type deleteCategoryLocalizationResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type deleteCategoryLocalizationResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type deleteCategoryLocalizationResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type deleteCategoryLocalizationResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type deleteCategoryLocalizationResponseSuccess =
+  deleteCategoryLocalizationResponse204 & {
+    headers: Headers;
+  };
+export type deleteCategoryLocalizationResponseError = (
+  | deleteCategoryLocalizationResponse400
+  | deleteCategoryLocalizationResponse401
+  | deleteCategoryLocalizationResponse403
+  | deleteCategoryLocalizationResponse404
+  | deleteCategoryLocalizationResponse409
+  | deleteCategoryLocalizationResponse500
+) & {
+  headers: Headers;
+};
+
+export type deleteCategoryLocalizationResponse =
+  | deleteCategoryLocalizationResponseSuccess
+  | deleteCategoryLocalizationResponseError;
+
+export const getDeleteCategoryLocalizationUrl = (
+  categoryId: string,
+  locale: string,
+) => {
+  return `/api/categories/${categoryId}/localizations/${locale}`;
+};
+
+export const deleteCategoryLocalization = async (
+  categoryId: string,
+  locale: string,
+  options?: RequestInit,
+): Promise<deleteCategoryLocalizationResponse> => {
+  const res = await fetch(
+    getDeleteCategoryLocalizationUrl(categoryId, locale),
+    {
+      ...options,
+      method: "DELETE",
+    },
+  );
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteCategoryLocalizationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteCategoryLocalizationResponse;
+};
+
+export type listTagsResponse200 = {
+  data: TaxonomyList;
+  status: 200;
+};
+
+export type listTagsResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type listTagsResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type listTagsResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type listTagsResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type listTagsResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type listTagsResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type listTagsResponseSuccess = listTagsResponse200 & {
+  headers: Headers;
+};
+export type listTagsResponseError = (
+  | listTagsResponse400
+  | listTagsResponse401
+  | listTagsResponse403
+  | listTagsResponse404
+  | listTagsResponse409
+  | listTagsResponse500
+) & {
+  headers: Headers;
+};
+
+export type listTagsResponse = listTagsResponseSuccess | listTagsResponseError;
+
+export const getListTagsUrl = () => {
+  return `/api/tags`;
+};
+
+export const listTags = async (
+  options?: RequestInit,
+): Promise<listTagsResponse> => {
+  const res = await fetch(getListTagsUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listTagsResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as listTagsResponse;
+};
+
+export type createTagResponse201 = {
+  data: EntityID;
+  status: 201;
+};
+
+export type createTagResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type createTagResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type createTagResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type createTagResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type createTagResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type createTagResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type createTagResponseSuccess = createTagResponse201 & {
+  headers: Headers;
+};
+export type createTagResponseError = (
+  | createTagResponse400
+  | createTagResponse401
+  | createTagResponse403
+  | createTagResponse404
+  | createTagResponse409
+  | createTagResponse500
+) & {
+  headers: Headers;
+};
+
+export type createTagResponse =
+  createTagResponseSuccess | createTagResponseError;
+
+export const getCreateTagUrl = () => {
+  return `/api/tags`;
+};
+
+export const createTag = async (
+  createTaxonomy: CreateTaxonomy,
+  options?: RequestInit,
+): Promise<createTagResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getCreateTagUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(createTaxonomy),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createTagResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createTagResponse;
+};
+
+export type getTagResponse200 = {
+  data: TaxonomyDetail;
+  status: 200;
+};
+
+export type getTagResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type getTagResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type getTagResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type getTagResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type getTagResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type getTagResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type getTagResponseSuccess = getTagResponse200 & {
+  headers: Headers;
+};
+export type getTagResponseError = (
+  | getTagResponse400
+  | getTagResponse401
+  | getTagResponse403
+  | getTagResponse404
+  | getTagResponse409
+  | getTagResponse500
+) & {
+  headers: Headers;
+};
+
+export type getTagResponse = getTagResponseSuccess | getTagResponseError;
+
+export const getGetTagUrl = (tagId: string) => {
+  return `/api/tags/${tagId}`;
+};
+
+export const getTag = async (
+  tagId: string,
+  options?: RequestInit,
+): Promise<getTagResponse> => {
+  const res = await fetch(getGetTagUrl(tagId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getTagResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getTagResponse;
+};
+
+export type patchTagResponse200 = {
+  data: EntityID;
+  status: 200;
+};
+
+export type patchTagResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type patchTagResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type patchTagResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type patchTagResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type patchTagResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type patchTagResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type patchTagResponseSuccess = patchTagResponse200 & {
+  headers: Headers;
+};
+export type patchTagResponseError = (
+  | patchTagResponse400
+  | patchTagResponse401
+  | patchTagResponse403
+  | patchTagResponse404
+  | patchTagResponse409
+  | patchTagResponse500
+) & {
+  headers: Headers;
+};
+
+export type patchTagResponse = patchTagResponseSuccess | patchTagResponseError;
+
+export const getPatchTagUrl = (tagId: string) => {
+  return `/api/tags/${tagId}`;
+};
+
+export const patchTag = async (
+  tagId: string,
+  patchTaxonomy: PatchTaxonomy,
+  options?: RequestInit,
+): Promise<patchTagResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getPatchTagUrl(tagId), {
+    ...options,
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(patchTaxonomy),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: patchTagResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as patchTagResponse;
+};
+
+export type deleteTagResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteTagResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type deleteTagResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type deleteTagResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type deleteTagResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type deleteTagResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type deleteTagResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type deleteTagResponseSuccess = deleteTagResponse204 & {
+  headers: Headers;
+};
+export type deleteTagResponseError = (
+  | deleteTagResponse400
+  | deleteTagResponse401
+  | deleteTagResponse403
+  | deleteTagResponse404
+  | deleteTagResponse409
+  | deleteTagResponse500
+) & {
+  headers: Headers;
+};
+
+export type deleteTagResponse =
+  deleteTagResponseSuccess | deleteTagResponseError;
+
+export const getDeleteTagUrl = (tagId: string) => {
+  return `/api/tags/${tagId}`;
+};
+
+export const deleteTag = async (
+  tagId: string,
+  options?: RequestInit,
+): Promise<deleteTagResponse> => {
+  const res = await fetch(getDeleteTagUrl(tagId), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteTagResponse["data"] = body ? JSON.parse(body) : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteTagResponse;
+};
+
+export type putTagLocalizationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type putTagLocalizationResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type putTagLocalizationResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type putTagLocalizationResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type putTagLocalizationResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type putTagLocalizationResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type putTagLocalizationResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type putTagLocalizationResponseSuccess =
+  putTagLocalizationResponse204 & {
+    headers: Headers;
+  };
+export type putTagLocalizationResponseError = (
+  | putTagLocalizationResponse400
+  | putTagLocalizationResponse401
+  | putTagLocalizationResponse403
+  | putTagLocalizationResponse404
+  | putTagLocalizationResponse409
+  | putTagLocalizationResponse500
+) & {
+  headers: Headers;
+};
+
+export type putTagLocalizationResponse =
+  putTagLocalizationResponseSuccess | putTagLocalizationResponseError;
+
+export const getPutTagLocalizationUrl = (tagId: string, locale: string) => {
+  return `/api/tags/${tagId}/localizations/${locale}`;
+};
+
+export const putTagLocalization = async (
+  tagId: string,
+  locale: string,
+  taxonomyLocalizationInput: TaxonomyLocalizationInput,
+  options?: RequestInit,
+): Promise<putTagLocalizationResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getPutTagLocalizationUrl(tagId, locale), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(taxonomyLocalizationInput),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: putTagLocalizationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as putTagLocalizationResponse;
+};
+
+export type deleteTagLocalizationResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type deleteTagLocalizationResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type deleteTagLocalizationResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type deleteTagLocalizationResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type deleteTagLocalizationResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type deleteTagLocalizationResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type deleteTagLocalizationResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type deleteTagLocalizationResponseSuccess =
+  deleteTagLocalizationResponse204 & {
+    headers: Headers;
+  };
+export type deleteTagLocalizationResponseError = (
+  | deleteTagLocalizationResponse400
+  | deleteTagLocalizationResponse401
+  | deleteTagLocalizationResponse403
+  | deleteTagLocalizationResponse404
+  | deleteTagLocalizationResponse409
+  | deleteTagLocalizationResponse500
+) & {
+  headers: Headers;
+};
+
+export type deleteTagLocalizationResponse =
+  deleteTagLocalizationResponseSuccess | deleteTagLocalizationResponseError;
+
+export const getDeleteTagLocalizationUrl = (tagId: string, locale: string) => {
+  return `/api/tags/${tagId}/localizations/${locale}`;
+};
+
+export const deleteTagLocalization = async (
+  tagId: string,
+  locale: string,
+  options?: RequestInit,
+): Promise<deleteTagLocalizationResponse> => {
+  const res = await fetch(getDeleteTagLocalizationUrl(tagId, locale), {
+    ...options,
+    method: "DELETE",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: deleteTagLocalizationResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as deleteTagLocalizationResponse;
 };

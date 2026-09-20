@@ -40,6 +40,28 @@ type AdminGrant struct {
 	ExpiresAt time.Time
 }
 
+// RequireAdminCapabilityTx shares the User-first lock order with authentication
+// and RoleOperator. Callers must keep this transaction open through their write;
+// roles carried in a previously resolved actor are deliberately not trusted.
+func RequireAdminCapabilityTx(ctx context.Context, tx pgx.Tx, actor AdminActor, capability Capability) ([]Role, error) {
+	q := sqlc.New(tx)
+	if err := lockUser(ctx, q, actor.UserID); err != nil {
+		return nil, adminActorError(err)
+	}
+	var now time.Time
+	if err := tx.QueryRow(ctx, "SELECT clock_timestamp()").Scan(&now); err != nil {
+		return nil, database.SafeError("read admin authorization time", err)
+	}
+	me, err := requireAdminActor(ctx, q, actor, now)
+	if err != nil {
+		return nil, err
+	}
+	if !HasCapability(me.Roles, capability) {
+		return nil, ErrAdminForbidden
+	}
+	return me.Roles, nil
+}
+
 func readAdminMe(ctx context.Context, q *sqlc.Queries, userID uuid.UUID, authenticatedAt time.Time) (AdminMe, error) {
 	account, err := q.ReadAdminAccount(ctx, dbID(userID))
 	if errors.Is(err, pgx.ErrNoRows) {

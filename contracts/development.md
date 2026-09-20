@@ -30,7 +30,9 @@ P0-1D Admin dev origin is `http://localhost:5173`, proxying to port 8081. Use
 prepared migrator input. No HTTP role-management surface exists. Grant only to an
 active verified local password account. Do not remove the last active administrator.
 `pnpm smoke:admin:dev` checks real runtime/owner identities and cleans only its own
-temporary moderator account. Runtime never gets role mutation rights.
+temporary account and Resource graph. Its fixture roles progress Moderator→Editor→Admin
+to validate read-only, ordinary curation and governance. Runtime never gets role
+mutation rights; product role changes do not change PostgreSQL grants.
 
 `ADMIN_CSRF_SECRET` is separate from Public `CSRF_SECRET`; API/Admin share
 `AUTH_THROTTLE_SECRET`. Production requires explicit private values of at least

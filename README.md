@@ -5,8 +5,9 @@ knowledge. P0-1 Identity/Auth and human acceptance are complete. MAIL-0 connects
 verification and recovery mail to Resend. P0-2A adds the ten-table Resource Core,
 pure Taxonomy/Resource primitives, localization and Resource revision/CAS groundwork.
 P0-2B exposes anonymous Resource/taxonomy read APIs and `/resources` Astro SSR pages,
-with field-level locale fallback and sanitized Markdown. P0-2C Admin Resource Curation
-is next; canonical writes, search and contributions remain future phases.
+with field-level locale fallback and sanitized Markdown. P0-2C adds canonical Admin
+curation with transactional capabilities, Resource CAS, graph invariants and a routed
+React editor. P0-3 Contribution & Review is next; search remains a later phase.
 Production deployment sign-off remains a separate gate.
 
 Canonical repository: [deepfurry/tap4furry](https://github.com/deepfurry/tap4furry).
@@ -57,7 +58,7 @@ Publishing, merging to `main`, tagging and releasing require explicit instructio
 `gfp_*` and `gfp:` are intentionally retained stable infrastructure identifiers and
 are not product-brand surfaces. BRAND-0 changes no database schema or infrastructure.
 
-Start with [AGENTS.md](AGENTS.md), the [P0-2B specification](docs/implementation/p0-2b-public-resource-read-surface.md),
+Start with [AGENTS.md](AGENTS.md), the [P0-2C specification](docs/implementation/p0-2c-admin-resource-curation.md),
 [product overview](docs/product/PRODUCT.md) and [architecture](docs/architecture/ARCHITECTURE.md).
 See [CHANGELOG.md](CHANGELOG.md) and [deployment artifacts](deploy/README.md).
 

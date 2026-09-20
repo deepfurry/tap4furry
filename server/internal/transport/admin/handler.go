@@ -5,9 +5,11 @@ import (
 	"time"
 
 	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/curation"
 	"github.com/deepfurry/tap4furry/server/internal/transport/admin/generated"
 	"github.com/deepfurry/tap4furry/server/internal/transport/health"
 	"github.com/gofiber/fiber/v3"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type Handler struct {
@@ -16,6 +18,8 @@ type Handler struct {
 }
 type Options struct {
 	Auth                                 *auth.App
+	Curation                             *curation.App
+	ResourcePool                         *pgxpool.Pool
 	Environment, AdminOrigin, CSRFSecret string
 }
 
@@ -27,7 +31,7 @@ func Register(router fiber.Router, checker *health.Checker, options ...Options) 
 		option = options[0]
 	}
 	h := &Handler{health: checker, options: option}
-	for _, path := range []string{"/auth", "/me"} {
+	for _, path := range []string{"/auth", "/me", "/resources", "/categories", "/tags"} {
 		router.Use(path, func(c fiber.Ctx) error {
 			ctx, cancel := context.WithTimeout(c.Context(), 5*time.Second)
 			defer cancel()
@@ -35,6 +39,9 @@ func Register(router fiber.Router, checker *health.Checker, options ...Options) 
 			c.Set("Cache-Control", "no-store")
 			return c.Next()
 		}, h.originGuard)
+	}
+	for _, path := range []string{"/resources", "/categories", "/tags"} {
+		router.Use(path, h.curationBoundary, h.adminAccessGuard, h.csrfGuard)
 	}
 	for _, path := range []string{"/auth/logout", "/auth/reauthenticate", "/me"} {
 		router.Use(path, h.csrfGuard)

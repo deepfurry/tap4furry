@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Add P0-2C Admin Resource/Taxonomy curation APIs, generated clients and routed React
+  Resource editors, Taxonomy pages and Account workspace. Create always starts Draft.
+- Add Application-owned transactions with live Admin capability revalidation under
+  the User lock, Resource expected-version CAS, atomic child diffs and true no-op handling.
+- Add Source primary switching/rights governance, fixed-lock per-type Relation cycle
+  prevention with dual endpoint revisions, first-publication slug freeze and soft deletion.
+- Preserve Goose 6, migrations 1–6, precise runtime grants and pure Resource/Taxonomy
+  domains. Extend Admin smoke and disposable tests with capability races, privacy lifecycle,
+  rollback and graph concurrency; add explicit conflict reload, dirty guards and typed deletion.
+
 - Add P0-2B anonymous Resource list/detail and Category/Tag browse OpenAPI endpoints,
   generated clients and purpose-built sqlc reads without changing migrations 1–6.
 - Filter public visibility, Source availability/rights and Relation endpoints in SQL;

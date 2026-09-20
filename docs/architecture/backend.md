@@ -69,6 +69,26 @@ Redis
 
 ## Application
 
+P0-2C's `internal/curation` is the canonical Resource/Taxonomy Application layer.
+It uses `auth.RequireAdminCapabilityTx` to lock the actor User, revalidate the Admin
+session and read current roles inside every READ COMMITTED mutation transaction.
+RoleOperator takes the same User lock, so a revoke waits for an already-authorized
+mutation and a later mutation observes revoked Editorial/Administration capability.
+Resource CAS is checked under the parent lock; child changes and the final bump
+commit together. No-op returns the current revision without changing timestamps.
+Canonical timestamps come from PostgreSQL transaction_timestamp().
+
+Relation edits add one fixed transaction advisory lock before UUID-ordered endpoint
+locks. Each directed type has its own recursive cycle check; related_to remains
+symmetric. Both endpoints bump once. Parent soft-delete, publication governance,
+retired binding rules and Source primary switching are explicit use cases, with no
+new schema/grants or Resource/Taxonomy infrastructure dependencies.
+
+Admin `admin_resource.sql` reads use a read-only snapshot and dedicated DTO mapping.
+All curation endpoints require AdminAccess, no-store and a five-second deadline;
+mutations additionally require exact Origin/CSRF. Admin Fiber accepts up to 256 KiB,
+while Auth decoder requests remain limited to 8 KiB.
+
 Application owns user/business intentions:
 
 ```text
@@ -84,9 +104,9 @@ MergeResources
 
 Application owns transaction boundaries.
 
-The use cases above remain future phase work. P0-2A demonstrates localization
+The example Contribution/Exchange use cases above remain future phase work. P0-2A demonstrates localization
 creation/default-switch/deletion and Resource CAS transaction patterns in disposable
-integration tests. Future P0-2C must hold the parent lock for localization decisions,
+integration tests. P0-2C holds the parent lock for localization decisions,
 create parent/default translation atomically, and reject deleting the default.
 Resource child mutations and version CAS share the same transaction; stale versions
 roll back all child writes. Relations lock both endpoint Resources in UUID order and
