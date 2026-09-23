@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+- Audit the Stage 1.2 baseline and design Stage 1.3 / P0-6 in Chinese: private
+  Resource/Source reports, scoped restrictions that preserve reporting and account
+  safety, fixed trust budgets, atomic governance/audits and manual source checks.
+  Record the profile-write authorization gap and planned visibility/cache semantics;
+  update the roadmap as design only, with no runtime, migration or permission changes.
+
 - Complete Stage 1.2 / P0-3B: add Source addition/removal, additive Tag sets, Relations
   and Resource translations to the existing private submission/review/history UI.
   Preserve originals, revised acceptance reasons, quota, replay and explicit conflict handling.
