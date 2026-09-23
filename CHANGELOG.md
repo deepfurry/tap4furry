@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Design Stage 1.2 / P0-3B in Chinese: five additional contribution types, shared
+  review UI, dual-endpoint relation CAS/audits, raw localization editing, private
+  history and additive migration compatibility. Update the roadmap as design only;
+  no runtime, schema, grants or generated contracts change in this documentation step.
+
 - Add Stage 1.1 / P0-3A basic contribution review: verified authors submit new
   Resources or default-language corrections, inspect private history and withdraw;
   Editors/Admins review, revise with reasons, accept atomically or reject.

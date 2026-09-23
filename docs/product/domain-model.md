@@ -26,8 +26,10 @@ Admin
 ## Core Entities
 
 P0-2A implements Resource/Taxonomy data foundations; P0-2B adds anonymous public
-reads and SSR Resource pages. The broader entity map remains product direction;
-P0-2C now adds Admin curation. Contribution, Search and Exchange remain future work.
+reads and SSR Resource pages. P0-2C adds Admin curation, and P0-3A implements
+new-Resource/default-language correction proposals and atomic review. The remaining
+P0 contribution types are in the Stage 1.2 design; Search and Exchange remain future
+work. The broader entity map below is product direction, not an implementation inventory.
 
 ```text
 User
