@@ -34,6 +34,252 @@ type NonReadonly<T> = [T] extends [UnionToIntersection<T>]
     }
   : DistributeReadOnlyOverUnions<T>;
 
+export interface RequestReceipt {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  id: string;
+}
+
+export type ReportInputTargetKind =
+  (typeof ReportInputTargetKind)[keyof typeof ReportInputTargetKind];
+
+export const ReportInputTargetKind = {
+  resource: "resource",
+  source: "source",
+} as const;
+
+export type ReportInputReason =
+  (typeof ReportInputReason)[keyof typeof ReportInputReason];
+
+export const ReportInputReason = {
+  broken_link: "broken_link",
+  rights_concern: "rights_concern",
+  malicious_link: "malicious_link",
+  privacy: "privacy",
+  content_rating: "content_rating",
+  spam: "spam",
+  other: "other",
+} as const;
+
+export interface ReportInput {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  request_id: string;
+  target_kind: ReportInputTargetKind;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  resource_id: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  source_id?: string;
+  reason: ReportInputReason;
+  /**
+   * @minLength 1
+   * @maxLength 4000
+   */
+  body: string;
+}
+
+export interface ReportWithdrawal {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  request_id: string;
+}
+
+export type ReportPublicEventEventType =
+  (typeof ReportPublicEventEventType)[keyof typeof ReportPublicEventEventType];
+
+export const ReportPublicEventEventType = {
+  submitted: "submitted",
+  triaged: "triaged",
+  escalated: "escalated",
+  resolved: "resolved",
+  dismissed: "dismissed",
+  withdrawn: "withdrawn",
+} as const;
+
+export interface ReportPublicEvent {
+  event_type: ReportPublicEventEventType;
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  safe_message?: string;
+  occurred_at: string;
+}
+
+export interface ReportPublicTarget {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  resource_id: string;
+  /**
+   * @minLength 1
+   * @maxLength 80
+   */
+  slug: string;
+  /**
+   * @minLength 1
+   * @maxLength 160
+   */
+  name: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  source_id?: string;
+}
+
+export type OwnReportTargetKind =
+  (typeof OwnReportTargetKind)[keyof typeof OwnReportTargetKind];
+
+export const OwnReportTargetKind = {
+  resource: "resource",
+  source: "source",
+} as const;
+
+export type OwnReportReason =
+  (typeof OwnReportReason)[keyof typeof OwnReportReason];
+
+export const OwnReportReason = {
+  broken_link: "broken_link",
+  rights_concern: "rights_concern",
+  malicious_link: "malicious_link",
+  privacy: "privacy",
+  content_rating: "content_rating",
+  spam: "spam",
+  other: "other",
+} as const;
+
+export type OwnReportStatus =
+  (typeof OwnReportStatus)[keyof typeof OwnReportStatus];
+
+export const OwnReportStatus = {
+  open: "open",
+  in_review: "in_review",
+  resolved: "resolved",
+  dismissed: "dismissed",
+  withdrawn: "withdrawn",
+} as const;
+
+export interface OwnReport {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  id: string;
+  target_kind: OwnReportTargetKind;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  resource_id: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  source_id?: string;
+  reason: OwnReportReason;
+  /**
+   * @minLength 1
+   * @maxLength 4000
+   */
+  body: string;
+  status: OwnReportStatus;
+  created_at: string;
+  decided_at?: string;
+  target?: ReportPublicTarget;
+  events: ReportPublicEvent[];
+}
+
+export interface OwnReportList {
+  items: OwnReport[];
+  /** @minimum 1 */
+  page: number;
+  /** @minimum 1 */
+  page_size: number;
+  has_next: boolean;
+}
+
+export type ActiveRestrictionScope =
+  (typeof ActiveRestrictionScope)[keyof typeof ActiveRestrictionScope];
+
+export const ActiveRestrictionScope = {
+  contribution_submit: "contribution_submit",
+  public_profile_write: "public_profile_write",
+  all_write: "all_write",
+} as const;
+
+export type ActiveRestrictionReasonCode =
+  (typeof ActiveRestrictionReasonCode)[keyof typeof ActiveRestrictionReasonCode];
+
+export const ActiveRestrictionReasonCode = {
+  spam: "spam",
+  abuse: "abuse",
+  repeated_policy_violation: "repeated_policy_violation",
+  other: "other",
+} as const;
+
+export interface ActiveRestriction {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  id: string;
+  scope: ActiveRestrictionScope;
+  reason_code: ActiveRestrictionReasonCode;
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  user_message: string;
+  starts_at: string;
+  expires_at?: string;
+}
+
+export interface BusinessQuota {
+  /** @minimum 0 */
+  daily_limit: number;
+  /** @minimum 0 */
+  pending_limit: number;
+  /** @minimum 0 */
+  interval_seconds: number;
+  /** @minimum 0 */
+  remaining_24h: number;
+  /** @minimum 0 */
+  pending: number;
+  /** @minimum 0 */
+  retry_after: number;
+}
+
+export interface OwnGovernance {
+  restrictions: ActiveRestriction[];
+  contribution_quota: BusinessQuota;
+  report_quota: BusinessQuota;
+}
+
 export type ContributionChangeSourceSourceType =
   (typeof ContributionChangeSourceSourceType)[keyof typeof ContributionChangeSourceSourceType];
 
@@ -766,6 +1012,13 @@ export const ApiErrorCode = {
   CONTRIBUTION_REQUEST_CONFLICT: "CONTRIBUTION_REQUEST_CONFLICT",
   CONTRIBUTION_LIMITED: "CONTRIBUTION_LIMITED",
   RESOURCE_VERSION_CONFLICT: "RESOURCE_VERSION_CONFLICT",
+  BUSINESS_RESTRICTED: "BUSINESS_RESTRICTED",
+  REPORT_NOT_FOUND: "REPORT_NOT_FOUND",
+  REPORT_FORBIDDEN: "REPORT_FORBIDDEN",
+  REPORT_VERIFICATION_REQUIRED: "REPORT_VERIFICATION_REQUIRED",
+  REPORT_LIMITED: "REPORT_LIMITED",
+  GOVERNANCE_CONFLICT: "GOVERNANCE_CONFLICT",
+  GOVERNANCE_REQUEST_CONFLICT: "GOVERNANCE_REQUEST_CONFLICT",
 } as const;
 
 export interface ApiError {
@@ -1029,6 +1282,30 @@ export type ListMyContributionsParams = {
   page_size?: number;
   status?: ContributionStatus;
 };
+
+export type ListOwnReportsParams = {
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+  status?: ListOwnReportsStatus;
+};
+
+export type ListOwnReportsStatus =
+  (typeof ListOwnReportsStatus)[keyof typeof ListOwnReportsStatus];
+
+export const ListOwnReportsStatus = {
+  open: "open",
+  in_review: "in_review",
+  resolved: "resolved",
+  dismissed: "dismissed",
+  withdrawn: "withdrawn",
+} as const;
 
 export type listResourcesResponse200 = {
   data: ResourceList;
@@ -3350,4 +3627,488 @@ export const withdrawContribution = async (
     status: res.status,
     headers: res.headers,
   } as withdrawContributionResponse;
+};
+
+export type submitReportResponse200 = {
+  data: RequestReceipt;
+  status: 200;
+};
+
+export type submitReportResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type submitReportResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type submitReportResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type submitReportResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type submitReportResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type submitReportResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type submitReportResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type submitReportResponseSuccess = submitReportResponse200 & {
+  headers: Headers;
+};
+export type submitReportResponseError = (
+  | submitReportResponse400
+  | submitReportResponse401
+  | submitReportResponse403
+  | submitReportResponse404
+  | submitReportResponse409
+  | submitReportResponse429
+  | submitReportResponse500
+) & {
+  headers: Headers;
+};
+
+export type submitReportResponse =
+  submitReportResponseSuccess | submitReportResponseError;
+
+export const getSubmitReportUrl = () => {
+  return `/api/reports`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const submitReport = async (
+  reportInput: ReportInput,
+  options?: RequestInit,
+): Promise<submitReportResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getSubmitReportUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(reportInput),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: submitReportResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as submitReportResponse;
+};
+
+export type listOwnReportsResponse200 = {
+  data: OwnReportList;
+  status: 200;
+};
+
+export type listOwnReportsResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type listOwnReportsResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type listOwnReportsResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type listOwnReportsResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type listOwnReportsResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type listOwnReportsResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type listOwnReportsResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type listOwnReportsResponseSuccess = listOwnReportsResponse200 & {
+  headers: Headers;
+};
+export type listOwnReportsResponseError = (
+  | listOwnReportsResponse400
+  | listOwnReportsResponse401
+  | listOwnReportsResponse403
+  | listOwnReportsResponse404
+  | listOwnReportsResponse409
+  | listOwnReportsResponse429
+  | listOwnReportsResponse500
+) & {
+  headers: Headers;
+};
+
+export type listOwnReportsResponse =
+  listOwnReportsResponseSuccess | listOwnReportsResponseError;
+
+export const getListOwnReportsUrl = (params?: ListOwnReportsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/me/reports?${stringifiedParams}`
+    : `/api/me/reports`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const listOwnReports = async (
+  params?: ListOwnReportsParams,
+  options?: RequestInit,
+): Promise<listOwnReportsResponse> => {
+  const res = await fetch(getListOwnReportsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listOwnReportsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listOwnReportsResponse;
+};
+
+export type getOwnReportResponse200 = {
+  data: OwnReport;
+  status: 200;
+};
+
+export type getOwnReportResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type getOwnReportResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type getOwnReportResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type getOwnReportResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type getOwnReportResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type getOwnReportResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type getOwnReportResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type getOwnReportResponseSuccess = getOwnReportResponse200 & {
+  headers: Headers;
+};
+export type getOwnReportResponseError = (
+  | getOwnReportResponse400
+  | getOwnReportResponse401
+  | getOwnReportResponse403
+  | getOwnReportResponse404
+  | getOwnReportResponse409
+  | getOwnReportResponse429
+  | getOwnReportResponse500
+) & {
+  headers: Headers;
+};
+
+export type getOwnReportResponse =
+  getOwnReportResponseSuccess | getOwnReportResponseError;
+
+export const getGetOwnReportUrl = (id: string) => {
+  return `/api/me/reports/${id}`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const getOwnReport = async (
+  id: string,
+  options?: RequestInit,
+): Promise<getOwnReportResponse> => {
+  const res = await fetch(getGetOwnReportUrl(id), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getOwnReportResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getOwnReportResponse;
+};
+
+export type withdrawReportResponse200 = {
+  data: RequestReceipt;
+  status: 200;
+};
+
+export type withdrawReportResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type withdrawReportResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type withdrawReportResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type withdrawReportResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type withdrawReportResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type withdrawReportResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type withdrawReportResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type withdrawReportResponseSuccess = withdrawReportResponse200 & {
+  headers: Headers;
+};
+export type withdrawReportResponseError = (
+  | withdrawReportResponse400
+  | withdrawReportResponse401
+  | withdrawReportResponse403
+  | withdrawReportResponse404
+  | withdrawReportResponse409
+  | withdrawReportResponse429
+  | withdrawReportResponse500
+) & {
+  headers: Headers;
+};
+
+export type withdrawReportResponse =
+  withdrawReportResponseSuccess | withdrawReportResponseError;
+
+export const getWithdrawReportUrl = (id: string) => {
+  return `/api/me/reports/${id}/withdraw`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const withdrawReport = async (
+  id: string,
+  reportWithdrawal: ReportWithdrawal,
+  options?: RequestInit,
+): Promise<withdrawReportResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getWithdrawReportUrl(id), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(reportWithdrawal),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: withdrawReportResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as withdrawReportResponse;
+};
+
+export type getOwnGovernanceResponse200 = {
+  data: OwnGovernance;
+  status: 200;
+};
+
+export type getOwnGovernanceResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type getOwnGovernanceResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type getOwnGovernanceResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type getOwnGovernanceResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type getOwnGovernanceResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type getOwnGovernanceResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type getOwnGovernanceResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type getOwnGovernanceResponseSuccess = getOwnGovernanceResponse200 & {
+  headers: Headers;
+};
+export type getOwnGovernanceResponseError = (
+  | getOwnGovernanceResponse400
+  | getOwnGovernanceResponse401
+  | getOwnGovernanceResponse403
+  | getOwnGovernanceResponse404
+  | getOwnGovernanceResponse409
+  | getOwnGovernanceResponse429
+  | getOwnGovernanceResponse500
+) & {
+  headers: Headers;
+};
+
+export type getOwnGovernanceResponse =
+  getOwnGovernanceResponseSuccess | getOwnGovernanceResponseError;
+
+export const getGetOwnGovernanceUrl = () => {
+  return `/api/me/governance`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const getOwnGovernance = async (
+  options?: RequestInit,
+): Promise<getOwnGovernanceResponse> => {
+  const res = await fetch(getGetOwnGovernanceUrl(), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getOwnGovernanceResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getOwnGovernanceResponse;
 };

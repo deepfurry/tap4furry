@@ -13,6 +13,147 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+// Defines values for AdminReportQueue.
+const (
+	AdminReportQueueAdministration AdminReportQueue = "administration"
+	AdminReportQueueModeration     AdminReportQueue = "moderation"
+)
+
+// Valid indicates whether the value is a known member of the AdminReportQueue enum.
+func (e AdminReportQueue) Valid() bool {
+	switch e {
+	case AdminReportQueueAdministration:
+		return true
+	case AdminReportQueueModeration:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AdminReportReason.
+const (
+	AdminReportReasonBrokenLink    AdminReportReason = "broken_link"
+	AdminReportReasonContentRating AdminReportReason = "content_rating"
+	AdminReportReasonMaliciousLink AdminReportReason = "malicious_link"
+	AdminReportReasonOther         AdminReportReason = "other"
+	AdminReportReasonPrivacy       AdminReportReason = "privacy"
+	AdminReportReasonRightsConcern AdminReportReason = "rights_concern"
+	AdminReportReasonSpam          AdminReportReason = "spam"
+)
+
+// Valid indicates whether the value is a known member of the AdminReportReason enum.
+func (e AdminReportReason) Valid() bool {
+	switch e {
+	case AdminReportReasonBrokenLink:
+		return true
+	case AdminReportReasonContentRating:
+		return true
+	case AdminReportReasonMaliciousLink:
+		return true
+	case AdminReportReasonOther:
+		return true
+	case AdminReportReasonPrivacy:
+		return true
+	case AdminReportReasonRightsConcern:
+		return true
+	case AdminReportReasonSpam:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AdminReportStatus.
+const (
+	AdminReportStatusDismissed AdminReportStatus = "dismissed"
+	AdminReportStatusInReview  AdminReportStatus = "in_review"
+	AdminReportStatusOpen      AdminReportStatus = "open"
+	AdminReportStatusResolved  AdminReportStatus = "resolved"
+	AdminReportStatusWithdrawn AdminReportStatus = "withdrawn"
+)
+
+// Valid indicates whether the value is a known member of the AdminReportStatus enum.
+func (e AdminReportStatus) Valid() bool {
+	switch e {
+	case AdminReportStatusDismissed:
+		return true
+	case AdminReportStatusInReview:
+		return true
+	case AdminReportStatusOpen:
+		return true
+	case AdminReportStatusResolved:
+		return true
+	case AdminReportStatusWithdrawn:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AdminReportTargetKind.
+const (
+	AdminReportTargetKindResource AdminReportTargetKind = "resource"
+	AdminReportTargetKindSource   AdminReportTargetKind = "source"
+)
+
+// Valid indicates whether the value is a known member of the AdminReportTargetKind enum.
+func (e AdminReportTargetKind) Valid() bool {
+	switch e {
+	case AdminReportTargetKindResource:
+		return true
+	case AdminReportTargetKindSource:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AdminRestrictionReasonCode.
+const (
+	AdminRestrictionReasonCodeAbuse                   AdminRestrictionReasonCode = "abuse"
+	AdminRestrictionReasonCodeOther                   AdminRestrictionReasonCode = "other"
+	AdminRestrictionReasonCodeRepeatedPolicyViolation AdminRestrictionReasonCode = "repeated_policy_violation"
+	AdminRestrictionReasonCodeSpam                    AdminRestrictionReasonCode = "spam"
+)
+
+// Valid indicates whether the value is a known member of the AdminRestrictionReasonCode enum.
+func (e AdminRestrictionReasonCode) Valid() bool {
+	switch e {
+	case AdminRestrictionReasonCodeAbuse:
+		return true
+	case AdminRestrictionReasonCodeOther:
+		return true
+	case AdminRestrictionReasonCodeRepeatedPolicyViolation:
+		return true
+	case AdminRestrictionReasonCodeSpam:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AdminRestrictionScope.
+const (
+	AdminRestrictionScopeAllWrite           AdminRestrictionScope = "all_write"
+	AdminRestrictionScopeContributionSubmit AdminRestrictionScope = "contribution_submit"
+	AdminRestrictionScopePublicProfileWrite AdminRestrictionScope = "public_profile_write"
+)
+
+// Valid indicates whether the value is a known member of the AdminRestrictionScope enum.
+func (e AdminRestrictionScope) Valid() bool {
+	switch e {
+	case AdminRestrictionScopeAllWrite:
+		return true
+	case AdminRestrictionScopeContributionSubmit:
+		return true
+	case AdminRestrictionScopePublicProfileWrite:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ApiErrorCode.
 const (
 	ADMINFORBIDDEN                   ApiErrorCode = "ADMIN_FORBIDDEN"
@@ -20,6 +161,7 @@ const (
 	ADMINSESSIONNOTFOUND             ApiErrorCode = "ADMIN_SESSION_NOT_FOUND"
 	ADMINUNAUTHENTICATED             ApiErrorCode = "ADMIN_UNAUTHENTICATED"
 	AUTHRATELIMITED                  ApiErrorCode = "AUTH_RATE_LIMITED"
+	BUSINESSRESTRICTED               ApiErrorCode = "BUSINESS_RESTRICTED"
 	CONTRIBUTIONCONFLICT             ApiErrorCode = "CONTRIBUTION_CONFLICT"
 	CONTRIBUTIONFORBIDDEN            ApiErrorCode = "CONTRIBUTION_FORBIDDEN"
 	CONTRIBUTIONLIMITED              ApiErrorCode = "CONTRIBUTION_LIMITED"
@@ -31,8 +173,14 @@ const (
 	CURATIONINUSE                    ApiErrorCode = "CURATION_IN_USE"
 	CURATIONNOTFOUND                 ApiErrorCode = "CURATION_NOT_FOUND"
 	CURATIONRELATIONCYCLE            ApiErrorCode = "CURATION_RELATION_CYCLE"
+	GOVERNANCECONFLICT               ApiErrorCode = "GOVERNANCE_CONFLICT"
+	GOVERNANCEREQUESTCONFLICT        ApiErrorCode = "GOVERNANCE_REQUEST_CONFLICT"
 	INTERNALERROR                    ApiErrorCode = "INTERNAL_ERROR"
 	ORIGINFORBIDDEN                  ApiErrorCode = "ORIGIN_FORBIDDEN"
+	REPORTFORBIDDEN                  ApiErrorCode = "REPORT_FORBIDDEN"
+	REPORTLIMITED                    ApiErrorCode = "REPORT_LIMITED"
+	REPORTNOTFOUND                   ApiErrorCode = "REPORT_NOT_FOUND"
+	REPORTVERIFICATIONREQUIRED       ApiErrorCode = "REPORT_VERIFICATION_REQUIRED"
 	RESOURCERELATIONCYCLE            ApiErrorCode = "RESOURCE_RELATION_CYCLE"
 	RESOURCEVERSIONCONFLICT          ApiErrorCode = "RESOURCE_VERSION_CONFLICT"
 	VALIDATIONERROR                  ApiErrorCode = "VALIDATION_ERROR"
@@ -50,6 +198,8 @@ func (e ApiErrorCode) Valid() bool {
 	case ADMINUNAUTHENTICATED:
 		return true
 	case AUTHRATELIMITED:
+		return true
+	case BUSINESSRESTRICTED:
 		return true
 	case CONTRIBUTIONCONFLICT:
 		return true
@@ -73,15 +223,414 @@ func (e ApiErrorCode) Valid() bool {
 		return true
 	case CURATIONRELATIONCYCLE:
 		return true
+	case GOVERNANCECONFLICT:
+		return true
+	case GOVERNANCEREQUESTCONFLICT:
+		return true
 	case INTERNALERROR:
 		return true
 	case ORIGINFORBIDDEN:
+		return true
+	case REPORTFORBIDDEN:
+		return true
+	case REPORTLIMITED:
+		return true
+	case REPORTNOTFOUND:
+		return true
+	case REPORTVERIFICATIONREQUIRED:
 		return true
 	case RESOURCERELATIONCYCLE:
 		return true
 	case RESOURCEVERSIONCONFLICT:
 		return true
 	case VALIDATIONERROR:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryAfterAvailability.
+const (
+	AuditEntryAfterAvailabilityActive      AuditEntryAfterAvailability = "active"
+	AuditEntryAfterAvailabilityBroken      AuditEntryAfterAvailability = "broken"
+	AuditEntryAfterAvailabilityRemoved     AuditEntryAfterAvailability = "removed"
+	AuditEntryAfterAvailabilityRestricted  AuditEntryAfterAvailability = "restricted"
+	AuditEntryAfterAvailabilityUnavailable AuditEntryAfterAvailability = "unavailable"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryAfterAvailability enum.
+func (e AuditEntryAfterAvailability) Valid() bool {
+	switch e {
+	case AuditEntryAfterAvailabilityActive:
+		return true
+	case AuditEntryAfterAvailabilityBroken:
+		return true
+	case AuditEntryAfterAvailabilityRemoved:
+		return true
+	case AuditEntryAfterAvailabilityRestricted:
+		return true
+	case AuditEntryAfterAvailabilityUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryAfterDistribution.
+const (
+	AuditEntryAfterDistributionExcluded AuditEntryAfterDistribution = "excluded"
+	AuditEntryAfterDistributionNormal   AuditEntryAfterDistribution = "normal"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryAfterDistribution enum.
+func (e AuditEntryAfterDistribution) Valid() bool {
+	switch e {
+	case AuditEntryAfterDistributionExcluded:
+		return true
+	case AuditEntryAfterDistributionNormal:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryAfterPublication.
+const (
+	AuditEntryAfterPublicationDraft      AuditEntryAfterPublication = "draft"
+	AuditEntryAfterPublicationPending    AuditEntryAfterPublication = "pending"
+	AuditEntryAfterPublicationPublished  AuditEntryAfterPublication = "published"
+	AuditEntryAfterPublicationRemoved    AuditEntryAfterPublication = "removed"
+	AuditEntryAfterPublicationRestricted AuditEntryAfterPublication = "restricted"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryAfterPublication enum.
+func (e AuditEntryAfterPublication) Valid() bool {
+	switch e {
+	case AuditEntryAfterPublicationDraft:
+		return true
+	case AuditEntryAfterPublicationPending:
+		return true
+	case AuditEntryAfterPublicationPublished:
+		return true
+	case AuditEntryAfterPublicationRemoved:
+		return true
+	case AuditEntryAfterPublicationRestricted:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryAfterRights.
+const (
+	AuditEntryAfterRightsConfirmed        AuditEntryAfterRights = "confirmed"
+	AuditEntryAfterRightsCreatorProvided  AuditEntryAfterRights = "creator_provided"
+	AuditEntryAfterRightsDisputed         AuditEntryAfterRights = "disputed"
+	AuditEntryAfterRightsRemovedByRequest AuditEntryAfterRights = "removed_by_request"
+	AuditEntryAfterRightsRightsReview     AuditEntryAfterRights = "rights_review"
+	AuditEntryAfterRightsUnknown          AuditEntryAfterRights = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryAfterRights enum.
+func (e AuditEntryAfterRights) Valid() bool {
+	switch e {
+	case AuditEntryAfterRightsConfirmed:
+		return true
+	case AuditEntryAfterRightsCreatorProvided:
+		return true
+	case AuditEntryAfterRightsDisputed:
+		return true
+	case AuditEntryAfterRightsRemovedByRequest:
+		return true
+	case AuditEntryAfterRightsRightsReview:
+		return true
+	case AuditEntryAfterRightsUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryAfterTaxonomyState.
+const (
+	AuditEntryAfterTaxonomyStateActive  AuditEntryAfterTaxonomyState = "active"
+	AuditEntryAfterTaxonomyStateRetired AuditEntryAfterTaxonomyState = "retired"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryAfterTaxonomyState enum.
+func (e AuditEntryAfterTaxonomyState) Valid() bool {
+	switch e {
+	case AuditEntryAfterTaxonomyStateActive:
+		return true
+	case AuditEntryAfterTaxonomyStateRetired:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryAfterTrust.
+const (
+	AuditEntryAfterTrustEstablished AuditEntryAfterTrust = "established"
+	AuditEntryAfterTrustNew         AuditEntryAfterTrust = "new"
+	AuditEntryAfterTrustTrusted     AuditEntryAfterTrust = "trusted"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryAfterTrust enum.
+func (e AuditEntryAfterTrust) Valid() bool {
+	switch e {
+	case AuditEntryAfterTrustEstablished:
+		return true
+	case AuditEntryAfterTrustNew:
+		return true
+	case AuditEntryAfterTrustTrusted:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryBeforeAvailability.
+const (
+	AuditEntryBeforeAvailabilityActive      AuditEntryBeforeAvailability = "active"
+	AuditEntryBeforeAvailabilityBroken      AuditEntryBeforeAvailability = "broken"
+	AuditEntryBeforeAvailabilityRemoved     AuditEntryBeforeAvailability = "removed"
+	AuditEntryBeforeAvailabilityRestricted  AuditEntryBeforeAvailability = "restricted"
+	AuditEntryBeforeAvailabilityUnavailable AuditEntryBeforeAvailability = "unavailable"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryBeforeAvailability enum.
+func (e AuditEntryBeforeAvailability) Valid() bool {
+	switch e {
+	case AuditEntryBeforeAvailabilityActive:
+		return true
+	case AuditEntryBeforeAvailabilityBroken:
+		return true
+	case AuditEntryBeforeAvailabilityRemoved:
+		return true
+	case AuditEntryBeforeAvailabilityRestricted:
+		return true
+	case AuditEntryBeforeAvailabilityUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryBeforeDistribution.
+const (
+	AuditEntryBeforeDistributionExcluded AuditEntryBeforeDistribution = "excluded"
+	AuditEntryBeforeDistributionNormal   AuditEntryBeforeDistribution = "normal"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryBeforeDistribution enum.
+func (e AuditEntryBeforeDistribution) Valid() bool {
+	switch e {
+	case AuditEntryBeforeDistributionExcluded:
+		return true
+	case AuditEntryBeforeDistributionNormal:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryBeforePublication.
+const (
+	AuditEntryBeforePublicationDraft      AuditEntryBeforePublication = "draft"
+	AuditEntryBeforePublicationPending    AuditEntryBeforePublication = "pending"
+	AuditEntryBeforePublicationPublished  AuditEntryBeforePublication = "published"
+	AuditEntryBeforePublicationRemoved    AuditEntryBeforePublication = "removed"
+	AuditEntryBeforePublicationRestricted AuditEntryBeforePublication = "restricted"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryBeforePublication enum.
+func (e AuditEntryBeforePublication) Valid() bool {
+	switch e {
+	case AuditEntryBeforePublicationDraft:
+		return true
+	case AuditEntryBeforePublicationPending:
+		return true
+	case AuditEntryBeforePublicationPublished:
+		return true
+	case AuditEntryBeforePublicationRemoved:
+		return true
+	case AuditEntryBeforePublicationRestricted:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryBeforeRights.
+const (
+	AuditEntryBeforeRightsConfirmed        AuditEntryBeforeRights = "confirmed"
+	AuditEntryBeforeRightsCreatorProvided  AuditEntryBeforeRights = "creator_provided"
+	AuditEntryBeforeRightsDisputed         AuditEntryBeforeRights = "disputed"
+	AuditEntryBeforeRightsRemovedByRequest AuditEntryBeforeRights = "removed_by_request"
+	AuditEntryBeforeRightsRightsReview     AuditEntryBeforeRights = "rights_review"
+	AuditEntryBeforeRightsUnknown          AuditEntryBeforeRights = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryBeforeRights enum.
+func (e AuditEntryBeforeRights) Valid() bool {
+	switch e {
+	case AuditEntryBeforeRightsConfirmed:
+		return true
+	case AuditEntryBeforeRightsCreatorProvided:
+		return true
+	case AuditEntryBeforeRightsDisputed:
+		return true
+	case AuditEntryBeforeRightsRemovedByRequest:
+		return true
+	case AuditEntryBeforeRightsRightsReview:
+		return true
+	case AuditEntryBeforeRightsUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryBeforeTaxonomyState.
+const (
+	AuditEntryBeforeTaxonomyStateActive  AuditEntryBeforeTaxonomyState = "active"
+	AuditEntryBeforeTaxonomyStateRetired AuditEntryBeforeTaxonomyState = "retired"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryBeforeTaxonomyState enum.
+func (e AuditEntryBeforeTaxonomyState) Valid() bool {
+	switch e {
+	case AuditEntryBeforeTaxonomyStateActive:
+		return true
+	case AuditEntryBeforeTaxonomyStateRetired:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryBeforeTrust.
+const (
+	AuditEntryBeforeTrustEstablished AuditEntryBeforeTrust = "established"
+	AuditEntryBeforeTrustNew         AuditEntryBeforeTrust = "new"
+	AuditEntryBeforeTrustTrusted     AuditEntryBeforeTrust = "trusted"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryBeforeTrust enum.
+func (e AuditEntryBeforeTrust) Valid() bool {
+	switch e {
+	case AuditEntryBeforeTrustEstablished:
+		return true
+	case AuditEntryBeforeTrustNew:
+		return true
+	case AuditEntryBeforeTrustTrusted:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryFields.
+const (
+	AuditEntryFieldsCore             AuditEntryFields = "core"
+	AuditEntryFieldsDeletedAt        AuditEntryFields = "deleted_at"
+	AuditEntryFieldsDistribution     AuditEntryFields = "distribution"
+	AuditEntryFieldsExternalIds      AuditEntryFields = "external_ids"
+	AuditEntryFieldsLocalization     AuditEntryFields = "localization"
+	AuditEntryFieldsPublicationState AuditEntryFields = "publication_state"
+	AuditEntryFieldsRelations        AuditEntryFields = "relations"
+	AuditEntryFieldsRestrictions     AuditEntryFields = "restrictions"
+	AuditEntryFieldsSources          AuditEntryFields = "sources"
+	AuditEntryFieldsTags             AuditEntryFields = "tags"
+	AuditEntryFieldsTaxonomy         AuditEntryFields = "taxonomy"
+	AuditEntryFieldsTrust            AuditEntryFields = "trust"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryFields enum.
+func (e AuditEntryFields) Valid() bool {
+	switch e {
+	case AuditEntryFieldsCore:
+		return true
+	case AuditEntryFieldsDeletedAt:
+		return true
+	case AuditEntryFieldsDistribution:
+		return true
+	case AuditEntryFieldsExternalIds:
+		return true
+	case AuditEntryFieldsLocalization:
+		return true
+	case AuditEntryFieldsPublicationState:
+		return true
+	case AuditEntryFieldsRelations:
+		return true
+	case AuditEntryFieldsRestrictions:
+		return true
+	case AuditEntryFieldsSources:
+		return true
+	case AuditEntryFieldsTags:
+		return true
+	case AuditEntryFieldsTaxonomy:
+		return true
+	case AuditEntryFieldsTrust:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for AuditEntryOperation.
+const (
+	AuditEntryOperationCore              AuditEntryOperation = "core"
+	AuditEntryOperationCreate            AuditEntryOperation = "create"
+	AuditEntryOperationDistribution      AuditEntryOperation = "distribution"
+	AuditEntryOperationExternalIds       AuditEntryOperation = "external_ids"
+	AuditEntryOperationLocalization      AuditEntryOperation = "localization"
+	AuditEntryOperationPublication       AuditEntryOperation = "publication"
+	AuditEntryOperationRelation          AuditEntryOperation = "relation"
+	AuditEntryOperationRestrict          AuditEntryOperation = "restrict"
+	AuditEntryOperationRevokeRestriction AuditEntryOperation = "revoke_restriction"
+	AuditEntryOperationSoftDelete        AuditEntryOperation = "soft_delete"
+	AuditEntryOperationSource            AuditEntryOperation = "source"
+	AuditEntryOperationSourceRights      AuditEntryOperation = "source_rights"
+	AuditEntryOperationTags              AuditEntryOperation = "tags"
+	AuditEntryOperationTaxonomy          AuditEntryOperation = "taxonomy"
+	AuditEntryOperationTrust             AuditEntryOperation = "trust"
+)
+
+// Valid indicates whether the value is a known member of the AuditEntryOperation enum.
+func (e AuditEntryOperation) Valid() bool {
+	switch e {
+	case AuditEntryOperationCore:
+		return true
+	case AuditEntryOperationCreate:
+		return true
+	case AuditEntryOperationDistribution:
+		return true
+	case AuditEntryOperationExternalIds:
+		return true
+	case AuditEntryOperationLocalization:
+		return true
+	case AuditEntryOperationPublication:
+		return true
+	case AuditEntryOperationRelation:
+		return true
+	case AuditEntryOperationRestrict:
+		return true
+	case AuditEntryOperationRevokeRestriction:
+		return true
+	case AuditEntryOperationSoftDelete:
+		return true
+	case AuditEntryOperationSource:
+		return true
+	case AuditEntryOperationSourceRights:
+		return true
+	case AuditEntryOperationTags:
+		return true
+	case AuditEntryOperationTaxonomy:
+		return true
+	case AuditEntryOperationTrust:
 		return true
 	default:
 		return false
@@ -433,6 +982,24 @@ func (e ContributionStatus) Valid() bool {
 	}
 }
 
+// Defines values for DistributionUpdatePolicy.
+const (
+	DistributionUpdatePolicyExcluded DistributionUpdatePolicy = "excluded"
+	DistributionUpdatePolicyNormal   DistributionUpdatePolicy = "normal"
+)
+
+// Valid indicates whether the value is a known member of the DistributionUpdatePolicy enum.
+func (e DistributionUpdatePolicy) Valid() bool {
+	switch e {
+	case DistributionUpdatePolicyExcluded:
+		return true
+	case DistributionUpdatePolicyNormal:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for Lifecycle.
 const (
 	LifecycleActive       Lifecycle = "active"
@@ -607,6 +1174,309 @@ func (e RelationType) Valid() bool {
 	}
 }
 
+// Defines values for ReportResolveAvailabilityState.
+const (
+	ReportResolveAvailabilityStateActive      ReportResolveAvailabilityState = "active"
+	ReportResolveAvailabilityStateBroken      ReportResolveAvailabilityState = "broken"
+	ReportResolveAvailabilityStateRemoved     ReportResolveAvailabilityState = "removed"
+	ReportResolveAvailabilityStateRestricted  ReportResolveAvailabilityState = "restricted"
+	ReportResolveAvailabilityStateUnavailable ReportResolveAvailabilityState = "unavailable"
+)
+
+// Valid indicates whether the value is a known member of the ReportResolveAvailabilityState enum.
+func (e ReportResolveAvailabilityState) Valid() bool {
+	switch e {
+	case ReportResolveAvailabilityStateActive:
+		return true
+	case ReportResolveAvailabilityStateBroken:
+		return true
+	case ReportResolveAvailabilityStateRemoved:
+		return true
+	case ReportResolveAvailabilityStateRestricted:
+		return true
+	case ReportResolveAvailabilityStateUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReportResolveMode.
+const (
+	ReportResolveModeDistribution       ReportResolveMode = "distribution"
+	ReportResolveModeLinkAudit          ReportResolveMode = "link_audit"
+	ReportResolveModeNoChange           ReportResolveMode = "no_change"
+	ReportResolveModePublication        ReportResolveMode = "publication"
+	ReportResolveModeSourceAvailability ReportResolveMode = "source_availability"
+	ReportResolveModeSourceRights       ReportResolveMode = "source_rights"
+)
+
+// Valid indicates whether the value is a known member of the ReportResolveMode enum.
+func (e ReportResolveMode) Valid() bool {
+	switch e {
+	case ReportResolveModeDistribution:
+		return true
+	case ReportResolveModeLinkAudit:
+		return true
+	case ReportResolveModeNoChange:
+		return true
+	case ReportResolveModePublication:
+		return true
+	case ReportResolveModeSourceAvailability:
+		return true
+	case ReportResolveModeSourceRights:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReportResolvePolicy.
+const (
+	ReportResolvePolicyExcluded ReportResolvePolicy = "excluded"
+	ReportResolvePolicyNormal   ReportResolvePolicy = "normal"
+)
+
+// Valid indicates whether the value is a known member of the ReportResolvePolicy enum.
+func (e ReportResolvePolicy) Valid() bool {
+	switch e {
+	case ReportResolvePolicyExcluded:
+		return true
+	case ReportResolvePolicyNormal:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReportResolvePublicationState.
+const (
+	ReportResolvePublicationStateDraft      ReportResolvePublicationState = "draft"
+	ReportResolvePublicationStatePending    ReportResolvePublicationState = "pending"
+	ReportResolvePublicationStatePublished  ReportResolvePublicationState = "published"
+	ReportResolvePublicationStateRemoved    ReportResolvePublicationState = "removed"
+	ReportResolvePublicationStateRestricted ReportResolvePublicationState = "restricted"
+)
+
+// Valid indicates whether the value is a known member of the ReportResolvePublicationState enum.
+func (e ReportResolvePublicationState) Valid() bool {
+	switch e {
+	case ReportResolvePublicationStateDraft:
+		return true
+	case ReportResolvePublicationStatePending:
+		return true
+	case ReportResolvePublicationStatePublished:
+		return true
+	case ReportResolvePublicationStateRemoved:
+		return true
+	case ReportResolvePublicationStateRestricted:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReportResolveRightsStatus.
+const (
+	ReportResolveRightsStatusConfirmed        ReportResolveRightsStatus = "confirmed"
+	ReportResolveRightsStatusCreatorProvided  ReportResolveRightsStatus = "creator_provided"
+	ReportResolveRightsStatusDisputed         ReportResolveRightsStatus = "disputed"
+	ReportResolveRightsStatusRemovedByRequest ReportResolveRightsStatus = "removed_by_request"
+	ReportResolveRightsStatusRightsReview     ReportResolveRightsStatus = "rights_review"
+	ReportResolveRightsStatusUnknown          ReportResolveRightsStatus = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the ReportResolveRightsStatus enum.
+func (e ReportResolveRightsStatus) Valid() bool {
+	switch e {
+	case ReportResolveRightsStatusConfirmed:
+		return true
+	case ReportResolveRightsStatusCreatorProvided:
+		return true
+	case ReportResolveRightsStatusDisputed:
+		return true
+	case ReportResolveRightsStatusRemovedByRequest:
+		return true
+	case ReportResolveRightsStatusRightsReview:
+		return true
+	case ReportResolveRightsStatusUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReportStaffEventEventType.
+const (
+	ReportStaffEventEventTypeDismissed ReportStaffEventEventType = "dismissed"
+	ReportStaffEventEventTypeEscalated ReportStaffEventEventType = "escalated"
+	ReportStaffEventEventTypeNoted     ReportStaffEventEventType = "noted"
+	ReportStaffEventEventTypeResolved  ReportStaffEventEventType = "resolved"
+	ReportStaffEventEventTypeSubmitted ReportStaffEventEventType = "submitted"
+	ReportStaffEventEventTypeTriaged   ReportStaffEventEventType = "triaged"
+	ReportStaffEventEventTypeWithdrawn ReportStaffEventEventType = "withdrawn"
+)
+
+// Valid indicates whether the value is a known member of the ReportStaffEventEventType enum.
+func (e ReportStaffEventEventType) Valid() bool {
+	switch e {
+	case ReportStaffEventEventTypeDismissed:
+		return true
+	case ReportStaffEventEventTypeEscalated:
+		return true
+	case ReportStaffEventEventTypeNoted:
+		return true
+	case ReportStaffEventEventTypeResolved:
+		return true
+	case ReportStaffEventEventTypeSubmitted:
+		return true
+	case ReportStaffEventEventTypeTriaged:
+		return true
+	case ReportStaffEventEventTypeWithdrawn:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReportStaffEventResolutionType.
+const (
+	ReportStaffEventResolutionTypeDistribution       ReportStaffEventResolutionType = "distribution"
+	ReportStaffEventResolutionTypeLinkAudit          ReportStaffEventResolutionType = "link_audit"
+	ReportStaffEventResolutionTypeNoChange           ReportStaffEventResolutionType = "no_change"
+	ReportStaffEventResolutionTypePublication        ReportStaffEventResolutionType = "publication"
+	ReportStaffEventResolutionTypeSourceAvailability ReportStaffEventResolutionType = "source_availability"
+	ReportStaffEventResolutionTypeSourceRights       ReportStaffEventResolutionType = "source_rights"
+)
+
+// Valid indicates whether the value is a known member of the ReportStaffEventResolutionType enum.
+func (e ReportStaffEventResolutionType) Valid() bool {
+	switch e {
+	case ReportStaffEventResolutionTypeDistribution:
+		return true
+	case ReportStaffEventResolutionTypeLinkAudit:
+		return true
+	case ReportStaffEventResolutionTypeNoChange:
+		return true
+	case ReportStaffEventResolutionTypePublication:
+		return true
+	case ReportStaffEventResolutionTypeSourceAvailability:
+		return true
+	case ReportStaffEventResolutionTypeSourceRights:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReportTriageAction.
+const (
+	Escalate ReportTriageAction = "escalate"
+	Note     ReportTriageAction = "note"
+	Receive  ReportTriageAction = "receive"
+)
+
+// Valid indicates whether the value is a known member of the ReportTriageAction enum.
+func (e ReportTriageAction) Valid() bool {
+	switch e {
+	case Escalate:
+		return true
+	case Note:
+		return true
+	case Receive:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ResourceDetailDistributionPolicy.
+const (
+	ResourceDetailDistributionPolicyExcluded ResourceDetailDistributionPolicy = "excluded"
+	ResourceDetailDistributionPolicyNormal   ResourceDetailDistributionPolicy = "normal"
+)
+
+// Valid indicates whether the value is a known member of the ResourceDetailDistributionPolicy enum.
+func (e ResourceDetailDistributionPolicy) Valid() bool {
+	switch e {
+	case ResourceDetailDistributionPolicyExcluded:
+		return true
+	case ResourceDetailDistributionPolicyNormal:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RestrictionCreateDuration.
+const (
+	Indefinite RestrictionCreateDuration = "indefinite"
+	N24h       RestrictionCreateDuration = "24h"
+	N30d       RestrictionCreateDuration = "30d"
+	N7d        RestrictionCreateDuration = "7d"
+)
+
+// Valid indicates whether the value is a known member of the RestrictionCreateDuration enum.
+func (e RestrictionCreateDuration) Valid() bool {
+	switch e {
+	case Indefinite:
+		return true
+	case N24h:
+		return true
+	case N30d:
+		return true
+	case N7d:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RestrictionCreateReasonCode.
+const (
+	RestrictionCreateReasonCodeAbuse                   RestrictionCreateReasonCode = "abuse"
+	RestrictionCreateReasonCodeOther                   RestrictionCreateReasonCode = "other"
+	RestrictionCreateReasonCodeRepeatedPolicyViolation RestrictionCreateReasonCode = "repeated_policy_violation"
+	RestrictionCreateReasonCodeSpam                    RestrictionCreateReasonCode = "spam"
+)
+
+// Valid indicates whether the value is a known member of the RestrictionCreateReasonCode enum.
+func (e RestrictionCreateReasonCode) Valid() bool {
+	switch e {
+	case RestrictionCreateReasonCodeAbuse:
+		return true
+	case RestrictionCreateReasonCodeOther:
+		return true
+	case RestrictionCreateReasonCodeRepeatedPolicyViolation:
+		return true
+	case RestrictionCreateReasonCodeSpam:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for RestrictionCreateScope.
+const (
+	RestrictionCreateScopeAllWrite           RestrictionCreateScope = "all_write"
+	RestrictionCreateScopeContributionSubmit RestrictionCreateScope = "contribution_submit"
+	RestrictionCreateScopePublicProfileWrite RestrictionCreateScope = "public_profile_write"
+)
+
+// Valid indicates whether the value is a known member of the RestrictionCreateScope enum.
+func (e RestrictionCreateScope) Valid() bool {
+	switch e {
+	case RestrictionCreateScopeAllWrite:
+		return true
+	case RestrictionCreateScopeContributionSubmit:
+		return true
+	case RestrictionCreateScopePublicProfileWrite:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for RightsStatus.
 const (
 	RightsStatusConfirmed        RightsStatus = "confirmed"
@@ -652,6 +1522,132 @@ func (e Role) Valid() bool {
 	case Editor:
 		return true
 	case Moderator:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SourceCheckOutcome.
+const (
+	SourceCheckOutcomeReachable   SourceCheckOutcome = "reachable"
+	SourceCheckOutcomeUncertain   SourceCheckOutcome = "uncertain"
+	SourceCheckOutcomeUnreachable SourceCheckOutcome = "unreachable"
+)
+
+// Valid indicates whether the value is a known member of the SourceCheckOutcome enum.
+func (e SourceCheckOutcome) Valid() bool {
+	switch e {
+	case SourceCheckOutcomeReachable:
+		return true
+	case SourceCheckOutcomeUncertain:
+		return true
+	case SourceCheckOutcomeUnreachable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SourceCheckInputAvailabilityState.
+const (
+	SourceCheckInputAvailabilityStateActive      SourceCheckInputAvailabilityState = "active"
+	SourceCheckInputAvailabilityStateBroken      SourceCheckInputAvailabilityState = "broken"
+	SourceCheckInputAvailabilityStateRemoved     SourceCheckInputAvailabilityState = "removed"
+	SourceCheckInputAvailabilityStateRestricted  SourceCheckInputAvailabilityState = "restricted"
+	SourceCheckInputAvailabilityStateUnavailable SourceCheckInputAvailabilityState = "unavailable"
+)
+
+// Valid indicates whether the value is a known member of the SourceCheckInputAvailabilityState enum.
+func (e SourceCheckInputAvailabilityState) Valid() bool {
+	switch e {
+	case SourceCheckInputAvailabilityStateActive:
+		return true
+	case SourceCheckInputAvailabilityStateBroken:
+		return true
+	case SourceCheckInputAvailabilityStateRemoved:
+		return true
+	case SourceCheckInputAvailabilityStateRestricted:
+		return true
+	case SourceCheckInputAvailabilityStateUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SourceCheckInputOutcome.
+const (
+	SourceCheckInputOutcomeReachable   SourceCheckInputOutcome = "reachable"
+	SourceCheckInputOutcomeUncertain   SourceCheckInputOutcome = "uncertain"
+	SourceCheckInputOutcomeUnreachable SourceCheckInputOutcome = "unreachable"
+)
+
+// Valid indicates whether the value is a known member of the SourceCheckInputOutcome enum.
+func (e SourceCheckInputOutcome) Valid() bool {
+	switch e {
+	case SourceCheckInputOutcomeReachable:
+		return true
+	case SourceCheckInputOutcomeUncertain:
+		return true
+	case SourceCheckInputOutcomeUnreachable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SourceHealthAvailabilityState.
+const (
+	SourceHealthAvailabilityStateActive      SourceHealthAvailabilityState = "active"
+	SourceHealthAvailabilityStateBroken      SourceHealthAvailabilityState = "broken"
+	SourceHealthAvailabilityStateRemoved     SourceHealthAvailabilityState = "removed"
+	SourceHealthAvailabilityStateRestricted  SourceHealthAvailabilityState = "restricted"
+	SourceHealthAvailabilityStateUnavailable SourceHealthAvailabilityState = "unavailable"
+)
+
+// Valid indicates whether the value is a known member of the SourceHealthAvailabilityState enum.
+func (e SourceHealthAvailabilityState) Valid() bool {
+	switch e {
+	case SourceHealthAvailabilityStateActive:
+		return true
+	case SourceHealthAvailabilityStateBroken:
+		return true
+	case SourceHealthAvailabilityStateRemoved:
+		return true
+	case SourceHealthAvailabilityStateRestricted:
+		return true
+	case SourceHealthAvailabilityStateUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for SourceHealthRightsStatus.
+const (
+	SourceHealthRightsStatusConfirmed        SourceHealthRightsStatus = "confirmed"
+	SourceHealthRightsStatusCreatorProvided  SourceHealthRightsStatus = "creator_provided"
+	SourceHealthRightsStatusDisputed         SourceHealthRightsStatus = "disputed"
+	SourceHealthRightsStatusRemovedByRequest SourceHealthRightsStatus = "removed_by_request"
+	SourceHealthRightsStatusRightsReview     SourceHealthRightsStatus = "rights_review"
+	SourceHealthRightsStatusUnknown          SourceHealthRightsStatus = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the SourceHealthRightsStatus enum.
+func (e SourceHealthRightsStatus) Valid() bool {
+	switch e {
+	case SourceHealthRightsStatusConfirmed:
+		return true
+	case SourceHealthRightsStatusCreatorProvided:
+		return true
+	case SourceHealthRightsStatusDisputed:
+		return true
+	case SourceHealthRightsStatusRemovedByRequest:
+		return true
+	case SourceHealthRightsStatusRightsReview:
+		return true
+	case SourceHealthRightsStatusUnknown:
 		return true
 	default:
 		return false
@@ -709,6 +1705,210 @@ func (e TaxonomyState) Valid() bool {
 	}
 }
 
+// Defines values for TrustUpdateTrustLevel.
+const (
+	TrustUpdateTrustLevelEstablished TrustUpdateTrustLevel = "established"
+	TrustUpdateTrustLevelNew         TrustUpdateTrustLevel = "new"
+	TrustUpdateTrustLevelTrusted     TrustUpdateTrustLevel = "trusted"
+)
+
+// Valid indicates whether the value is a known member of the TrustUpdateTrustLevel enum.
+func (e TrustUpdateTrustLevel) Valid() bool {
+	switch e {
+	case TrustUpdateTrustLevelEstablished:
+		return true
+	case TrustUpdateTrustLevelNew:
+		return true
+	case TrustUpdateTrustLevelTrusted:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for UserGovernanceTrustLevel.
+const (
+	UserGovernanceTrustLevelEstablished UserGovernanceTrustLevel = "established"
+	UserGovernanceTrustLevelNew         UserGovernanceTrustLevel = "new"
+	UserGovernanceTrustLevelTrusted     UserGovernanceTrustLevel = "trusted"
+)
+
+// Valid indicates whether the value is a known member of the UserGovernanceTrustLevel enum.
+func (e UserGovernanceTrustLevel) Valid() bool {
+	switch e {
+	case UserGovernanceTrustLevelEstablished:
+		return true
+	case UserGovernanceTrustLevelNew:
+		return true
+	case UserGovernanceTrustLevelTrusted:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ListAuditParamsOperation.
+const (
+	ListAuditParamsOperationCore              ListAuditParamsOperation = "core"
+	ListAuditParamsOperationCreate            ListAuditParamsOperation = "create"
+	ListAuditParamsOperationDistribution      ListAuditParamsOperation = "distribution"
+	ListAuditParamsOperationExternalIds       ListAuditParamsOperation = "external_ids"
+	ListAuditParamsOperationLocalization      ListAuditParamsOperation = "localization"
+	ListAuditParamsOperationPublication       ListAuditParamsOperation = "publication"
+	ListAuditParamsOperationRelation          ListAuditParamsOperation = "relation"
+	ListAuditParamsOperationRestrict          ListAuditParamsOperation = "restrict"
+	ListAuditParamsOperationRevokeRestriction ListAuditParamsOperation = "revoke_restriction"
+	ListAuditParamsOperationSoftDelete        ListAuditParamsOperation = "soft_delete"
+	ListAuditParamsOperationSource            ListAuditParamsOperation = "source"
+	ListAuditParamsOperationSourceRights      ListAuditParamsOperation = "source_rights"
+	ListAuditParamsOperationTags              ListAuditParamsOperation = "tags"
+	ListAuditParamsOperationTaxonomy          ListAuditParamsOperation = "taxonomy"
+	ListAuditParamsOperationTrust             ListAuditParamsOperation = "trust"
+)
+
+// Valid indicates whether the value is a known member of the ListAuditParamsOperation enum.
+func (e ListAuditParamsOperation) Valid() bool {
+	switch e {
+	case ListAuditParamsOperationCore:
+		return true
+	case ListAuditParamsOperationCreate:
+		return true
+	case ListAuditParamsOperationDistribution:
+		return true
+	case ListAuditParamsOperationExternalIds:
+		return true
+	case ListAuditParamsOperationLocalization:
+		return true
+	case ListAuditParamsOperationPublication:
+		return true
+	case ListAuditParamsOperationRelation:
+		return true
+	case ListAuditParamsOperationRestrict:
+		return true
+	case ListAuditParamsOperationRevokeRestriction:
+		return true
+	case ListAuditParamsOperationSoftDelete:
+		return true
+	case ListAuditParamsOperationSource:
+		return true
+	case ListAuditParamsOperationSourceRights:
+		return true
+	case ListAuditParamsOperationTags:
+		return true
+	case ListAuditParamsOperationTaxonomy:
+		return true
+	case ListAuditParamsOperationTrust:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ListReportsParamsStatus.
+const (
+	ListReportsParamsStatusDismissed ListReportsParamsStatus = "dismissed"
+	ListReportsParamsStatusInReview  ListReportsParamsStatus = "in_review"
+	ListReportsParamsStatusOpen      ListReportsParamsStatus = "open"
+	ListReportsParamsStatusResolved  ListReportsParamsStatus = "resolved"
+	ListReportsParamsStatusWithdrawn ListReportsParamsStatus = "withdrawn"
+)
+
+// Valid indicates whether the value is a known member of the ListReportsParamsStatus enum.
+func (e ListReportsParamsStatus) Valid() bool {
+	switch e {
+	case ListReportsParamsStatusDismissed:
+		return true
+	case ListReportsParamsStatusInReview:
+		return true
+	case ListReportsParamsStatusOpen:
+		return true
+	case ListReportsParamsStatusResolved:
+		return true
+	case ListReportsParamsStatusWithdrawn:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ListReportsParamsReason.
+const (
+	ListReportsParamsReasonBrokenLink    ListReportsParamsReason = "broken_link"
+	ListReportsParamsReasonContentRating ListReportsParamsReason = "content_rating"
+	ListReportsParamsReasonMaliciousLink ListReportsParamsReason = "malicious_link"
+	ListReportsParamsReasonOther         ListReportsParamsReason = "other"
+	ListReportsParamsReasonPrivacy       ListReportsParamsReason = "privacy"
+	ListReportsParamsReasonRightsConcern ListReportsParamsReason = "rights_concern"
+	ListReportsParamsReasonSpam          ListReportsParamsReason = "spam"
+)
+
+// Valid indicates whether the value is a known member of the ListReportsParamsReason enum.
+func (e ListReportsParamsReason) Valid() bool {
+	switch e {
+	case ListReportsParamsReasonBrokenLink:
+		return true
+	case ListReportsParamsReasonContentRating:
+		return true
+	case ListReportsParamsReasonMaliciousLink:
+		return true
+	case ListReportsParamsReasonOther:
+		return true
+	case ListReportsParamsReasonPrivacy:
+		return true
+	case ListReportsParamsReasonRightsConcern:
+		return true
+	case ListReportsParamsReasonSpam:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ListReportsParamsQueue.
+const (
+	ListReportsParamsQueueAdministration ListReportsParamsQueue = "administration"
+	ListReportsParamsQueueModeration     ListReportsParamsQueue = "moderation"
+)
+
+// Valid indicates whether the value is a known member of the ListReportsParamsQueue enum.
+func (e ListReportsParamsQueue) Valid() bool {
+	switch e {
+	case ListReportsParamsQueueAdministration:
+		return true
+	case ListReportsParamsQueueModeration:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ListSourceHealthParamsAvailabilityState.
+const (
+	ListSourceHealthParamsAvailabilityStateActive      ListSourceHealthParamsAvailabilityState = "active"
+	ListSourceHealthParamsAvailabilityStateBroken      ListSourceHealthParamsAvailabilityState = "broken"
+	ListSourceHealthParamsAvailabilityStateRemoved     ListSourceHealthParamsAvailabilityState = "removed"
+	ListSourceHealthParamsAvailabilityStateRestricted  ListSourceHealthParamsAvailabilityState = "restricted"
+	ListSourceHealthParamsAvailabilityStateUnavailable ListSourceHealthParamsAvailabilityState = "unavailable"
+)
+
+// Valid indicates whether the value is a known member of the ListSourceHealthParamsAvailabilityState enum.
+func (e ListSourceHealthParamsAvailabilityState) Valid() bool {
+	switch e {
+	case ListSourceHealthParamsAvailabilityStateActive:
+		return true
+	case ListSourceHealthParamsAvailabilityStateBroken:
+		return true
+	case ListSourceHealthParamsAvailabilityStateRemoved:
+		return true
+	case ListSourceHealthParamsAvailabilityStateRestricted:
+		return true
+	case ListSourceHealthParamsAvailabilityStateUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
 // AcceptContribution defines model for AcceptContribution.
 type AcceptContribution struct {
 	// Change Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests.
@@ -732,6 +1932,66 @@ type AdminMe struct {
 	Roles           []Role    `json:"roles"`
 }
 
+// AdminReport defines model for AdminReport.
+type AdminReport struct {
+	Body        string                `json:"body"`
+	CreatedAt   time.Time             `json:"created_at"`
+	DecidedAt   *time.Time            `json:"decided_at,omitempty"`
+	DuplicateOf *string               `json:"duplicate_of,omitempty"`
+	Events      []ReportStaffEvent    `json:"events"`
+	Id          string                `json:"id"`
+	Priority    int64                 `json:"priority"`
+	Queue       AdminReportQueue      `json:"queue"`
+	Reason      AdminReportReason     `json:"reason"`
+	ReporterId  string                `json:"reporter_id"`
+	ResourceId  string                `json:"resource_id"`
+	SourceId    *string               `json:"source_id,omitempty"`
+	Status      AdminReportStatus     `json:"status"`
+	TargetKind  AdminReportTargetKind `json:"target_kind"`
+	Version     int64                 `json:"version"`
+}
+
+// AdminReportQueue defines model for AdminReport.Queue.
+type AdminReportQueue string
+
+// AdminReportReason defines model for AdminReport.Reason.
+type AdminReportReason string
+
+// AdminReportStatus defines model for AdminReport.Status.
+type AdminReportStatus string
+
+// AdminReportTargetKind defines model for AdminReport.TargetKind.
+type AdminReportTargetKind string
+
+// AdminReportList defines model for AdminReportList.
+type AdminReportList struct {
+	HasNext  bool          `json:"has_next"`
+	Items    []AdminReport `json:"items"`
+	Page     int64         `json:"page"`
+	PageSize int64         `json:"page_size"`
+}
+
+// AdminRestriction defines model for AdminRestriction.
+type AdminRestriction struct {
+	CreatedBy    string                     `json:"created_by"`
+	ExpiresAt    *time.Time                 `json:"expires_at,omitempty"`
+	Id           string                     `json:"id"`
+	InternalNote *string                    `json:"internal_note,omitempty"`
+	ReasonCode   AdminRestrictionReasonCode `json:"reason_code"`
+	RevokeReason *string                    `json:"revoke_reason,omitempty"`
+	RevokedAt    *time.Time                 `json:"revoked_at,omitempty"`
+	RevokedBy    *string                    `json:"revoked_by,omitempty"`
+	Scope        AdminRestrictionScope      `json:"scope"`
+	StartsAt     time.Time                  `json:"starts_at"`
+	UserMessage  string                     `json:"user_message"`
+}
+
+// AdminRestrictionReasonCode defines model for AdminRestriction.ReasonCode.
+type AdminRestrictionReasonCode string
+
+// AdminRestrictionScope defines model for AdminRestriction.Scope.
+type AdminRestrictionScope string
+
 // ApiError defines model for ApiError.
 type ApiError struct {
 	Code    ApiErrorCode `json:"code"`
@@ -740,6 +2000,87 @@ type ApiError struct {
 
 // ApiErrorCode defines model for ApiError.Code.
 type ApiErrorCode string
+
+// AuditEntry defines model for AuditEntry.
+type AuditEntry struct {
+	ActorId             string                         `json:"actor_id"`
+	AfterAvailability   *AuditEntryAfterAvailability   `json:"after_availability,omitempty"`
+	AfterDistribution   *AuditEntryAfterDistribution   `json:"after_distribution,omitempty"`
+	AfterPublication    *AuditEntryAfterPublication    `json:"after_publication,omitempty"`
+	AfterRights         *AuditEntryAfterRights         `json:"after_rights,omitempty"`
+	AfterTaxonomyState  *AuditEntryAfterTaxonomyState  `json:"after_taxonomy_state,omitempty"`
+	AfterTrust          *AuditEntryAfterTrust          `json:"after_trust,omitempty"`
+	AfterVersion        *int64                         `json:"after_version,omitempty"`
+	BeforeAvailability  *AuditEntryBeforeAvailability  `json:"before_availability,omitempty"`
+	BeforeDistribution  *AuditEntryBeforeDistribution  `json:"before_distribution,omitempty"`
+	BeforePublication   *AuditEntryBeforePublication   `json:"before_publication,omitempty"`
+	BeforeRights        *AuditEntryBeforeRights        `json:"before_rights,omitempty"`
+	BeforeTaxonomyState *AuditEntryBeforeTaxonomyState `json:"before_taxonomy_state,omitempty"`
+	BeforeTrust         *AuditEntryBeforeTrust         `json:"before_trust,omitempty"`
+	BeforeVersion       *int64                         `json:"before_version,omitempty"`
+	CategoryId          *string                        `json:"category_id,omitempty"`
+	ContributionId      *string                        `json:"contribution_id,omitempty"`
+	Fields              []AuditEntryFields             `json:"fields"`
+	Id                  string                         `json:"id"`
+	ModerationActionId  *string                        `json:"moderation_action_id,omitempty"`
+	OccurredAt          time.Time                      `json:"occurred_at"`
+	Operation           AuditEntryOperation            `json:"operation"`
+	Reason              *string                        `json:"reason,omitempty"`
+	ResourceId          *string                        `json:"resource_id,omitempty"`
+	SourceId            *string                        `json:"source_id,omitempty"`
+	TagId               *string                        `json:"tag_id,omitempty"`
+	UserId              *string                        `json:"user_id,omitempty"`
+}
+
+// AuditEntryAfterAvailability defines model for AuditEntry.AfterAvailability.
+type AuditEntryAfterAvailability string
+
+// AuditEntryAfterDistribution defines model for AuditEntry.AfterDistribution.
+type AuditEntryAfterDistribution string
+
+// AuditEntryAfterPublication defines model for AuditEntry.AfterPublication.
+type AuditEntryAfterPublication string
+
+// AuditEntryAfterRights defines model for AuditEntry.AfterRights.
+type AuditEntryAfterRights string
+
+// AuditEntryAfterTaxonomyState defines model for AuditEntry.AfterTaxonomyState.
+type AuditEntryAfterTaxonomyState string
+
+// AuditEntryAfterTrust defines model for AuditEntry.AfterTrust.
+type AuditEntryAfterTrust string
+
+// AuditEntryBeforeAvailability defines model for AuditEntry.BeforeAvailability.
+type AuditEntryBeforeAvailability string
+
+// AuditEntryBeforeDistribution defines model for AuditEntry.BeforeDistribution.
+type AuditEntryBeforeDistribution string
+
+// AuditEntryBeforePublication defines model for AuditEntry.BeforePublication.
+type AuditEntryBeforePublication string
+
+// AuditEntryBeforeRights defines model for AuditEntry.BeforeRights.
+type AuditEntryBeforeRights string
+
+// AuditEntryBeforeTaxonomyState defines model for AuditEntry.BeforeTaxonomyState.
+type AuditEntryBeforeTaxonomyState string
+
+// AuditEntryBeforeTrust defines model for AuditEntry.BeforeTrust.
+type AuditEntryBeforeTrust string
+
+// AuditEntryFields defines model for AuditEntry.Fields.
+type AuditEntryFields string
+
+// AuditEntryOperation defines model for AuditEntry.Operation.
+type AuditEntryOperation string
+
+// AuditList defines model for AuditList.
+type AuditList struct {
+	HasNext  bool         `json:"has_next"`
+	Items    []AuditEntry `json:"items"`
+	Page     int64        `json:"page"`
+	PageSize int64        `json:"page_size"`
+}
 
 // AvailabilityState defines model for AvailabilityState.
 type AvailabilityState string
@@ -941,6 +2282,17 @@ type CsrfToken struct {
 	CsrfToken string `json:"csrf_token"`
 }
 
+// DistributionUpdate defines model for DistributionUpdate.
+type DistributionUpdate struct {
+	ExpectedVersion int64                    `json:"expected_version"`
+	Policy          DistributionUpdatePolicy `json:"policy"`
+	Reason          string                   `json:"reason"`
+	RequestId       string                   `json:"request_id"`
+}
+
+// DistributionUpdatePolicy defines model for DistributionUpdate.Policy.
+type DistributionUpdatePolicy string
+
 // EntityID defines model for EntityID.
 type EntityID struct {
 	Id string `json:"id"`
@@ -950,6 +2302,11 @@ type EntityID struct {
 type ExternalID struct {
 	ExternalId string `json:"external_id"`
 	Namespace  string `json:"namespace"`
+}
+
+// GovernanceReason defines model for GovernanceReason.
+type GovernanceReason struct {
+	Reason string `json:"reason"`
 }
 
 // Lifecycle defines model for Lifecycle.
@@ -984,6 +2341,7 @@ type PatchSource struct {
 // PatchTaxonomy defines model for PatchTaxonomy.
 type PatchTaxonomy struct {
 	DefaultLocale *string        `json:"default_locale,omitempty"`
+	Reason        *string        `json:"reason,omitempty"`
 	State         *TaxonomyState `json:"state,omitempty"`
 }
 
@@ -1038,25 +2396,103 @@ type RelationDirection string
 // RelationType defines model for RelationType.
 type RelationType string
 
+// ReportDismiss defines model for ReportDismiss.
+type ReportDismiss struct {
+	DuplicateOf           *string `json:"duplicate_of,omitempty"`
+	ExpectedReportVersion int64   `json:"expected_report_version"`
+	InternalNote          *string `json:"internal_note,omitempty"`
+	RequestId             string  `json:"request_id"`
+	SafeMessage           string  `json:"safe_message"`
+}
+
+// ReportResolve defines model for ReportResolve.
+type ReportResolve struct {
+	AuditId                 *string                         `json:"audit_id,omitempty"`
+	AvailabilityState       *ReportResolveAvailabilityState `json:"availability_state,omitempty"`
+	ExpectedReportVersion   int64                           `json:"expected_report_version"`
+	ExpectedResourceVersion *int64                          `json:"expected_resource_version,omitempty"`
+	InternalNote            *string                         `json:"internal_note,omitempty"`
+	Mode                    ReportResolveMode               `json:"mode"`
+	Policy                  *ReportResolvePolicy            `json:"policy,omitempty"`
+	PublicationState        *ReportResolvePublicationState  `json:"publication_state,omitempty"`
+	Reason                  *string                         `json:"reason,omitempty"`
+	RequestId               string                          `json:"request_id"`
+	RightsStatus            *ReportResolveRightsStatus      `json:"rights_status,omitempty"`
+	SafeMessage             string                          `json:"safe_message"`
+}
+
+// ReportResolveAvailabilityState defines model for ReportResolve.AvailabilityState.
+type ReportResolveAvailabilityState string
+
+// ReportResolveMode defines model for ReportResolve.Mode.
+type ReportResolveMode string
+
+// ReportResolvePolicy defines model for ReportResolve.Policy.
+type ReportResolvePolicy string
+
+// ReportResolvePublicationState defines model for ReportResolve.PublicationState.
+type ReportResolvePublicationState string
+
+// ReportResolveRightsStatus defines model for ReportResolve.RightsStatus.
+type ReportResolveRightsStatus string
+
+// ReportStaffEvent defines model for ReportStaffEvent.
+type ReportStaffEvent struct {
+	ActorId        string                          `json:"actor_id"`
+	AuditId        *string                         `json:"audit_id,omitempty"`
+	EventType      ReportStaffEventEventType       `json:"event_type"`
+	Id             string                          `json:"id"`
+	InternalNote   *string                         `json:"internal_note,omitempty"`
+	OccurredAt     time.Time                       `json:"occurred_at"`
+	ResolutionType *ReportStaffEventResolutionType `json:"resolution_type,omitempty"`
+	SafeMessage    *string                         `json:"safe_message,omitempty"`
+}
+
+// ReportStaffEventEventType defines model for ReportStaffEvent.EventType.
+type ReportStaffEventEventType string
+
+// ReportStaffEventResolutionType defines model for ReportStaffEvent.ResolutionType.
+type ReportStaffEventResolutionType string
+
+// ReportTriage defines model for ReportTriage.
+type ReportTriage struct {
+	Action                ReportTriageAction `json:"action"`
+	ExpectedReportVersion int64              `json:"expected_report_version"`
+	InternalNote          *string            `json:"internal_note,omitempty"`
+	RequestId             string             `json:"request_id"`
+}
+
+// ReportTriageAction defines model for ReportTriage.Action.
+type ReportTriageAction string
+
+// RequestReceipt defines model for RequestReceipt.
+type RequestReceipt struct {
+	Id string `json:"id"`
+}
+
 // ResourceDetail defines model for ResourceDetail.
 type ResourceDetail struct {
-	Category         TaxonomySummary        `json:"category"`
-	ContentRating    ContentRating          `json:"content_rating"`
-	CreatedAt        time.Time              `json:"created_at"`
-	DefaultLocale    string                 `json:"default_locale"`
-	ExternalIds      []ExternalID           `json:"external_ids"`
-	Id               string                 `json:"id"`
-	Lifecycle        Lifecycle              `json:"lifecycle"`
-	Localizations    []ResourceLocalization `json:"localizations"`
-	PublicationState PublicationState       `json:"publication_state"`
-	PublishedAt      *time.Time             `json:"published_at"`
-	Relations        []Relation             `json:"relations"`
-	Slug             string                 `json:"slug"`
-	Sources          []Source               `json:"sources"`
-	Tags             []TaxonomySummary      `json:"tags"`
-	UpdatedAt        time.Time              `json:"updated_at"`
-	Version          int64                  `json:"version"`
+	Category           TaxonomySummary                   `json:"category"`
+	ContentRating      ContentRating                     `json:"content_rating"`
+	CreatedAt          time.Time                         `json:"created_at"`
+	DefaultLocale      string                            `json:"default_locale"`
+	DistributionPolicy *ResourceDetailDistributionPolicy `json:"distribution_policy,omitempty"`
+	ExternalIds        []ExternalID                      `json:"external_ids"`
+	Id                 string                            `json:"id"`
+	Lifecycle          Lifecycle                         `json:"lifecycle"`
+	Localizations      []ResourceLocalization            `json:"localizations"`
+	PublicationState   PublicationState                  `json:"publication_state"`
+	PublishedAt        *time.Time                        `json:"published_at"`
+	Relations          []Relation                        `json:"relations"`
+	Slug               string                            `json:"slug"`
+	Sources            []Source                          `json:"sources"`
+	Tags               []TaxonomySummary                 `json:"tags"`
+	UpdatedAt          time.Time                         `json:"updated_at"`
+	Version            int64                             `json:"version"`
 }
+
+// ResourceDetailDistributionPolicy defines model for ResourceDetail.DistributionPolicy.
+type ResourceDetailDistributionPolicy string
 
 // ResourceList defines model for ResourceList.
 type ResourceList struct {
@@ -1102,6 +2538,34 @@ type ResourceRevision struct {
 	Version int64  `json:"version"`
 }
 
+// RestrictionCreate defines model for RestrictionCreate.
+type RestrictionCreate struct {
+	Duration              RestrictionCreateDuration   `json:"duration"`
+	ExpectedRevision      int64                       `json:"expected_revision"`
+	InternalNote          *string                     `json:"internal_note,omitempty"`
+	ReasonCode            RestrictionCreateReasonCode `json:"reason_code"`
+	ReplacesRestrictionId *string                     `json:"replaces_restriction_id,omitempty"`
+	RequestId             string                      `json:"request_id"`
+	Scope                 RestrictionCreateScope      `json:"scope"`
+	UserMessage           string                      `json:"user_message"`
+}
+
+// RestrictionCreateDuration defines model for RestrictionCreate.Duration.
+type RestrictionCreateDuration string
+
+// RestrictionCreateReasonCode defines model for RestrictionCreate.ReasonCode.
+type RestrictionCreateReasonCode string
+
+// RestrictionCreateScope defines model for RestrictionCreate.Scope.
+type RestrictionCreateScope string
+
+// RestrictionRevoke defines model for RestrictionRevoke.
+type RestrictionRevoke struct {
+	ExpectedRevision int64  `json:"expected_revision"`
+	Reason           string `json:"reason"`
+	RequestId        string `json:"request_id"`
+}
+
 // RightsStatus defines model for RightsStatus.
 type RightsStatus string
 
@@ -1131,7 +2595,8 @@ type SetExternalIDs struct {
 
 // SetPublication defines model for SetPublication.
 type SetPublication struct {
-	State PublicationState `json:"state"`
+	Reason *string          `json:"reason,omitempty"`
+	State  PublicationState `json:"state"`
 }
 
 // SetResourceTags defines model for SetResourceTags.
@@ -1141,6 +2606,7 @@ type SetResourceTags struct {
 
 // SetSourceRights defines model for SetSourceRights.
 type SetSourceRights struct {
+	Reason       string       `json:"reason"`
 	RightsStatus RightsStatus `json:"rights_status"`
 }
 
@@ -1155,6 +2621,65 @@ type Source struct {
 	SourceType        SourceType        `json:"source_type"`
 	UpdatedAt         time.Time         `json:"updated_at"`
 	Url               string            `json:"url"`
+}
+
+// SourceCheck defines model for SourceCheck.
+type SourceCheck struct {
+	ActorId         string             `json:"actor_id"`
+	Current         bool               `json:"current"`
+	Id              string             `json:"id"`
+	Note            string             `json:"note"`
+	ObservedAt      time.Time          `json:"observed_at"`
+	Outcome         SourceCheckOutcome `json:"outcome"`
+	ResourceId      string             `json:"resource_id"`
+	ResourceVersion int64              `json:"resource_version"`
+	SourceId        string             `json:"source_id"`
+}
+
+// SourceCheckOutcome defines model for SourceCheck.Outcome.
+type SourceCheckOutcome string
+
+// SourceCheckInput defines model for SourceCheckInput.
+type SourceCheckInput struct {
+	AvailabilityState *SourceCheckInputAvailabilityState `json:"availability_state,omitempty"`
+	ExpectedVersion   int64                              `json:"expected_version"`
+	Note              string                             `json:"note"`
+	ObservedAt        time.Time                          `json:"observed_at"`
+	Outcome           SourceCheckInputOutcome            `json:"outcome"`
+	RequestId         string                             `json:"request_id"`
+}
+
+// SourceCheckInputAvailabilityState defines model for SourceCheckInput.AvailabilityState.
+type SourceCheckInputAvailabilityState string
+
+// SourceCheckInputOutcome defines model for SourceCheckInput.Outcome.
+type SourceCheckInputOutcome string
+
+// SourceHealth defines model for SourceHealth.
+type SourceHealth struct {
+	AvailabilityState SourceHealthAvailabilityState `json:"availability_state"`
+	LastCheck         *SourceCheck                  `json:"last_check,omitempty"`
+	OpenBrokenReport  bool                          `json:"open_broken_report"`
+	ResourceId        string                        `json:"resource_id"`
+	ResourceSlug      string                        `json:"resource_slug"`
+	ResourceVersion   int64                         `json:"resource_version"`
+	RightsStatus      SourceHealthRightsStatus      `json:"rights_status"`
+	SourceId          string                        `json:"source_id"`
+	Url               string                        `json:"url"`
+}
+
+// SourceHealthAvailabilityState defines model for SourceHealth.AvailabilityState.
+type SourceHealthAvailabilityState string
+
+// SourceHealthRightsStatus defines model for SourceHealth.RightsStatus.
+type SourceHealthRightsStatus string
+
+// SourceHealthList defines model for SourceHealthList.
+type SourceHealthList struct {
+	HasNext  bool           `json:"has_next"`
+	Items    []SourceHealth `json:"items"`
+	Page     int64          `json:"page"`
+	PageSize int64          `json:"page_size"`
 }
 
 // SourceType defines model for SourceType.
@@ -1201,6 +2726,29 @@ type TaxonomySummary struct {
 	State         TaxonomyState `json:"state"`
 }
 
+// TrustUpdate defines model for TrustUpdate.
+type TrustUpdate struct {
+	ExpectedRevision int64                 `json:"expected_revision"`
+	InternalNote     *string               `json:"internal_note,omitempty"`
+	Reason           string                `json:"reason"`
+	RequestId        string                `json:"request_id"`
+	TrustLevel       TrustUpdateTrustLevel `json:"trust_level"`
+}
+
+// TrustUpdateTrustLevel defines model for TrustUpdate.TrustLevel.
+type TrustUpdateTrustLevel string
+
+// UserGovernance defines model for UserGovernance.
+type UserGovernance struct {
+	Restrictions []AdminRestriction       `json:"restrictions"`
+	Revision     int64                    `json:"revision"`
+	TrustLevel   UserGovernanceTrustLevel `json:"trust_level"`
+	UserId       string                   `json:"user_id"`
+}
+
+// UserGovernanceTrustLevel defines model for UserGovernance.TrustLevel.
+type UserGovernanceTrustLevel string
+
 // CSRF defines model for CSRF.
 type CSRF = string
 
@@ -1209,6 +2757,18 @@ type Authenticated = AdminMe
 
 // Error defines model for Error.
 type Error = ApiError
+
+// ListAuditParams defines parameters for ListAudit.
+type ListAuditParams struct {
+	Page       *int64                    `form:"page,omitempty" json:"page,omitempty"`
+	PageSize   *int                      `form:"page_size,omitempty" json:"page_size,omitempty"`
+	ResourceId *string                   `form:"resource_id,omitempty" json:"resource_id,omitempty"`
+	UserId     *string                   `form:"user_id,omitempty" json:"user_id,omitempty"`
+	Operation  *ListAuditParamsOperation `form:"operation,omitempty" json:"operation,omitempty"`
+}
+
+// ListAuditParamsOperation defines parameters for ListAudit.
+type ListAuditParamsOperation string
 
 // LogoutParams defines parameters for Logout.
 type LogoutParams struct {
@@ -1273,6 +2833,39 @@ type RevokeSessionParams struct {
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
 }
 
+// ListReportsParams defines parameters for ListReports.
+type ListReportsParams struct {
+	Page     *int64                   `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *int                     `form:"page_size,omitempty" json:"page_size,omitempty"`
+	Status   *ListReportsParamsStatus `form:"status,omitempty" json:"status,omitempty"`
+	Reason   *ListReportsParamsReason `form:"reason,omitempty" json:"reason,omitempty"`
+	Queue    *ListReportsParamsQueue  `form:"queue,omitempty" json:"queue,omitempty"`
+}
+
+// ListReportsParamsStatus defines parameters for ListReports.
+type ListReportsParamsStatus string
+
+// ListReportsParamsReason defines parameters for ListReports.
+type ListReportsParamsReason string
+
+// ListReportsParamsQueue defines parameters for ListReports.
+type ListReportsParamsQueue string
+
+// DismissReportParams defines parameters for DismissReport.
+type DismissReportParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// ResolveReportParams defines parameters for ResolveReport.
+type ResolveReportParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// TriageReportParams defines parameters for TriageReport.
+type TriageReportParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
 // ListResourcesParams defines parameters for ListResources.
 type ListResourcesParams struct {
 	Page             *int64            `form:"page,omitempty" json:"page,omitempty"`
@@ -1284,6 +2877,16 @@ type ListResourcesParams struct {
 
 // CreateResourceParams defines parameters for CreateResource.
 type CreateResourceParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// UpdateResourceDistributionParams defines parameters for UpdateResourceDistribution.
+type UpdateResourceDistributionParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// RecordSourceCheckParams defines parameters for RecordSourceCheck.
+type RecordSourceCheckParams struct {
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
 }
 
@@ -1359,6 +2962,19 @@ type SetResourceTagsParams struct {
 	XCSRFToken      CSRF  `json:"X-CSRF-Token"`
 }
 
+// ListSourceHealthParams defines parameters for ListSourceHealth.
+type ListSourceHealthParams struct {
+	Page              *int64                                   `form:"page,omitempty" json:"page,omitempty"`
+	PageSize          *int                                     `form:"page_size,omitempty" json:"page_size,omitempty"`
+	AvailabilityState *ListSourceHealthParamsAvailabilityState `form:"availability_state,omitempty" json:"availability_state,omitempty"`
+	OpenBrokenReport  *bool                                    `form:"open_broken_report,omitempty" json:"open_broken_report,omitempty"`
+	ResourceId        *string                                  `form:"resource_id,omitempty" json:"resource_id,omitempty"`
+	SourceId          *string                                  `form:"source_id,omitempty" json:"source_id,omitempty"`
+}
+
+// ListSourceHealthParamsAvailabilityState defines parameters for ListSourceHealth.
+type ListSourceHealthParamsAvailabilityState string
+
 // CreateTagParams defines parameters for CreateTag.
 type CreateTagParams struct {
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
@@ -1384,6 +3000,21 @@ type PutTagLocalizationParams struct {
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
 }
 
+// CreateRestrictionParams defines parameters for CreateRestriction.
+type CreateRestrictionParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// RevokeRestrictionParams defines parameters for RevokeRestriction.
+type RevokeRestrictionParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// UpdateUserTrustParams defines parameters for UpdateUserTrust.
+type UpdateUserTrustParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
 // LoginJSONRequestBody defines body for Login for application/json ContentType.
 type LoginJSONRequestBody = Credentials
 
@@ -1392,6 +3023,9 @@ type ReauthenticateJSONRequestBody = Reauthentication
 
 // CreateCategoryJSONRequestBody defines body for CreateCategory for application/json ContentType.
 type CreateCategoryJSONRequestBody = CreateTaxonomy
+
+// DeleteCategoryJSONRequestBody defines body for DeleteCategory for application/json ContentType.
+type DeleteCategoryJSONRequestBody = GovernanceReason
 
 // PatchCategoryJSONRequestBody defines body for PatchCategory for application/json ContentType.
 type PatchCategoryJSONRequestBody = PatchTaxonomy
@@ -1405,8 +3039,26 @@ type AcceptContributionJSONRequestBody = AcceptContribution
 // RejectContributionJSONRequestBody defines body for RejectContribution for application/json ContentType.
 type RejectContributionJSONRequestBody = RejectContribution
 
+// DismissReportJSONRequestBody defines body for DismissReport for application/json ContentType.
+type DismissReportJSONRequestBody = ReportDismiss
+
+// ResolveReportJSONRequestBody defines body for ResolveReport for application/json ContentType.
+type ResolveReportJSONRequestBody = ReportResolve
+
+// TriageReportJSONRequestBody defines body for TriageReport for application/json ContentType.
+type TriageReportJSONRequestBody = ReportTriage
+
 // CreateResourceJSONRequestBody defines body for CreateResource for application/json ContentType.
 type CreateResourceJSONRequestBody = CreateResource
+
+// UpdateResourceDistributionJSONRequestBody defines body for UpdateResourceDistribution for application/json ContentType.
+type UpdateResourceDistributionJSONRequestBody = DistributionUpdate
+
+// RecordSourceCheckJSONRequestBody defines body for RecordSourceCheck for application/json ContentType.
+type RecordSourceCheckJSONRequestBody = SourceCheckInput
+
+// DeleteResourceJSONRequestBody defines body for DeleteResource for application/json ContentType.
+type DeleteResourceJSONRequestBody = GovernanceReason
 
 // PatchResourceJSONRequestBody defines body for PatchResource for application/json ContentType.
 type PatchResourceJSONRequestBody = PatchResource
@@ -1438,14 +3090,32 @@ type SetResourceTagsJSONRequestBody = SetResourceTags
 // CreateTagJSONRequestBody defines body for CreateTag for application/json ContentType.
 type CreateTagJSONRequestBody = CreateTaxonomy
 
+// DeleteTagJSONRequestBody defines body for DeleteTag for application/json ContentType.
+type DeleteTagJSONRequestBody = GovernanceReason
+
 // PatchTagJSONRequestBody defines body for PatchTag for application/json ContentType.
 type PatchTagJSONRequestBody = PatchTaxonomy
 
 // PutTagLocalizationJSONRequestBody defines body for PutTagLocalization for application/json ContentType.
 type PutTagLocalizationJSONRequestBody = TaxonomyLocalizationInput
 
+// CreateRestrictionJSONRequestBody defines body for CreateRestriction for application/json ContentType.
+type CreateRestrictionJSONRequestBody = RestrictionCreate
+
+// RevokeRestrictionJSONRequestBody defines body for RevokeRestriction for application/json ContentType.
+type RevokeRestrictionJSONRequestBody = RestrictionRevoke
+
+// UpdateUserTrustJSONRequestBody defines body for UpdateUserTrust for application/json ContentType.
+type UpdateUserTrustJSONRequestBody = TrustUpdate
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+
+	// (GET /audit)
+	ListAudit(c fiber.Ctx, params ListAuditParams) error
+
+	// (GET /audit/{id})
+	GetAudit(c fiber.Ctx, id string) error
 
 	// (GET /auth/csrf)
 	GetCsrf(c fiber.Ctx) error
@@ -1510,11 +3180,32 @@ type ServerInterface interface {
 	// (DELETE /me/sessions/{session_id})
 	RevokeSession(c fiber.Ctx, sessionId string, params RevokeSessionParams) error
 
+	// (GET /reports)
+	ListReports(c fiber.Ctx, params ListReportsParams) error
+
+	// (GET /reports/{id})
+	GetReport(c fiber.Ctx, id string) error
+
+	// (POST /reports/{id}/dismiss)
+	DismissReport(c fiber.Ctx, id string, params DismissReportParams) error
+
+	// (POST /reports/{id}/resolve)
+	ResolveReport(c fiber.Ctx, id string, params ResolveReportParams) error
+
+	// (POST /reports/{id}/triage)
+	TriageReport(c fiber.Ctx, id string, params TriageReportParams) error
+
 	// (GET /resources)
 	ListResources(c fiber.Ctx, params ListResourcesParams) error
 
 	// (POST /resources)
 	CreateResource(c fiber.Ctx, params CreateResourceParams) error
+
+	// (PUT /resources/{id}/distribution)
+	UpdateResourceDistribution(c fiber.Ctx, id string, params UpdateResourceDistributionParams) error
+
+	// (POST /resources/{id}/sources/{source_id}/checks)
+	RecordSourceCheck(c fiber.Ctx, id string, sourceId string, params RecordSourceCheckParams) error
 
 	// (DELETE /resources/{resource_id})
 	DeleteResource(c fiber.Ctx, resourceId string, params DeleteResourceParams) error
@@ -1555,6 +3246,9 @@ type ServerInterface interface {
 	// (PUT /resources/{resource_id}/tags)
 	SetResourceTags(c fiber.Ctx, resourceId string, params SetResourceTagsParams) error
 
+	// (GET /source-checks)
+	ListSourceHealth(c fiber.Ctx, params ListSourceHealthParams) error
+
 	// (GET /tags)
 	ListTags(c fiber.Ctx) error
 
@@ -1575,6 +3269,18 @@ type ServerInterface interface {
 
 	// (PUT /tags/{tag_id}/localizations/{locale})
 	PutTagLocalization(c fiber.Ctx, tagId string, locale string, params PutTagLocalizationParams) error
+
+	// (GET /users/{id}/governance)
+	GetUserGovernance(c fiber.Ctx, id string) error
+
+	// (POST /users/{id}/restrictions)
+	CreateRestriction(c fiber.Ctx, id string, params CreateRestrictionParams) error
+
+	// (POST /users/{id}/restrictions/{restriction_id}/revoke)
+	RevokeRestriction(c fiber.Ctx, id string, restrictionId string, params RevokeRestrictionParams) error
+
+	// (PUT /users/{id}/trust)
+	UpdateUserTrust(c fiber.Ctx, id string, params UpdateUserTrustParams) error
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -1585,6 +3291,100 @@ type ServerInterfaceWrapper struct {
 
 type MiddlewareFunc fiber.Handler
 type HandlerMiddlewareFunc func(c fiber.Ctx, next fiber.Handler) error
+
+// ListAudit operation middleware
+func (siw *ServerInterfaceWrapper) ListAudit(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListAuditParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", query, &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page_size" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page_size", query, &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page_size: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "resource_id" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "resource_id", query, &params.ResourceId, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "user_id" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "user_id", query, &params.UserId, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter user_id: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "operation" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "operation", query, &params.Operation, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter operation: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.ListAudit(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// GetAudit operation middleware
+func (siw *ServerInterfaceWrapper) GetAudit(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Params("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter id: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.GetAudit(c, id)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
 
 // GetCsrf operation middleware
 func (siw *ServerInterfaceWrapper) GetCsrf(c fiber.Ctx) error {
@@ -2395,6 +4195,259 @@ func (siw *ServerInterfaceWrapper) RevokeSession(c fiber.Ctx) error {
 	return handler(c)
 }
 
+// ListReports operation middleware
+func (siw *ServerInterfaceWrapper) ListReports(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListReportsParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", query, &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page_size" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page_size", query, &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page_size: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", query, &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter status: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "reason" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "reason", query, &params.Reason, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter reason: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "queue" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "queue", query, &params.Queue, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter queue: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.ListReports(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// GetReport operation middleware
+func (siw *ServerInterfaceWrapper) GetReport(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Params("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter id: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.GetReport(c, id)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// DismissReport operation middleware
+func (siw *ServerInterfaceWrapper) DismissReport(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Params("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params DismissReportParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.DismissReport(c, id, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// ResolveReport operation middleware
+func (siw *ServerInterfaceWrapper) ResolveReport(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Params("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ResolveReportParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.ResolveReport(c, id, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// TriageReport operation middleware
+func (siw *ServerInterfaceWrapper) TriageReport(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Params("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params TriageReportParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.TriageReport(c, id, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
 // ListResources operation middleware
 func (siw *ServerInterfaceWrapper) ListResources(c fiber.Ctx) error {
 
@@ -2492,6 +4545,120 @@ func (siw *ServerInterfaceWrapper) CreateResource(c fiber.Ctx) error {
 
 	handler := func(c fiber.Ctx) error {
 		return siw.Handler.CreateResource(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// UpdateResourceDistribution operation middleware
+func (siw *ServerInterfaceWrapper) UpdateResourceDistribution(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Params("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateResourceDistributionParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.UpdateResourceDistribution(c, id, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// RecordSourceCheck operation middleware
+func (siw *ServerInterfaceWrapper) RecordSourceCheck(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Params("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter id: %w", err).Error())
+	}
+
+	// ------------- Path parameter "source_id" -------------
+	var sourceId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "source_id", c.Params("source_id"), &sourceId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter source_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RecordSourceCheckParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.RecordSourceCheck(c, id, sourceId, params)
 	}
 
 	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
@@ -3366,6 +5533,78 @@ func (siw *ServerInterfaceWrapper) SetResourceTags(c fiber.Ctx) error {
 	return handler(c)
 }
 
+// ListSourceHealth operation middleware
+func (siw *ServerInterfaceWrapper) ListSourceHealth(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListSourceHealthParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", query, &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page_size" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page_size", query, &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page_size: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "availability_state" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "availability_state", query, &params.AvailabilityState, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter availability_state: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "open_broken_report" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "open_broken_report", query, &params.OpenBrokenReport, runtime.BindQueryParameterOptions{Type: "boolean", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter open_broken_report: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "resource_id" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "resource_id", query, &params.ResourceId, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter resource_id: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "source_id" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "source_id", query, &params.SourceId, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter source_id: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.ListSourceHealth(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
 // ListTags operation middleware
 func (siw *ServerInterfaceWrapper) ListTags(c fiber.Ctx) error {
 
@@ -3686,6 +5925,202 @@ func (siw *ServerInterfaceWrapper) PutTagLocalization(c fiber.Ctx) error {
 	return handler(c)
 }
 
+// GetUserGovernance operation middleware
+func (siw *ServerInterfaceWrapper) GetUserGovernance(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Params("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter id: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.GetUserGovernance(c, id)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// CreateRestriction operation middleware
+func (siw *ServerInterfaceWrapper) CreateRestriction(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Params("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params CreateRestrictionParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.CreateRestriction(c, id, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// RevokeRestriction operation middleware
+func (siw *ServerInterfaceWrapper) RevokeRestriction(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Params("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter id: %w", err).Error())
+	}
+
+	// ------------- Path parameter "restriction_id" -------------
+	var restrictionId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "restriction_id", c.Params("restriction_id"), &restrictionId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter restriction_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RevokeRestrictionParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.RevokeRestriction(c, id, restrictionId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// UpdateUserTrust operation middleware
+func (siw *ServerInterfaceWrapper) UpdateUserTrust(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Params("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params UpdateUserTrustParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.UpdateUserTrust(c, id, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
 // FiberServerOptions provides options for the Fiber server.
 type FiberServerOptions struct {
 	BaseURL            string
@@ -3794,5 +6229,33 @@ func RegisterHandlersWithOptions(router fiber.Router, si ServerInterface, option
 	router.Post(options.BaseURL+"/contributions/:contribution_id/accept", wrapper.AcceptContribution)
 
 	router.Post(options.BaseURL+"/contributions/:contribution_id/reject", wrapper.RejectContribution)
+
+	router.Get(options.BaseURL+"/reports", wrapper.ListReports)
+
+	router.Get(options.BaseURL+"/reports/:id", wrapper.GetReport)
+
+	router.Post(options.BaseURL+"/reports/:id/triage", wrapper.TriageReport)
+
+	router.Post(options.BaseURL+"/reports/:id/resolve", wrapper.ResolveReport)
+
+	router.Post(options.BaseURL+"/reports/:id/dismiss", wrapper.DismissReport)
+
+	router.Get(options.BaseURL+"/users/:id/governance", wrapper.GetUserGovernance)
+
+	router.Put(options.BaseURL+"/users/:id/trust", wrapper.UpdateUserTrust)
+
+	router.Post(options.BaseURL+"/users/:id/restrictions", wrapper.CreateRestriction)
+
+	router.Post(options.BaseURL+"/users/:id/restrictions/:restriction_id/revoke", wrapper.RevokeRestriction)
+
+	router.Put(options.BaseURL+"/resources/:id/distribution", wrapper.UpdateResourceDistribution)
+
+	router.Get(options.BaseURL+"/source-checks", wrapper.ListSourceHealth)
+
+	router.Post(options.BaseURL+"/resources/:id/sources/:source_id/checks", wrapper.RecordSourceCheck)
+
+	router.Get(options.BaseURL+"/audit", wrapper.ListAudit)
+
+	router.Get(options.BaseURL+"/audit/:id", wrapper.GetAudit)
 
 }

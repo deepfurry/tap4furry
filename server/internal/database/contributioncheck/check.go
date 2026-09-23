@@ -32,6 +32,9 @@ func (f *Fixture) Cleanup(owner *pgxpool.Pool) error {
 		return database.SafeError("begin contribution fixture cleanup", err)
 	}
 	defer tx.Rollback(ctx)
+	if _, err = tx.Exec(ctx, "DELETE FROM app.audit_entries WHERE contribution_id=ANY($1::uuid[])", f.IDs); err != nil {
+		return database.SafeError("remove fixture contribution business audits", err)
+	}
 	for _, table := range []string{"contribution_review_resource_changes", "contribution_localization_changes", "contribution_relation_changes", "contribution_tag_changes", "contribution_source_changes", "contribution_review_audits", "contribution_events", "contribution_initial_sources", "contribution_contents", "contributions"} {
 		key := "contribution_id"
 		if table == "contributions" {

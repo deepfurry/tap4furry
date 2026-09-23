@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/deepfurry/tap4furry/server/internal/database/sqlc"
+	"github.com/deepfurry/tap4furry/server/internal/governance"
 	"github.com/deepfurry/tap4furry/server/internal/resource"
 	"slices"
 	"uuid"
@@ -77,6 +78,9 @@ func (a *App) relationMutation(ctx context.Context, actor auth.AdminActor, ancho
 		for _, row := range rows {
 			revision, err := bump(ctx, q, uuid.UUID(row.ID.Bytes), row.Version)
 			if err != nil {
+				return err
+			}
+			if _, err = governance.Record(ctx, q, actor.UserID, governance.Change{Operation: "relation", ResourceID: revision.ID, BeforeVersion: row.Version, AfterVersion: revision.Version, Fields: []string{"relations"}}); err != nil {
 				return err
 			}
 			if revision.ID == anchor {

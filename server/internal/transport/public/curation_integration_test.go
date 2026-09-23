@@ -173,10 +173,10 @@ func TestIntegrationCurationTaxonomySourceAndPublication(t *testing.T) {
 		k  curation.TaxonomyKind
 		id uuid.UUID
 	}{{curation.Category, f.category}, {curation.Tag, tag}} {
-		if err = f.curation.PatchTaxonomy(ctx, f.actor, entry.k, entry.id, curation.TaxonomyPatch{State: &retired}); err != nil {
+		if err = f.curation.PatchTaxonomy(ctx, f.actor, entry.k, entry.id, curation.TaxonomyPatch{Reason: "Fixture governance reason", State: &retired}); err != nil {
 			t.Fatal(err)
 		}
-		if err = f.curation.DeleteTaxonomy(ctx, f.actor, entry.k, entry.id); !errors.Is(err, curation.ErrInUse) {
+		if err = f.curation.DeleteTaxonomy(ctx, f.actor, entry.k, entry.id, "Fixture governance reason"); !errors.Is(err, curation.ErrInUse) {
 			t.Fatal("in-use taxonomy delete allowed")
 		}
 	}
@@ -216,11 +216,11 @@ func TestIntegrationCurationTaxonomySourceAndPublication(t *testing.T) {
 	if f.scalar("SELECT count(*) FROM app.resource_sources WHERE resource_id=$1", r.ID.String()) != 2 {
 		t.Fatal("Source removal physically deleted row")
 	}
-	r, err = f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Published)
+	r, err = f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Published, "Fixture governance reason")
 	r = mustCuration(t, r, err)
 	published := f.revision(r.ID).PublishedAt
 	for _, state := range []resource.PublicationState{resource.Restricted, resource.Published, resource.Removed, resource.Published, resource.Draft, resource.Published} {
-		r, err = f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, state)
+		r, err = f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, state, "Fixture governance reason")
 		r = mustCuration(t, r, err)
 		if f.revision(r.ID).PublishedAt != published {
 			t.Fatal("first publication timestamp changed")
@@ -231,7 +231,7 @@ func TestIntegrationCurationTaxonomySourceAndPublication(t *testing.T) {
 		t.Fatal("published slug changed")
 	}
 	before = f.revision(r.ID)
-	same, err = f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Published)
+	same, err = f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Published, "Fixture governance reason")
 	if err != nil || same != r || !reflect.DeepEqual(before, f.revision(r.ID)) {
 		t.Fatal("publication no-op bumped")
 	}
@@ -427,7 +427,7 @@ func TestIntegrationCurationTaxonomyLocalizationsAndReadFilters(t *testing.T) {
 		t.Fatal("Admin pagination lookahead failed")
 	}
 	f.adminRequest("GET", "/resources?page=9223372036854775807&page_size=100", nil, f.cookie, 400)
-	if _, err := f.curation.SetPublication(ctx, f.actor, b.ID, b.Version, resource.Pending); err != nil {
+	if _, err := f.curation.SetPublication(ctx, f.actor, b.ID, b.Version, resource.Pending, "Fixture governance reason"); err != nil {
 		t.Fatal(err)
 	}
 	filtered, _ := f.adminRequest("GET", "/resources?category_id="+f.category.String()+"&publication_state=pending", nil, f.cookie, 200)

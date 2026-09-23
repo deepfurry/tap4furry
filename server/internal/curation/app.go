@@ -9,6 +9,7 @@ import (
 	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/deepfurry/tap4furry/server/internal/database"
 	"github.com/deepfurry/tap4furry/server/internal/database/sqlc"
+	"github.com/deepfurry/tap4furry/server/internal/governance"
 	"github.com/deepfurry/tap4furry/server/internal/resource"
 	"github.com/deepfurry/tap4furry/server/internal/taxonomy"
 	"github.com/jackc/pgx/v5"
@@ -112,7 +113,7 @@ func bump(ctx context.Context, q *sqlc.Queries, id uuid.UUID, expected int64) (R
 	}
 	return Revision{id, next}, err
 }
-func (a *App) mutate(ctx context.Context, actor auth.AdminActor, id uuid.UUID, expected int64, cap auth.Capability, work func(*sqlc.Queries, sqlc.LockResourceCoreRow, []auth.Role) (bool, error)) (Revision, error) {
+func (a *App) mutate(ctx context.Context, actor auth.AdminActor, id uuid.UUID, expected int64, cap auth.Capability, audit governance.Change, work func(*sqlc.Queries, sqlc.LockResourceCoreRow, []auth.Role) (bool, error)) (Revision, error) {
 	result := Revision{id, expected}
 	err := a.transact(ctx, actor, cap, func(q *sqlc.Queries, roles []auth.Role) error {
 		row, err := lockedResource(ctx, q, id, expected)
@@ -125,6 +126,12 @@ func (a *App) mutate(ctx context.Context, actor auth.AdminActor, id uuid.UUID, e
 		}
 		if changed {
 			result, err = bump(ctx, q, id, expected)
+			if err == nil {
+				audit.ResourceID = id
+				audit.BeforeVersion = expected
+				audit.AfterVersion = result.Version
+				_, err = governance.Record(ctx, q, actor.UserID, audit)
+			}
 		}
 		return err
 	})

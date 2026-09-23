@@ -8,6 +8,7 @@ import (
 	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/deepfurry/tap4furry/server/internal/contribution"
 	"github.com/deepfurry/tap4furry/server/internal/identity"
+	"github.com/deepfurry/tap4furry/server/internal/moderation"
 	"github.com/deepfurry/tap4furry/server/internal/transport/health"
 	"github.com/deepfurry/tap4furry/server/internal/transport/public/generated"
 	"github.com/gofiber/fiber/v3"
@@ -21,6 +22,7 @@ type Handler struct {
 	options       Options
 	resources     *pgxpool.Pool
 	contributions *contribution.App
+	moderation    *moderation.App
 }
 type Options struct {
 	Environment, PublicOrigin, CSRFSecret string
@@ -33,8 +35,9 @@ func Register(router fiber.Router, checker *health.Checker, authentication *auth
 	h := &Handler{health: checker, auth: authentication, identity: identities, options: options, resources: options.ResourcePool}
 	if options.ResourcePool != nil {
 		h.contributions = contribution.New(options.ResourcePool, options.CSRFSecret)
+		h.moderation = moderation.New(options.ResourcePool)
 	}
-	for _, path := range []string{"/auth", "/me", "/users", "/resources", "/categories", "/tags", "/contributions"} {
+	for _, path := range []string{"/auth", "/me", "/users", "/resources", "/categories", "/tags", "/contributions", "/reports"} {
 		router.Use(path, func(c fiber.Ctx) error {
 			deadline := 5 * time.Second
 			if strings.HasPrefix(c.Path(), "/auth/oauth/") {
@@ -58,6 +61,9 @@ func Register(router fiber.Router, checker *health.Checker, authentication *auth
 	}
 	router.Use("/contributions", h.contributionBoundary, h.originGuard, h.csrfGuard)
 	router.Use("/me/contributions", h.contributionBoundary, h.csrfGuard)
+	router.Use("/reports", h.moderationBoundary, h.originGuard, h.csrfGuard)
+	router.Use("/me/reports", h.moderationBoundary, h.csrfGuard)
+	router.Use("/me/governance", h.moderationBoundary, h.csrfGuard)
 	generated.RegisterHandlers(router, h)
 }
 func (*Handler) GetLive(c fiber.Ctx) error { return c.JSON(generated.Live{Status: "alive"}) }

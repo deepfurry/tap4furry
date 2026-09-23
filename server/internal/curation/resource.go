@@ -7,6 +7,7 @@ import (
 
 	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/deepfurry/tap4furry/server/internal/database/sqlc"
+	"github.com/deepfurry/tap4furry/server/internal/governance"
 	"github.com/deepfurry/tap4furry/server/internal/resource"
 	"github.com/deepfurry/tap4furry/server/internal/taxonomy"
 )
@@ -40,6 +41,9 @@ func (a *App) CreateResource(ctx context.Context, actor auth.AdminActor, input C
 	err := a.transact(ctx, actor, auth.Editorial, func(q *sqlc.Queries, _ []auth.Role) error {
 		var err error
 		result, err = createResource(ctx, q, input)
+		if err == nil {
+			_, err = governance.Record(ctx, q, actor.UserID, governance.Change{Operation: "create", ResourceID: result.ID, AfterVersion: 1, Fields: []string{"core", "localization"}})
+		}
 		return err
 	})
 	return result, err
@@ -85,7 +89,7 @@ type CorePatch struct {
 }
 
 func (a *App) PatchResource(ctx context.Context, actor auth.AdminActor, id uuid.UUID, expected int64, input CorePatch) (Revision, error) {
-	return a.mutate(ctx, actor, id, expected, auth.Editorial, func(q *sqlc.Queries, row sqlc.LockResourceCoreRow, _ []auth.Role) (bool, error) {
+	return a.mutate(ctx, actor, id, expected, auth.Editorial, governance.Change{Operation: "core", Fields: []string{"core"}}, func(q *sqlc.Queries, row sqlc.LockResourceCoreRow, _ []auth.Role) (bool, error) {
 		next := row
 		if input.Slug != nil {
 			core := resource.Core{Slug: row.Slug}
@@ -141,7 +145,7 @@ func (a *App) PatchResource(ctx context.Context, actor auth.AdminActor, id uuid.
 	})
 }
 func (a *App) PutLocalization(ctx context.Context, actor auth.AdminActor, id uuid.UUID, expected int64, locale string, input LocalizationInput) (Revision, error) {
-	return a.mutate(ctx, actor, id, expected, auth.Editorial, func(q *sqlc.Queries, _ sqlc.LockResourceCoreRow, _ []auth.Role) (bool, error) {
+	return a.mutate(ctx, actor, id, expected, auth.Editorial, governance.Change{Operation: "localization", Fields: []string{"localization"}}, func(q *sqlc.Queries, _ sqlc.LockResourceCoreRow, _ []auth.Role) (bool, error) {
 		l, err := normalizeLocalization(locale, input)
 		if err != nil {
 			return false, err
@@ -151,7 +155,7 @@ func (a *App) PutLocalization(ctx context.Context, actor auth.AdminActor, id uui
 	})
 }
 func (a *App) DeleteLocalization(ctx context.Context, actor auth.AdminActor, id uuid.UUID, expected int64, locale string) (Revision, error) {
-	return a.mutate(ctx, actor, id, expected, auth.Editorial, func(q *sqlc.Queries, row sqlc.LockResourceCoreRow, _ []auth.Role) (bool, error) {
+	return a.mutate(ctx, actor, id, expected, auth.Editorial, governance.Change{Operation: "localization", Fields: []string{"localization"}}, func(q *sqlc.Queries, row sqlc.LockResourceCoreRow, _ []auth.Role) (bool, error) {
 		l, err := taxonomy.ParseLocale(locale)
 		if err != nil {
 			return false, err
@@ -164,7 +168,7 @@ func (a *App) DeleteLocalization(ctx context.Context, actor auth.AdminActor, id 
 	})
 }
 func (a *App) SetTags(ctx context.Context, actor auth.AdminActor, id uuid.UUID, expected int64, ids []uuid.UUID) (Revision, error) {
-	return a.mutate(ctx, actor, id, expected, auth.Editorial, func(q *sqlc.Queries, row sqlc.LockResourceCoreRow, _ []auth.Role) (bool, error) {
+	return a.mutate(ctx, actor, id, expected, auth.Editorial, governance.Change{Operation: "tags", Fields: []string{"tags"}}, func(q *sqlc.Queries, row sqlc.LockResourceCoreRow, _ []auth.Role) (bool, error) {
 		current, err := q.CurationCurrentTags(ctx, row.ID)
 		if err != nil {
 			return false, err
@@ -207,7 +211,7 @@ func (a *App) SetTags(ctx context.Context, actor auth.AdminActor, id uuid.UUID, 
 	})
 }
 func (a *App) SetExternalIDs(ctx context.Context, actor auth.AdminActor, id uuid.UUID, expected int64, items []resource.ExternalID) (Revision, error) {
-	return a.mutate(ctx, actor, id, expected, auth.Editorial, func(q *sqlc.Queries, row sqlc.LockResourceCoreRow, _ []auth.Role) (bool, error) {
+	return a.mutate(ctx, actor, id, expected, auth.Editorial, governance.Change{Operation: "external_ids", Fields: []string{"external_ids"}}, func(q *sqlc.Queries, row sqlc.LockResourceCoreRow, _ []auth.Role) (bool, error) {
 		current, err := q.AdminResourceExternalIDs(ctx, row.ID)
 		if err != nil {
 			return false, err
@@ -243,23 +247,11 @@ func (a *App) SetExternalIDs(ctx context.Context, actor auth.AdminActor, id uuid
 		return changed, nil
 	})
 }
-func (a *App) SetPublication(ctx context.Context, actor auth.AdminActor, id uuid.UUID, expected int64, state resource.PublicationState) (Revision, error) {
-	return a.mutate(ctx, actor, id, expected, auth.Editorial, func(q *sqlc.Queries, row sqlc.LockResourceCoreRow, roles []auth.Role) (bool, error) {
-		if !state.Valid() {
-			return false, ErrValidation
-		}
-		governed := func(s string) bool { return s == "restricted" || s == "removed" }
-		if (governed(row.PublicationState) || governed(string(state))) && !auth.HasCapability(roles, auth.Administration) {
-			return false, auth.ErrAdminForbidden
-		}
-		if row.PublicationState == string(state) {
-			return false, nil
-		}
-		return true, q.CurationPublish(ctx, sqlc.CurationPublishParams{ID: row.ID, State: string(state)})
-	})
-}
-func (a *App) DeleteResource(ctx context.Context, actor auth.AdminActor, id uuid.UUID, expected int64) (Revision, error) {
-	return a.mutate(ctx, actor, id, expected, auth.Administration, func(q *sqlc.Queries, row sqlc.LockResourceCoreRow, _ []auth.Role) (bool, error) {
+func (a *App) DeleteResource(ctx context.Context, actor auth.AdminActor, id uuid.UUID, expected int64, reason string) (Revision, error) {
+	if _, err := governance.Text(reason, 1000); err != nil {
+		return Revision{}, ErrValidation
+	}
+	return a.mutate(ctx, actor, id, expected, auth.Administration, governance.Change{Operation: "soft_delete", Fields: []string{"deleted_at"}, Reason: reason}, func(q *sqlc.Queries, row sqlc.LockResourceCoreRow, _ []auth.Role) (bool, error) {
 		return true, q.CurationSoftDeleteResource(ctx, row.ID)
 	})
 }

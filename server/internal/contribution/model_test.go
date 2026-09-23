@@ -3,6 +3,7 @@ package contribution
 import (
 	"errors"
 	"github.com/deepfurry/tap4furry/server/internal/database/sqlc"
+	"github.com/deepfurry/tap4furry/server/internal/governance"
 	"github.com/deepfurry/tap4furry/server/internal/resource"
 	"github.com/jackc/pgx/v5/pgtype"
 	"strings"
@@ -48,11 +49,11 @@ func TestQuotaEdges(t *testing.T) {
 		{sqlc.ContributionQuotaRow{LastAt: stamp(now.Add(-59 * time.Second))}, "submission_interval", 1},
 	} {
 		var limit *LimitError
-		if !errors.As(checkQuota(test.quota, now), &limit) || limit.Reason != test.reason || limit.RetryAfter != test.retry {
+		if !errors.As(checkQuota(test.quota, now, governance.ReportBudget()), &limit) || limit.Reason != test.reason || limit.RetryAfter != test.retry {
 			t.Fatal("quota boundary failed")
 		}
 	}
-	if checkQuota(sqlc.ContributionQuotaRow{Recent: 9, Pending: 4, LastAt: stamp(now.Add(-time.Minute))}, now) != nil {
+	if checkQuota(sqlc.ContributionQuotaRow{Recent: 9, Pending: 4, LastAt: stamp(now.Add(-time.Minute))}, now, governance.ReportBudget()) != nil {
 		t.Fatal("quota exact boundary rejected")
 	}
 }

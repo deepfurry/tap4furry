@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- Complete Stage 1.3 / P0-6: private Resource/Source reports, scoped restrictions,
+  fixed trust budgets, manual source checks and recommendation eligibility with
+  working Public/Admin pages, explicit confirmations, dirty guards and safe history.
+- Add migration 9 and eight governance tables with exact column grants; preserve
+  migrations 1–8 and all existing identity/Resource/Contribution permissions. Canonical
+  changes and composite report resolutions append atomic typed audits with CAS.
+- Protect profile writes with transaction-time session/restriction checks and ordered
+  User locks. Preserve reporting, account security, history, withdrawal and indexing
+  opt-out under business restrictions. Anonymous reads/SSR now use no-store.
+- Extend disposable downgrade, privacy, quota, concurrency and rollback acceptance,
+  existing shared Admin smoke and browser workflows; close Stage 1 and route the
+  Chinese roadmap to Stage 2.1 search/discovery. No production deployment.
+
 - Audit the Stage 1.2 baseline and design Stage 1.3 / P0-6 in Chinese: private
   Resource/Source reports, scoped restrictions that preserve reporting and account
   safety, fixed trust budgets, atomic governance/audits and manual source checks.

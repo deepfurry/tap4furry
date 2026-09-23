@@ -18,7 +18,7 @@ import (
 func (f *contributionFixture) published() curation.Revision {
 	f.t.Helper()
 	r := f.create()
-	r, e := f.curation.SetPublication(f.t.Context(), f.actor, r.ID, r.Version, resource.Published)
+	r, e := f.curation.SetPublication(f.t.Context(), f.actor, r.ID, r.Version, resource.Published, "Fixture governance reason")
 	if e != nil {
 		f.t.Fatal(e)
 	}
@@ -190,7 +190,7 @@ func TestIntegrationContributionChangesTagsAtomic(t *testing.T) {
 	if _, e = f.operator.Grant(ctx, f.email, auth.Administrator); e != nil {
 		t.Fatal(e)
 	}
-	if e = f.curation.PatchTaxonomy(ctx, f.actor, curation.Tag, ids[2], curation.TaxonomyPatch{State: cp(taxonomy.Retired)}); e != nil {
+	if e = f.curation.PatchTaxonomy(ctx, f.actor, curation.Tag, ids[2], curation.TaxonomyPatch{Reason: "Fixture governance reason", State: cp(taxonomy.Retired)}); e != nil {
 		t.Fatal(e)
 	}
 	before := f.revision(r.ID)
@@ -377,7 +377,7 @@ func TestIntegrationContributionChangesTagRetirementRace(t *testing.T) {
 	case <-time.After(5 * time.Second):
 		t.Fatal("tag lock not reached")
 	}
-	if err = f.curation.PatchTaxonomy(ctx, governor, curation.Tag, tag, curation.TaxonomyPatch{State: cp(taxonomy.Retired)}); err != nil {
+	if err = f.curation.PatchTaxonomy(ctx, governor, curation.Tag, tag, curation.TaxonomyPatch{Reason: "Fixture governance reason", State: cp(taxonomy.Retired)}); err != nil {
 		t.Fatal(err)
 	}
 	close(pause.resume)

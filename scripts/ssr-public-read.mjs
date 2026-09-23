@@ -6,7 +6,7 @@ import { once } from 'node:events';
 import { join } from 'node:path';
 import { root } from './process.mjs';
 
-const cache = 'public, max-age=0, s-maxage=60, stale-while-revalidate=30';
+const cache = 'no-store';
 const id = '0198a100-0000-7000-8000-000000000001';
 const calls = [];
 const core = { id, slug: 'test-resource', name: 'Test Resource', summary: 'A community resource.', category: { id, slug: 'games', name: 'Games' }, lifecycle: 'discontinued', content_rating: 'explicit', published_at: '2026-09-19T00:00:00Z', updated_at: '2026-09-19T00:00:00Z' };

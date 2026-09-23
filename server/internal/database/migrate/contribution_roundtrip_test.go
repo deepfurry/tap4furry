@@ -47,7 +47,7 @@ func completeContributionRoundTrip(t *testing.T, p *goose.Provider, pool *pgxpoo
 	if err = pool.QueryRow(ctx, "SELECT name FROM app.contribution_contents WHERE contribution_id=$1", old).Scan(&name); err != nil || name != "Old original" {
 		t.Fatal("migration 8 down changed old proposal")
 	}
-	if _, err = p.Up(ctx); err != nil {
+	if _, err = p.UpTo(ctx, 8); err != nil {
 		t.Fatal("migration 8 up failed")
 	}
 	if err = pool.QueryRow(ctx, "SELECT name FROM app.contribution_contents WHERE contribution_id=$1", old).Scan(&name); err != nil || name != "Old original" {

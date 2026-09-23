@@ -13,6 +13,51 @@ import (
 	"github.com/oapi-codegen/runtime"
 )
 
+// Defines values for ActiveRestrictionReasonCode.
+const (
+	ActiveRestrictionReasonCodeAbuse                   ActiveRestrictionReasonCode = "abuse"
+	ActiveRestrictionReasonCodeOther                   ActiveRestrictionReasonCode = "other"
+	ActiveRestrictionReasonCodeRepeatedPolicyViolation ActiveRestrictionReasonCode = "repeated_policy_violation"
+	ActiveRestrictionReasonCodeSpam                    ActiveRestrictionReasonCode = "spam"
+)
+
+// Valid indicates whether the value is a known member of the ActiveRestrictionReasonCode enum.
+func (e ActiveRestrictionReasonCode) Valid() bool {
+	switch e {
+	case ActiveRestrictionReasonCodeAbuse:
+		return true
+	case ActiveRestrictionReasonCodeOther:
+		return true
+	case ActiveRestrictionReasonCodeRepeatedPolicyViolation:
+		return true
+	case ActiveRestrictionReasonCodeSpam:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ActiveRestrictionScope.
+const (
+	AllWrite           ActiveRestrictionScope = "all_write"
+	ContributionSubmit ActiveRestrictionScope = "contribution_submit"
+	PublicProfileWrite ActiveRestrictionScope = "public_profile_write"
+)
+
+// Valid indicates whether the value is a known member of the ActiveRestrictionScope enum.
+func (e ActiveRestrictionScope) Valid() bool {
+	switch e {
+	case AllWrite:
+		return true
+	case ContributionSubmit:
+		return true
+	case PublicProfileWrite:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ApiErrorCode.
 const (
 	AUTHACCOUNTDISABLED              ApiErrorCode = "AUTH_ACCOUNT_DISABLED"
@@ -30,6 +75,7 @@ const (
 	AUTHREAUTHREQUIRED               ApiErrorCode = "AUTH_REAUTH_REQUIRED"
 	AUTHSESSIONNOTFOUND              ApiErrorCode = "AUTH_SESSION_NOT_FOUND"
 	AUTHUNAUTHENTICATED              ApiErrorCode = "AUTH_UNAUTHENTICATED"
+	BUSINESSRESTRICTED               ApiErrorCode = "BUSINESS_RESTRICTED"
 	CONTRIBUTIONCONFLICT             ApiErrorCode = "CONTRIBUTION_CONFLICT"
 	CONTRIBUTIONFORBIDDEN            ApiErrorCode = "CONTRIBUTION_FORBIDDEN"
 	CONTRIBUTIONLIMITED              ApiErrorCode = "CONTRIBUTION_LIMITED"
@@ -37,11 +83,17 @@ const (
 	CONTRIBUTIONREQUESTCONFLICT      ApiErrorCode = "CONTRIBUTION_REQUEST_CONFLICT"
 	CONTRIBUTIONVERIFICATIONREQUIRED ApiErrorCode = "CONTRIBUTION_VERIFICATION_REQUIRED"
 	CSRFINVALID                      ApiErrorCode = "CSRF_INVALID"
+	GOVERNANCECONFLICT               ApiErrorCode = "GOVERNANCE_CONFLICT"
+	GOVERNANCEREQUESTCONFLICT        ApiErrorCode = "GOVERNANCE_REQUEST_CONFLICT"
 	INTERNALERROR                    ApiErrorCode = "INTERNAL_ERROR"
 	MAILUNAVAILABLE                  ApiErrorCode = "MAIL_UNAVAILABLE"
 	ORIGINFORBIDDEN                  ApiErrorCode = "ORIGIN_FORBIDDEN"
 	PROFILEHANDLEUNAVAILABLE         ApiErrorCode = "PROFILE_HANDLE_UNAVAILABLE"
 	PROFILENOTFOUND                  ApiErrorCode = "PROFILE_NOT_FOUND"
+	REPORTFORBIDDEN                  ApiErrorCode = "REPORT_FORBIDDEN"
+	REPORTLIMITED                    ApiErrorCode = "REPORT_LIMITED"
+	REPORTNOTFOUND                   ApiErrorCode = "REPORT_NOT_FOUND"
+	REPORTVERIFICATIONREQUIRED       ApiErrorCode = "REPORT_VERIFICATION_REQUIRED"
 	RESOURCENOTFOUND                 ApiErrorCode = "RESOURCE_NOT_FOUND"
 	RESOURCERELATIONCYCLE            ApiErrorCode = "RESOURCE_RELATION_CYCLE"
 	RESOURCEVERSIONCONFLICT          ApiErrorCode = "RESOURCE_VERSION_CONFLICT"
@@ -81,6 +133,8 @@ func (e ApiErrorCode) Valid() bool {
 		return true
 	case AUTHUNAUTHENTICATED:
 		return true
+	case BUSINESSRESTRICTED:
+		return true
 	case CONTRIBUTIONCONFLICT:
 		return true
 	case CONTRIBUTIONFORBIDDEN:
@@ -95,6 +149,10 @@ func (e ApiErrorCode) Valid() bool {
 		return true
 	case CSRFINVALID:
 		return true
+	case GOVERNANCECONFLICT:
+		return true
+	case GOVERNANCEREQUESTCONFLICT:
+		return true
 	case INTERNALERROR:
 		return true
 	case MAILUNAVAILABLE:
@@ -104,6 +162,14 @@ func (e ApiErrorCode) Valid() bool {
 	case PROFILEHANDLEUNAVAILABLE:
 		return true
 	case PROFILENOTFOUND:
+		return true
+	case REPORTFORBIDDEN:
+		return true
+	case REPORTLIMITED:
+		return true
+	case REPORTNOTFOUND:
+		return true
+	case REPORTVERIFICATIONREQUIRED:
 		return true
 	case RESOURCENOTFOUND:
 		return true
@@ -571,6 +637,84 @@ func (e OAuthProvider) Valid() bool {
 	}
 }
 
+// Defines values for OwnReportReason.
+const (
+	OwnReportReasonBrokenLink    OwnReportReason = "broken_link"
+	OwnReportReasonContentRating OwnReportReason = "content_rating"
+	OwnReportReasonMaliciousLink OwnReportReason = "malicious_link"
+	OwnReportReasonOther         OwnReportReason = "other"
+	OwnReportReasonPrivacy       OwnReportReason = "privacy"
+	OwnReportReasonRightsConcern OwnReportReason = "rights_concern"
+	OwnReportReasonSpam          OwnReportReason = "spam"
+)
+
+// Valid indicates whether the value is a known member of the OwnReportReason enum.
+func (e OwnReportReason) Valid() bool {
+	switch e {
+	case OwnReportReasonBrokenLink:
+		return true
+	case OwnReportReasonContentRating:
+		return true
+	case OwnReportReasonMaliciousLink:
+		return true
+	case OwnReportReasonOther:
+		return true
+	case OwnReportReasonPrivacy:
+		return true
+	case OwnReportReasonRightsConcern:
+		return true
+	case OwnReportReasonSpam:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for OwnReportStatus.
+const (
+	OwnReportStatusDismissed OwnReportStatus = "dismissed"
+	OwnReportStatusInReview  OwnReportStatus = "in_review"
+	OwnReportStatusOpen      OwnReportStatus = "open"
+	OwnReportStatusResolved  OwnReportStatus = "resolved"
+	OwnReportStatusWithdrawn OwnReportStatus = "withdrawn"
+)
+
+// Valid indicates whether the value is a known member of the OwnReportStatus enum.
+func (e OwnReportStatus) Valid() bool {
+	switch e {
+	case OwnReportStatusDismissed:
+		return true
+	case OwnReportStatusInReview:
+		return true
+	case OwnReportStatusOpen:
+		return true
+	case OwnReportStatusResolved:
+		return true
+	case OwnReportStatusWithdrawn:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for OwnReportTargetKind.
+const (
+	OwnReportTargetKindResource OwnReportTargetKind = "resource"
+	OwnReportTargetKindSource   OwnReportTargetKind = "source"
+)
+
+// Valid indicates whether the value is a known member of the OwnReportTargetKind enum.
+func (e OwnReportTargetKind) Valid() bool {
+	switch e {
+	case OwnReportTargetKindResource:
+		return true
+	case OwnReportTargetKindSource:
+		return true
+	default:
+		return false
+	}
+}
+
 // Defines values for ReadyPostgres.
 const (
 	ReadyPostgresDown ReadyPostgres = "down"
@@ -622,6 +766,87 @@ func (e ReadyStatus) Valid() bool {
 	case ReadyStatusReady:
 		return true
 	case ReadyStatusUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReportInputReason.
+const (
+	ReportInputReasonBrokenLink    ReportInputReason = "broken_link"
+	ReportInputReasonContentRating ReportInputReason = "content_rating"
+	ReportInputReasonMaliciousLink ReportInputReason = "malicious_link"
+	ReportInputReasonOther         ReportInputReason = "other"
+	ReportInputReasonPrivacy       ReportInputReason = "privacy"
+	ReportInputReasonRightsConcern ReportInputReason = "rights_concern"
+	ReportInputReasonSpam          ReportInputReason = "spam"
+)
+
+// Valid indicates whether the value is a known member of the ReportInputReason enum.
+func (e ReportInputReason) Valid() bool {
+	switch e {
+	case ReportInputReasonBrokenLink:
+		return true
+	case ReportInputReasonContentRating:
+		return true
+	case ReportInputReasonMaliciousLink:
+		return true
+	case ReportInputReasonOther:
+		return true
+	case ReportInputReasonPrivacy:
+		return true
+	case ReportInputReasonRightsConcern:
+		return true
+	case ReportInputReasonSpam:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReportInputTargetKind.
+const (
+	ReportInputTargetKindResource ReportInputTargetKind = "resource"
+	ReportInputTargetKindSource   ReportInputTargetKind = "source"
+)
+
+// Valid indicates whether the value is a known member of the ReportInputTargetKind enum.
+func (e ReportInputTargetKind) Valid() bool {
+	switch e {
+	case ReportInputTargetKindResource:
+		return true
+	case ReportInputTargetKindSource:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ReportPublicEventEventType.
+const (
+	ReportPublicEventEventTypeDismissed ReportPublicEventEventType = "dismissed"
+	ReportPublicEventEventTypeEscalated ReportPublicEventEventType = "escalated"
+	ReportPublicEventEventTypeResolved  ReportPublicEventEventType = "resolved"
+	ReportPublicEventEventTypeSubmitted ReportPublicEventEventType = "submitted"
+	ReportPublicEventEventTypeTriaged   ReportPublicEventEventType = "triaged"
+	ReportPublicEventEventTypeWithdrawn ReportPublicEventEventType = "withdrawn"
+)
+
+// Valid indicates whether the value is a known member of the ReportPublicEventEventType enum.
+func (e ReportPublicEventEventType) Valid() bool {
+	switch e {
+	case ReportPublicEventEventTypeDismissed:
+		return true
+	case ReportPublicEventEventTypeEscalated:
+		return true
+	case ReportPublicEventEventTypeResolved:
+		return true
+	case ReportPublicEventEventTypeSubmitted:
+		return true
+	case ReportPublicEventEventTypeTriaged:
+		return true
+	case ReportPublicEventEventTypeWithdrawn:
 		return true
 	default:
 		return false
@@ -883,10 +1108,53 @@ func (e GetContributionContextParamsRelationType) Valid() bool {
 	}
 }
 
+// Defines values for ListOwnReportsParamsStatus.
+const (
+	ListOwnReportsParamsStatusDismissed ListOwnReportsParamsStatus = "dismissed"
+	ListOwnReportsParamsStatusInReview  ListOwnReportsParamsStatus = "in_review"
+	ListOwnReportsParamsStatusOpen      ListOwnReportsParamsStatus = "open"
+	ListOwnReportsParamsStatusResolved  ListOwnReportsParamsStatus = "resolved"
+	ListOwnReportsParamsStatusWithdrawn ListOwnReportsParamsStatus = "withdrawn"
+)
+
+// Valid indicates whether the value is a known member of the ListOwnReportsParamsStatus enum.
+func (e ListOwnReportsParamsStatus) Valid() bool {
+	switch e {
+	case ListOwnReportsParamsStatusDismissed:
+		return true
+	case ListOwnReportsParamsStatusInReview:
+		return true
+	case ListOwnReportsParamsStatusOpen:
+		return true
+	case ListOwnReportsParamsStatusResolved:
+		return true
+	case ListOwnReportsParamsStatusWithdrawn:
+		return true
+	default:
+		return false
+	}
+}
+
 // Accepted defines model for Accepted.
 type Accepted struct {
 	Message string `json:"message"`
 }
+
+// ActiveRestriction defines model for ActiveRestriction.
+type ActiveRestriction struct {
+	ExpiresAt   *time.Time                  `json:"expires_at,omitempty"`
+	Id          string                      `json:"id"`
+	ReasonCode  ActiveRestrictionReasonCode `json:"reason_code"`
+	Scope       ActiveRestrictionScope      `json:"scope"`
+	StartsAt    time.Time                   `json:"starts_at"`
+	UserMessage string                      `json:"user_message"`
+}
+
+// ActiveRestrictionReasonCode defines model for ActiveRestriction.ReasonCode.
+type ActiveRestrictionReasonCode string
+
+// ActiveRestrictionScope defines model for ActiveRestriction.Scope.
+type ActiveRestrictionScope string
 
 // ApiError defines model for ApiError.
 type ApiError struct {
@@ -901,6 +1169,16 @@ type ApiErrorCode string
 type AuthMethods struct {
 	Password  bool             `json:"password"`
 	Providers []ProviderMethod `json:"providers"`
+}
+
+// BusinessQuota defines model for BusinessQuota.
+type BusinessQuota struct {
+	DailyLimit      int64 `json:"daily_limit"`
+	IntervalSeconds int64 `json:"interval_seconds"`
+	Pending         int64 `json:"pending"`
+	PendingLimit    int64 `json:"pending_limit"`
+	Remaining24h    int64 `json:"remaining_24h"`
+	RetryAfter      int64 `json:"retry_after"`
 }
 
 // CategoryItem defines model for CategoryItem.
@@ -1186,6 +1464,45 @@ type OAuthAuthorization struct {
 // OAuthProvider defines model for OAuthProvider.
 type OAuthProvider string
 
+// OwnGovernance defines model for OwnGovernance.
+type OwnGovernance struct {
+	ContributionQuota BusinessQuota       `json:"contribution_quota"`
+	ReportQuota       BusinessQuota       `json:"report_quota"`
+	Restrictions      []ActiveRestriction `json:"restrictions"`
+}
+
+// OwnReport defines model for OwnReport.
+type OwnReport struct {
+	Body       string              `json:"body"`
+	CreatedAt  time.Time           `json:"created_at"`
+	DecidedAt  *time.Time          `json:"decided_at,omitempty"`
+	Events     []ReportPublicEvent `json:"events"`
+	Id         string              `json:"id"`
+	Reason     OwnReportReason     `json:"reason"`
+	ResourceId string              `json:"resource_id"`
+	SourceId   *string             `json:"source_id,omitempty"`
+	Status     OwnReportStatus     `json:"status"`
+	Target     *ReportPublicTarget `json:"target,omitempty"`
+	TargetKind OwnReportTargetKind `json:"target_kind"`
+}
+
+// OwnReportReason defines model for OwnReport.Reason.
+type OwnReportReason string
+
+// OwnReportStatus defines model for OwnReport.Status.
+type OwnReportStatus string
+
+// OwnReportTargetKind defines model for OwnReport.TargetKind.
+type OwnReportTargetKind string
+
+// OwnReportList defines model for OwnReportList.
+type OwnReportList struct {
+	HasNext  bool        `json:"has_next"`
+	Items    []OwnReport `json:"items"`
+	Page     int64       `json:"page"`
+	PageSize int64       `json:"page_size"`
+}
+
 // PasswordChange defines model for PasswordChange.
 type PasswordChange struct {
 	CurrentPassword *string `json:"current_password,omitempty"`
@@ -1247,6 +1564,50 @@ type ReadyStatus string
 // Reauthentication defines model for Reauthentication.
 type Reauthentication struct {
 	Password *string `json:"password,omitempty"`
+}
+
+// ReportInput defines model for ReportInput.
+type ReportInput struct {
+	Body       string                `json:"body"`
+	Reason     ReportInputReason     `json:"reason"`
+	RequestId  string                `json:"request_id"`
+	ResourceId string                `json:"resource_id"`
+	SourceId   *string               `json:"source_id,omitempty"`
+	TargetKind ReportInputTargetKind `json:"target_kind"`
+}
+
+// ReportInputReason defines model for ReportInput.Reason.
+type ReportInputReason string
+
+// ReportInputTargetKind defines model for ReportInput.TargetKind.
+type ReportInputTargetKind string
+
+// ReportPublicEvent defines model for ReportPublicEvent.
+type ReportPublicEvent struct {
+	EventType   ReportPublicEventEventType `json:"event_type"`
+	OccurredAt  time.Time                  `json:"occurred_at"`
+	SafeMessage *string                    `json:"safe_message,omitempty"`
+}
+
+// ReportPublicEventEventType defines model for ReportPublicEvent.EventType.
+type ReportPublicEventEventType string
+
+// ReportPublicTarget defines model for ReportPublicTarget.
+type ReportPublicTarget struct {
+	Name       string  `json:"name"`
+	ResourceId string  `json:"resource_id"`
+	Slug       string  `json:"slug"`
+	SourceId   *string `json:"source_id,omitempty"`
+}
+
+// ReportWithdrawal defines model for ReportWithdrawal.
+type ReportWithdrawal struct {
+	RequestId string `json:"request_id"`
+}
+
+// RequestReceipt defines model for RequestReceipt.
+type RequestReceipt struct {
+	Id string `json:"id"`
 }
 
 // ResetRequest defines model for ResetRequest.
@@ -1521,6 +1882,22 @@ type UpdateProfileParams struct {
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
 }
 
+// ListOwnReportsParams defines parameters for ListOwnReports.
+type ListOwnReportsParams struct {
+	Page     *int64                      `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *int                        `form:"page_size,omitempty" json:"page_size,omitempty"`
+	Status   *ListOwnReportsParamsStatus `form:"status,omitempty" json:"status,omitempty"`
+}
+
+// ListOwnReportsParamsStatus defines parameters for ListOwnReports.
+type ListOwnReportsParamsStatus string
+
+// WithdrawReportParams defines parameters for WithdrawReport.
+type WithdrawReportParams struct {
+	// XCSRFToken Obtain from GET /auth/csrf for the current session. Exact PUBLIC_ORIGIN is also required.
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
 // RevokeOtherSessionsParams defines parameters for RevokeOtherSessions.
 type RevokeOtherSessionsParams struct {
 	// XCSRFToken Obtain from GET /auth/csrf for the current session. Exact PUBLIC_ORIGIN is also required.
@@ -1529,6 +1906,12 @@ type RevokeOtherSessionsParams struct {
 
 // RevokeSessionParams defines parameters for RevokeSession.
 type RevokeSessionParams struct {
+	// XCSRFToken Obtain from GET /auth/csrf for the current session. Exact PUBLIC_ORIGIN is also required.
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// SubmitReportParams defines parameters for SubmitReport.
+type SubmitReportParams struct {
 	// XCSRFToken Obtain from GET /auth/csrf for the current session. Exact PUBLIC_ORIGIN is also required.
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
 }
@@ -1579,6 +1962,12 @@ type SubmitContributionJSONRequestBody = SubmitContribution
 
 // UpdateProfileJSONRequestBody defines body for UpdateProfile for application/json ContentType.
 type UpdateProfileJSONRequestBody = ProfileUpdate
+
+// WithdrawReportJSONRequestBody defines body for WithdrawReport for application/json ContentType.
+type WithdrawReportJSONRequestBody = ReportWithdrawal
+
+// SubmitReportJSONRequestBody defines body for SubmitReport for application/json ContentType.
+type SubmitReportJSONRequestBody = ReportInput
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
@@ -1658,8 +2047,20 @@ type ServerInterface interface {
 	// (POST /me/contributions/{contribution_id}/withdraw)
 	WithdrawContribution(c fiber.Ctx, contributionId string, params WithdrawContributionParams) error
 
+	// (GET /me/governance)
+	GetOwnGovernance(c fiber.Ctx) error
+
 	// (PATCH /me/profile)
 	UpdateProfile(c fiber.Ctx, params UpdateProfileParams) error
+
+	// (GET /me/reports)
+	ListOwnReports(c fiber.Ctx, params ListOwnReportsParams) error
+
+	// (GET /me/reports/{id})
+	GetOwnReport(c fiber.Ctx, id string) error
+
+	// (POST /me/reports/{id}/withdraw)
+	WithdrawReport(c fiber.Ctx, id string, params WithdrawReportParams) error
 
 	// (GET /me/sessions)
 	ListSessions(c fiber.Ctx) error
@@ -1669,6 +2070,9 @@ type ServerInterface interface {
 
 	// (DELETE /me/sessions/{session_id})
 	RevokeSession(c fiber.Ctx, sessionId string, params RevokeSessionParams) error
+
+	// (POST /reports)
+	SubmitReport(c fiber.Ctx, params SubmitReportParams) error
 
 	// (GET /resources)
 	ListResources(c fiber.Ctx, params ListResourcesParams) error
@@ -2594,6 +2998,24 @@ func (siw *ServerInterfaceWrapper) WithdrawContribution(c fiber.Ctx) error {
 	return handler(c)
 }
 
+// GetOwnGovernance operation middleware
+func (siw *ServerInterfaceWrapper) GetOwnGovernance(c fiber.Ctx) error {
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.GetOwnGovernance(c)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
 // UpdateProfile operation middleware
 func (siw *ServerInterfaceWrapper) UpdateProfile(c fiber.Ctx) error {
 
@@ -2626,6 +3048,139 @@ func (siw *ServerInterfaceWrapper) UpdateProfile(c fiber.Ctx) error {
 
 	handler := func(c fiber.Ctx) error {
 		return siw.Handler.UpdateProfile(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// ListOwnReports operation middleware
+func (siw *ServerInterfaceWrapper) ListOwnReports(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListOwnReportsParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", query, &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page_size" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page_size", query, &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page_size: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", query, &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter status: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.ListOwnReports(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// GetOwnReport operation middleware
+func (siw *ServerInterfaceWrapper) GetOwnReport(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Params("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter id: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.GetOwnReport(c, id)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// WithdrawReport operation middleware
+func (siw *ServerInterfaceWrapper) WithdrawReport(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "id" -------------
+	var id string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "id", c.Params("id"), &id, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params WithdrawReportParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.WithdrawReport(c, id, params)
 	}
 
 	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
@@ -2742,6 +3297,51 @@ func (siw *ServerInterfaceWrapper) RevokeSession(c fiber.Ctx) error {
 
 	handler := func(c fiber.Ctx) error {
 		return siw.Handler.RevokeSession(c, sessionId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// SubmitReport operation middleware
+func (siw *ServerInterfaceWrapper) SubmitReport(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SubmitReportParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.SubmitReport(c, params)
 	}
 
 	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
@@ -3005,5 +3605,15 @@ func RegisterHandlersWithOptions(router fiber.Router, si ServerInterface, option
 	router.Get(options.BaseURL+"/me/contributions/:contribution_id", wrapper.GetMyContribution)
 
 	router.Post(options.BaseURL+"/me/contributions/:contribution_id/withdraw", wrapper.WithdrawContribution)
+
+	router.Post(options.BaseURL+"/reports", wrapper.SubmitReport)
+
+	router.Get(options.BaseURL+"/me/reports", wrapper.ListOwnReports)
+
+	router.Get(options.BaseURL+"/me/reports/:id", wrapper.GetOwnReport)
+
+	router.Post(options.BaseURL+"/me/reports/:id/withdraw", wrapper.WithdrawReport)
+
+	router.Get(options.BaseURL+"/me/governance", wrapper.GetOwnGovernance)
 
 }

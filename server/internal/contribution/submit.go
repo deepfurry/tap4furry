@@ -12,6 +12,7 @@ import (
 
 	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/deepfurry/tap4furry/server/internal/database/sqlc"
+	"github.com/deepfurry/tap4furry/server/internal/governance"
 	"github.com/deepfurry/tap4furry/server/internal/resource"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -50,15 +51,15 @@ func (a *App) Context(ctx context.Context, actor auth.Actor, slug string) (EditC
 	return out, err
 }
 func retry(t, now time.Time) int { return max(1, int(math.Ceil(t.Sub(now).Seconds()))) }
-func checkQuota(quota sqlc.ContributionQuotaRow, now time.Time) error {
-	if quota.Pending >= 5 {
+func checkQuota(quota sqlc.ContributionQuotaRow, now time.Time, budget governance.Budget) error {
+	if quota.Pending >= budget.Pending {
 		return &LimitError{Reason: "pending_limit"}
 	}
-	if quota.Recent >= 10 {
+	if quota.Recent >= budget.Daily {
 		return &LimitError{Reason: "daily_limit", RetryAfter: retry(quota.FirstAt.Time.Add(24*time.Hour), now)}
 	}
-	if quota.LastAt.Valid && now.Before(quota.LastAt.Time.Add(time.Minute)) {
-		return &LimitError{Reason: "submission_interval", RetryAfter: retry(quota.LastAt.Time.Add(time.Minute), now)}
+	if quota.LastAt.Valid && now.Before(quota.LastAt.Time.Add(budget.Interval)) {
+		return &LimitError{Reason: "submission_interval", RetryAfter: retry(quota.LastAt.Time.Add(budget.Interval), now)}
 	}
 	return nil
 }
@@ -92,11 +93,18 @@ func (a *App) Submit(ctx context.Context, actor auth.Actor, input SubmitInput) (
 		if !errors.Is(err, pgx.ErrNoRows) {
 			return err
 		}
+		if err = governance.CheckTx(ctx, q, actor.UserID, governance.ContributionSubmit, now); err != nil {
+			return err
+		}
+		budget, err := governance.BudgetTx(ctx, q, actor.UserID)
+		if err != nil {
+			return err
+		}
 		quota, err := q.ContributionQuota(ctx, sqlc.ContributionQuotaParams{AuthorID: id(actor.UserID), Now: stamp(now)})
 		if err != nil {
 			return err
 		}
-		if err = checkQuota(quota, now); err != nil {
+		if err = checkQuota(quota, now, budget); err != nil {
 			return err
 		}
 		if in.PreviousID != uuid.Nil() {

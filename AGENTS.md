@@ -7,6 +7,7 @@ MAIL-0 adds Resend; P0-2A adds Resource/Taxonomy schema and domain primitives.
 P0-2B adds anonymous Resource reads and Astro SSR; P0-2C adds Admin curation.
 P0-3A (roadmap 1.1) adds typed Resource proposals and atomic Editorial review.
 P0-3B (roadmap 1.2) completes Source/Tag/Relation/Translation proposals.
+P0-6 (roadmap 1.3) adds private reports, scoped governance and canonical audits.
 
 ## Start here
 
@@ -70,7 +71,8 @@ are pattern references only and never override this repository.
   successful mutations refetch, never retry or optimistically reconstruct canonical state.
 - Resource pages are Astro SSR without islands. Only server helpers read
   `API_INTERNAL_ORIGIN`; no credentials are forwarded. Markdown.astro is the sole
-  audited sanitized HTML sink. Errors are no-store/noindex; success uses short shared cache.
+  audited sanitized HTML sink. P0-6 makes all Resource/taxonomy reads and Resource
+  SSR no-store; error pages remain noindex.
 - P0-3A adds migration 7 only; migrations 1–6 and Resource Core grants remain immutable.
   Contribution writes lock the current User, revalidate sessions/capabilities and
   serialize quotas or proposal decisions. Acceptance joins `curation.ApplyReviewedTx`
@@ -86,6 +88,13 @@ are pattern references only and never override this repository.
   presence bits preserve omission/null/raw locale values. Private projections use
   one canonical snapshot and fresh authorization before return. No Source hard-delete,
   rights proposal, taxonomy creation or separate review system.
+- P0-6 adds migration 9 only and preserves migrations 1–8 and existing grants.
+  Governance policy/audit primitives cannot import application boundaries; moderation
+  composes the closed transactional use cases. User governance locks both Users in
+  UUID order before live authorization; report decisions lock Report before Resource.
+  Profile writes revalidate sessions/restrictions in the User-locked transaction.
+  Business restrictions preserve reporting, Auth/security, own history/withdrawal and
+  indexing opt-out. No automatic sanctions/trust, URL fetches, jobs or Redis keys.
 - Auth owns transactions and the challenge-mail interface. Raw challenge tokens
   never enter jobs; mail delivers once after commit to Resend or private local capture.
   Production requires explicit Resend config; provider payloads/errors stay private.

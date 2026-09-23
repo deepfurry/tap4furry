@@ -1,5 +1,7 @@
 import { DirtyFormGuard } from '../../components/admin/DirtyFormGuard';
 import { useState } from 'react';
+import { flushSync } from 'react-dom';
+import { DistributionPanel } from '../governance/DistributionPanel';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import {
@@ -24,7 +26,8 @@ export function ResourceOverviewPage() {
   const roles = useRoles();
   const navigate = useNavigate();
   const [dirty, setDirty] = useState(false);
-  const blocker = useDirtyGuard(dirty);
+  const [reason, setReason] = useState('');
+  const blocker = useDirtyGuard(dirty || !!reason);
   const categories = useQuery({
     queryKey: keys.categories,
     queryFn: async () => result(await listCategories(readOptions)),
@@ -39,12 +42,27 @@ export function ResourceOverviewPage() {
   );
   const publication = useCanonicalMutation(async (state: PublicationState) =>
     result(
-      await setPublication(r.id, { state }, { expected_version: r.version }, await writeOptions()),
+      await setPublication(
+        r.id,
+        { state, ...(reason.trim() && { reason: reason.trim() }) },
+        { expected_version: r.version },
+        await writeOptions(),
+      ),
     ),
   );
   const deletion = useCanonicalMutation(async () => {
-    result(await deleteResource(r.id, { expected_version: r.version }, await writeOptions()));
-    setDirty(false);
+    result(
+      await deleteResource(
+        r.id,
+        { reason: reason.trim() },
+        { expected_version: r.version },
+        await writeOptions(),
+      ),
+    );
+    flushSync(() => {
+      setDirty(false);
+      setReason('');
+    });
     await navigate({ to: '/resources' });
   });
   const error = mutation.error ?? publication.error ?? deletion.error;
@@ -139,6 +157,11 @@ export function ResourceOverviewPage() {
       </Panel>
       <Panel title="Publication">
         <p>Current: {r.publication_state}</p>
+        {canAdministrate(roles) && (
+          <Field label="Governance reason for publication changes or soft deletion">
+            <textarea maxLength={1000} value={reason} onChange={(e) => setReason(e.target.value)} />
+          </Field>
+        )}
         {r.published_at && <p>First published: {new Date(r.published_at).toLocaleString()}</p>}
         <div className="flex flex-wrap gap-3">
           {actions
@@ -155,7 +178,8 @@ export function ResourceOverviewPage() {
                   blocked ||
                   dirty ||
                   !canEditorial(roles) ||
-                  (governed && !canAdministrate(roles))
+                  (governed && !canAdministrate(roles)) ||
+                  ((governed || ['restricted', 'removed'].includes(action.state)) && !reason.trim())
                 }
                 onClick={() => publication.mutate(action.state)}
               >
@@ -176,16 +200,18 @@ export function ResourceOverviewPage() {
           </p>
           <ConfirmDialog
             slug={r.slug}
-            disabled={pending || blocked || dirty}
+            disabled={pending || blocked || dirty || !reason.trim()}
             onConfirm={() => deletion.mutate()}
           />
         </Panel>
       )}
+      {canAdministrate(roles) && <DistributionPanel resource={r} reload={reload} />}
       <MutationStatus
         error={error}
         success={mutation.isSuccess}
         reload={() => {
           setDirty(false);
+          setReason('');
           void reload();
         }}
       />

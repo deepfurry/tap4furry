@@ -1,0 +1,5 @@
+---
+import AccountLayout from '../../layouts/AccountLayout.astro';
+import { ReportDetail } from '../../components/reports/Reports';
+---
+<AccountLayout title="Your report" description="View your original report and safe processing updates."><ReportDetail id={Astro.params.id ?? ''} client:load /></AccountLayout>

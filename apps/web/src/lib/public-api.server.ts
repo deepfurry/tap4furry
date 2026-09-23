@@ -1,7 +1,7 @@
 import { getGetResourceUrl, getListResourcesUrl } from '@tap4furry/api-client/public';
 import type { ResourceDetail, ResourceList } from '@tap4furry/api-client/public';
 
-export const PUBLIC_READ_CACHE = 'public, max-age=0, s-maxage=60, stale-while-revalidate=30';
+export const PUBLIC_READ_CACHE = 'no-store';
 export type ReadResult<T> = { status: 200; data: T } | { status: 400 | 404 | 503 };
 export interface ReadQuery { locale: string; explicitLocale: boolean; page: number }
 

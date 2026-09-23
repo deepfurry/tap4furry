@@ -74,7 +74,8 @@ SQL filters hidden nodes/Source governance/Relation endpoints and signals missin
 canonical localizations. Public DTOs omit internal governance fields. Anonymous Astro
 SSR calls `API_INTERNAL_ORIGIN` with generated URL builders and no browser credentials.
 Markdown is rendered/sanitized server-side into exactly one audited HTML sink; these
-pages have no React islands. Public cache headers are short-lived; all errors no-store.
+pages have no React islands. P0-6 sets all four reads and Resource SSR to no-store,
+including successes, so new requests observe committed governance.
 
 OpenAPI owns Go transport and TypeScript clients. Goose migrations plus SQL queries
 own sqlc output. Generated files are committed, reviewed, and never manually edited.
@@ -98,6 +99,15 @@ submitted endpoint versions before writing canonical state and per-resource audi
 Private multi-query projections use REPEATABLE READ followed by fresh READ COMMITTED
 authorization; the transactions are sequential, without holding a second pool connection.
 All mutations remain READ COMMITTED with User/session/capability revalidation.
+
+P0-6 adds `governance` policy/audit primitives and the `moderation` application.
+Reports and four-operation canonical resolutions commit atomically; private reads
+use consistent projection plus fresh authorization. User restrictions/trust updates
+lock both Users in UUID order. Public profile mutation now uses an authorized,
+User-locked transaction. Reporting, security and privacy opt-out stay available.
+Manual Source checks never fetch URLs; recommendation eligibility is a separate,
+tested policy, with no ranking or Search domain. Migration 9 adds eight tables,
+preserving all previous migrations/ACLs. `database/governancecheck` is developer-only.
 
 Public web uses anonymous Astro Node SSR with isolated React interaction; Admin is
 a React SPA. Apps use API-client facades, never deep generated imports or direct DB

@@ -10,3 +10,6 @@ export { getContributionContext, submitContribution, listMyContributions, getMyC
 export type { ContributionContent, ContributionOriginal, ContributionContext, ContributionDetail, ContributionList, ContributionKind, ContributionStatus, SubmitContribution } from './generated/public/client';
 
 export type { ContributionChange, ContributionChangeSource, ContributionChangeTranslation, ContributionChangeRelation, GetContributionContextParams } from './generated/public/client';
+
+export { submitReport,listOwnReports,getOwnReport,withdrawReport,getOwnGovernance } from './generated/public/client';
+export type { ReportInput,OwnReport,OwnReportList,OwnReportStatus,OwnGovernance,ActiveRestriction,BusinessQuota } from './generated/public/client';

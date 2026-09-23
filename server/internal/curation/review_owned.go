@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/deepfurry/tap4furry/server/internal/database/sqlc"
+	"github.com/deepfurry/tap4furry/server/internal/governance"
 	"github.com/deepfurry/tap4furry/server/internal/resource"
 	"github.com/jackc/pgx/v5"
 	"slices"
@@ -30,7 +31,7 @@ type ReviewedOwnedResult struct {
 
 // ApplyReviewedOwnedTx never commits. Canonical writes and the proposal decision
 // share the caller's transaction, but authorization remains mandatory here.
-func ApplyReviewedOwnedTx(ctx context.Context, tx pgx.Tx, actor auth.AdminActor, anchor uuid.UUID, expected int64, in ReviewedOwnedChange) (ReviewedOwnedResult, error) {
+func ApplyReviewedOwnedTx(ctx context.Context, tx pgx.Tx, actor auth.AdminActor, anchor uuid.UUID, expected int64, in ReviewedOwnedChange, contributionID uuid.UUID) (ReviewedOwnedResult, error) {
 	var out ReviewedOwnedResult
 	if _, err := auth.RequireAdminCapabilityTx(ctx, tx, actor, auth.Editorial); err != nil {
 		return out, err
@@ -178,6 +179,18 @@ func ApplyReviewedOwnedTx(ctx context.Context, tx pgx.Tx, actor auth.AdminActor,
 	for _, key := range ids {
 		rev, e := bump(ctx, q, key, versions[key])
 		if e != nil {
+			return out, safe(e)
+		}
+		op, field := "source", "sources"
+		switch in.Kind {
+		case "add_tag":
+			op, field = "tags", "tags"
+		case "add_relation":
+			op, field = "relation", "relations"
+		case "add_translation":
+			op, field = "localization", "localization"
+		}
+		if _, e = governance.Record(ctx, q, actor.UserID, governance.Change{Operation: op, ResourceID: key, SourceID: out.SourceID, ContributionID: contributionID, BeforeVersion: versions[key], AfterVersion: rev.Version, Fields: []string{field}}); e != nil {
 			return out, safe(e)
 		}
 		out.Revisions = append(out.Revisions, rev)

@@ -1,5 +1,6 @@
 import { DirtyFormGuard } from '../../components/admin/DirtyFormGuard';
 import { useState } from 'react';
+import { flushSync } from 'react-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useNavigate, useParams } from '@tanstack/react-router';
 import {
@@ -51,7 +52,8 @@ function TaxonomyEditor({ kind, entity: e }: { kind: TaxonomyKind; entity: Taxon
   const [locale, setLocale] = useState(e.default_locale);
   const [adding, setAdding] = useState(false);
   const [dirty, setDirty] = useState(false);
-  const blocker = useDirtyGuard(dirty);
+  const [reason, setReason] = useState('');
+  const blocker = useDirtyGuard(dirty || !!reason);
   const selected = e.localizations.find((item) => item.locale === locale);
   const mutation = useCanonicalMutation(
     async (action: {
@@ -82,7 +84,7 @@ function TaxonomyEditor({ kind, entity: e }: { kind: TaxonomyKind; entity: Taxon
         return result(
           await (kind === 'categories' ? patchCategory : patchTag)(
             e.id,
-            { state: e.state === 'active' ? 'retired' : 'active' },
+            { state: e.state === 'active' ? 'retired' : 'active', reason: reason.trim() },
             options,
           ),
         );
@@ -94,8 +96,17 @@ function TaxonomyEditor({ kind, entity: e }: { kind: TaxonomyKind; entity: Taxon
             options,
           ),
         );
-      result(await (kind === 'categories' ? deleteCategory : deleteTag)(e.id, options));
-      setDirty(false);
+      result(
+        await (kind === 'categories' ? deleteCategory : deleteTag)(
+          e.id,
+          { reason: reason.trim() },
+          options,
+        ),
+      );
+      flushSync(() => {
+        setDirty(false);
+        setReason('');
+      });
       await navigate({ to: kind === 'categories' ? '/taxonomy/categories' : '/taxonomy/tags' });
     },
     () => setDirty(false),
@@ -185,12 +196,20 @@ function TaxonomyEditor({ kind, entity: e }: { kind: TaxonomyKind; entity: Taxon
         )}
       </Panel>
       <Panel title="Governance">
+        <Field label="Governance reason">
+          <textarea
+            maxLength={1000}
+            value={reason}
+            onChange={(e) => setReason(e.target.value)}
+            disabled={!canAdministrate(roles)}
+          />
+        </Field>
         <p>
           Administration capability required. Retired taxonomy keeps existing bindings and cannot
           accept new bindings.
         </p>
         <Button
-          disabled={!canAdministrate(roles) || dirty || mutation.isPending}
+          disabled={!canAdministrate(roles) || dirty || mutation.isPending || !reason.trim()}
           onClick={() => mutation.mutate({ kind: 'state' })}
         >
           {e.state === 'active' ? 'Retire' : 'Reactivate'}
@@ -201,7 +220,7 @@ function TaxonomyEditor({ kind, entity: e }: { kind: TaxonomyKind; entity: Taxon
           <p>Soft deletion is blocked while any non-deleted Resource uses this taxonomy.</p>
           <ConfirmDialog
             slug={e.slug}
-            disabled={dirty || mutation.isPending}
+            disabled={dirty || mutation.isPending || !reason.trim()}
             onConfirm={() => mutation.mutate({ kind: 'delete' })}
           />
         </Panel>

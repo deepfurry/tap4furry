@@ -44,6 +44,37 @@
   revision explanations, dirty guards and conflict preservation remain mandatory;
   anonymous Resource SSR and its sole sanitized HTML sink are unchanged.
 
+## P0-6 reports and governance
+
+- `governance` owns fixed quotas, effective restriction checks and typed audit writes;
+  it does not import Auth, Identity, Curation, Contribution or transport. `moderation`
+  orchestrates those boundaries. Contribution/Curation never import moderation.
+- Reports use current public Resource/Source eligibility, immutable originals and
+  independent 10/day, 5 active, 60-second quotas. Private author DTOs omit staff notes,
+  identities and hidden canonical data. Staff decisions require report CAS and reject
+  self-review; only Administration resolves sensitive cases or reads global audits.
+- Composite report resolution locks User, Report, then Resource and joins only the
+  four closed `curation.ApplyGovernanceTx` operations. Audit, action, canonical change
+  and report event commit together. Duplicate-report links lock both UUIDs in order.
+- User governance locks actor and target Users in UUID order before checking live
+  session/capability. Restrictions and fixed trust budgets use configuration CAS;
+  expiry is evaluated with database time after locks. No automatic trust or account ban.
+- Protected profile writes now pass through moderation and revalidate the Public
+  session under User lock before `identity.ApplyProfileTx`. `all_write` covers only
+  contribution submission and public profile edits; reporting, Auth/security, own
+  history/withdrawal and disabling indexing remain available. Mixed requests reject
+  atomically. Existing successful contribution replay precedes restriction checking.
+- Every actual canonical mutation, including reviewed proposals, appends typed audit
+  in the same transaction. No-op leaves version/time/audit unchanged. Governance
+  reasons are mandatory for rights, restricted/removed transitions, retirement and
+  soft deletion; existing endpoints use the same audited application paths.
+- Manual source observations bind current Resource CAS and normalized URL fingerprint;
+  no URL is fetched. Observation alone never bumps Resource; Editorial may explicitly
+  update availability in the same transaction. It never overrides rights.
+- Recommendation eligibility is separate from public display: canonical/public,
+  general, active, active category, not excluded, and an active confirmed or
+  creator-provided Source. SQL and pure policy are tested together. No search or ranking.
+
 ## Core boundaries
 
 - One Go module, three runtime processes: Public API, Admin API, Worker.
@@ -126,6 +157,8 @@
 - Markdown-it disables raw HTML/linkify/typographer; sanitize-html allowlists content,
   protocols and attributes. No images/MDX. Only Markdown.astro has `set:html` and server
   helpers cannot be imported by browser modules/scripts.
-- API/page success uses `public, max-age=0, s-maxage=60, stale-while-revalidate=30`;
-  errors use no-store, SSR errors also noindex. SEO uses the fixed production site,
+- P0-6 changes all four anonymous read endpoints and Resource SSR success to
+  `no-store` so subsequent requests observe committed governance. Existing caches
+  require expiry/purge before deployment; responses cannot erase loaded content.
+  Errors also use no-store, SSR errors noindex. SEO uses the fixed production site,
   excludes locale from canonical, and includes page only above 1. No Accept-Language Vary.

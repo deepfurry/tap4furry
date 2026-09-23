@@ -47,6 +47,14 @@ old-proposal preservation and 8→7→8 acceptance. Shared checks assert Goose=8
 unchanged Resource Core grants and all ten Contribution table/column grant matrices;
 cleanup remains restricted to owned fixture IDs. No new smoke command or Infra changes.
 
+P0-6 extends the same Admin smoke with private report handling, live role boundaries,
+restricted business writes with protected channels, fixed trust quotas, manual source
+observations, recommendation exclusion, no-store Public visibility and business audit.
+It reuses the temporary accounts, cleans only owned records and asserts Goose=9 and
+the exact new column grants. Existing Resource/identity grants and private inputs
+remain unchanged. Disposable tests also exercise authorization/restriction races,
+audit failure rollback, report terminal competition and migration 9 downgrade refusal.
+
 `ADMIN_CSRF_SECRET` is separate from Public `CSRF_SECRET`; API/Admin share
 `AUTH_THROTTLE_SECRET`. Production requires explicit private values of at least
 32 bytes; development/test have public defaults. Existing private files stay intact.

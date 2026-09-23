@@ -34,6 +34,929 @@ type NonReadonly<T> = [T] extends [UnionToIntersection<T>]
     }
   : DistributeReadOnlyOverUnions<T>;
 
+export interface GovernanceReason {
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  reason: string;
+}
+
+export interface RequestReceipt {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  id: string;
+}
+
+export type ReportStaffEventEventType =
+  (typeof ReportStaffEventEventType)[keyof typeof ReportStaffEventEventType];
+
+export const ReportStaffEventEventType = {
+  submitted: "submitted",
+  triaged: "triaged",
+  escalated: "escalated",
+  noted: "noted",
+  resolved: "resolved",
+  dismissed: "dismissed",
+  withdrawn: "withdrawn",
+} as const;
+
+export type ReportStaffEventResolutionType =
+  (typeof ReportStaffEventResolutionType)[keyof typeof ReportStaffEventResolutionType];
+
+export const ReportStaffEventResolutionType = {
+  no_change: "no_change",
+  link_audit: "link_audit",
+  publication: "publication",
+  source_availability: "source_availability",
+  source_rights: "source_rights",
+  distribution: "distribution",
+} as const;
+
+export interface ReportStaffEvent {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  id: string;
+  event_type: ReportStaffEventEventType;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  actor_id: string;
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  safe_message?: string;
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  internal_note?: string;
+  occurred_at: string;
+  audit_id?: string;
+  resolution_type?: ReportStaffEventResolutionType;
+}
+
+export type AdminReportTargetKind =
+  (typeof AdminReportTargetKind)[keyof typeof AdminReportTargetKind];
+
+export const AdminReportTargetKind = {
+  resource: "resource",
+  source: "source",
+} as const;
+
+export type AdminReportReason =
+  (typeof AdminReportReason)[keyof typeof AdminReportReason];
+
+export const AdminReportReason = {
+  broken_link: "broken_link",
+  rights_concern: "rights_concern",
+  malicious_link: "malicious_link",
+  privacy: "privacy",
+  content_rating: "content_rating",
+  spam: "spam",
+  other: "other",
+} as const;
+
+export type AdminReportStatus =
+  (typeof AdminReportStatus)[keyof typeof AdminReportStatus];
+
+export const AdminReportStatus = {
+  open: "open",
+  in_review: "in_review",
+  resolved: "resolved",
+  dismissed: "dismissed",
+  withdrawn: "withdrawn",
+} as const;
+
+export type AdminReportQueue =
+  (typeof AdminReportQueue)[keyof typeof AdminReportQueue];
+
+export const AdminReportQueue = {
+  moderation: "moderation",
+  administration: "administration",
+} as const;
+
+export interface AdminReport {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  id: string;
+  target_kind: AdminReportTargetKind;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  resource_id: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  source_id?: string;
+  reason: AdminReportReason;
+  /**
+   * @minLength 1
+   * @maxLength 4000
+   */
+  body: string;
+  status: AdminReportStatus;
+  created_at: string;
+  decided_at?: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  reporter_id: string;
+  /** @minimum 1 */
+  version: number;
+  queue: AdminReportQueue;
+  /** @minimum 0 */
+  priority: number;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  duplicate_of?: string;
+  events: ReportStaffEvent[];
+}
+
+export interface AdminReportList {
+  items: AdminReport[];
+  /** @minimum 1 */
+  page: number;
+  /** @minimum 1 */
+  page_size: number;
+  has_next: boolean;
+}
+
+export type ReportTriageAction =
+  (typeof ReportTriageAction)[keyof typeof ReportTriageAction];
+
+export const ReportTriageAction = {
+  receive: "receive",
+  escalate: "escalate",
+  note: "note",
+} as const;
+
+export interface ReportTriage {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  request_id: string;
+  /** @minimum 1 */
+  expected_report_version: number;
+  action: ReportTriageAction;
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  internal_note?: string;
+}
+
+export interface ReportDismiss {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  request_id: string;
+  /** @minimum 1 */
+  expected_report_version: number;
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  safe_message: string;
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  internal_note?: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  duplicate_of?: string;
+}
+
+export type ReportResolveMode =
+  (typeof ReportResolveMode)[keyof typeof ReportResolveMode];
+
+export const ReportResolveMode = {
+  no_change: "no_change",
+  link_audit: "link_audit",
+  publication: "publication",
+  source_availability: "source_availability",
+  source_rights: "source_rights",
+  distribution: "distribution",
+} as const;
+
+export type ReportResolvePublicationState =
+  (typeof ReportResolvePublicationState)[keyof typeof ReportResolvePublicationState];
+
+export const ReportResolvePublicationState = {
+  draft: "draft",
+  pending: "pending",
+  published: "published",
+  restricted: "restricted",
+  removed: "removed",
+} as const;
+
+export type ReportResolveAvailabilityState =
+  (typeof ReportResolveAvailabilityState)[keyof typeof ReportResolveAvailabilityState];
+
+export const ReportResolveAvailabilityState = {
+  active: "active",
+  unavailable: "unavailable",
+  broken: "broken",
+  restricted: "restricted",
+  removed: "removed",
+} as const;
+
+export type ReportResolveRightsStatus =
+  (typeof ReportResolveRightsStatus)[keyof typeof ReportResolveRightsStatus];
+
+export const ReportResolveRightsStatus = {
+  unknown: "unknown",
+  creator_provided: "creator_provided",
+  confirmed: "confirmed",
+  rights_review: "rights_review",
+  disputed: "disputed",
+  removed_by_request: "removed_by_request",
+} as const;
+
+export type ReportResolvePolicy =
+  (typeof ReportResolvePolicy)[keyof typeof ReportResolvePolicy];
+
+export const ReportResolvePolicy = {
+  normal: "normal",
+  excluded: "excluded",
+} as const;
+
+export interface ReportResolve {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  request_id: string;
+  /** @minimum 1 */
+  expected_report_version: number;
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  safe_message: string;
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  internal_note?: string;
+  mode: ReportResolveMode;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  audit_id?: string;
+  /** @minimum 1 */
+  expected_resource_version?: number;
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  reason?: string;
+  publication_state?: ReportResolvePublicationState;
+  availability_state?: ReportResolveAvailabilityState;
+  rights_status?: ReportResolveRightsStatus;
+  policy?: ReportResolvePolicy;
+}
+
+export type AdminRestrictionScope =
+  (typeof AdminRestrictionScope)[keyof typeof AdminRestrictionScope];
+
+export const AdminRestrictionScope = {
+  contribution_submit: "contribution_submit",
+  public_profile_write: "public_profile_write",
+  all_write: "all_write",
+} as const;
+
+export type AdminRestrictionReasonCode =
+  (typeof AdminRestrictionReasonCode)[keyof typeof AdminRestrictionReasonCode];
+
+export const AdminRestrictionReasonCode = {
+  spam: "spam",
+  abuse: "abuse",
+  repeated_policy_violation: "repeated_policy_violation",
+  other: "other",
+} as const;
+
+export interface AdminRestriction {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  id: string;
+  scope: AdminRestrictionScope;
+  reason_code: AdminRestrictionReasonCode;
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  user_message: string;
+  starts_at: string;
+  expires_at?: string;
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  internal_note?: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  created_by: string;
+  revoked_at?: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  revoked_by?: string;
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  revoke_reason?: string;
+}
+
+export type UserGovernanceTrustLevel =
+  (typeof UserGovernanceTrustLevel)[keyof typeof UserGovernanceTrustLevel];
+
+export const UserGovernanceTrustLevel = {
+  new: "new",
+  established: "established",
+  trusted: "trusted",
+} as const;
+
+export interface UserGovernance {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  user_id: string;
+  trust_level: UserGovernanceTrustLevel;
+  /** @minimum 0 */
+  revision: number;
+  restrictions: AdminRestriction[];
+}
+
+export type TrustUpdateTrustLevel =
+  (typeof TrustUpdateTrustLevel)[keyof typeof TrustUpdateTrustLevel];
+
+export const TrustUpdateTrustLevel = {
+  new: "new",
+  established: "established",
+  trusted: "trusted",
+} as const;
+
+export interface TrustUpdate {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  request_id: string;
+  /** @minimum 0 */
+  expected_revision: number;
+  trust_level: TrustUpdateTrustLevel;
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  reason: string;
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  internal_note?: string;
+}
+
+export type RestrictionCreateScope =
+  (typeof RestrictionCreateScope)[keyof typeof RestrictionCreateScope];
+
+export const RestrictionCreateScope = {
+  contribution_submit: "contribution_submit",
+  public_profile_write: "public_profile_write",
+  all_write: "all_write",
+} as const;
+
+export type RestrictionCreateDuration =
+  (typeof RestrictionCreateDuration)[keyof typeof RestrictionCreateDuration];
+
+export const RestrictionCreateDuration = {
+  "24h": "24h",
+  "7d": "7d",
+  "30d": "30d",
+  indefinite: "indefinite",
+} as const;
+
+export type RestrictionCreateReasonCode =
+  (typeof RestrictionCreateReasonCode)[keyof typeof RestrictionCreateReasonCode];
+
+export const RestrictionCreateReasonCode = {
+  spam: "spam",
+  abuse: "abuse",
+  repeated_policy_violation: "repeated_policy_violation",
+  other: "other",
+} as const;
+
+export interface RestrictionCreate {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  request_id: string;
+  /** @minimum 0 */
+  expected_revision: number;
+  scope: RestrictionCreateScope;
+  duration: RestrictionCreateDuration;
+  reason_code: RestrictionCreateReasonCode;
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  user_message: string;
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  internal_note?: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  replaces_restriction_id?: string;
+}
+
+export interface RestrictionRevoke {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  request_id: string;
+  /** @minimum 0 */
+  expected_revision: number;
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  reason: string;
+}
+
+export type DistributionUpdatePolicy =
+  (typeof DistributionUpdatePolicy)[keyof typeof DistributionUpdatePolicy];
+
+export const DistributionUpdatePolicy = {
+  normal: "normal",
+  excluded: "excluded",
+} as const;
+
+export interface DistributionUpdate {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  request_id: string;
+  /** @minimum 1 */
+  expected_version: number;
+  policy: DistributionUpdatePolicy;
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  reason: string;
+}
+
+export type SourceCheckInputOutcome =
+  (typeof SourceCheckInputOutcome)[keyof typeof SourceCheckInputOutcome];
+
+export const SourceCheckInputOutcome = {
+  reachable: "reachable",
+  unreachable: "unreachable",
+  uncertain: "uncertain",
+} as const;
+
+export type SourceCheckInputAvailabilityState =
+  (typeof SourceCheckInputAvailabilityState)[keyof typeof SourceCheckInputAvailabilityState];
+
+export const SourceCheckInputAvailabilityState = {
+  active: "active",
+  unavailable: "unavailable",
+  broken: "broken",
+  restricted: "restricted",
+  removed: "removed",
+} as const;
+
+export interface SourceCheckInput {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  request_id: string;
+  /** @minimum 1 */
+  expected_version: number;
+  outcome: SourceCheckInputOutcome;
+  observed_at: string;
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  note: string;
+  availability_state?: SourceCheckInputAvailabilityState;
+}
+
+export type SourceCheckOutcome =
+  (typeof SourceCheckOutcome)[keyof typeof SourceCheckOutcome];
+
+export const SourceCheckOutcome = {
+  reachable: "reachable",
+  unreachable: "unreachable",
+  uncertain: "uncertain",
+} as const;
+
+export interface SourceCheck {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  id: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  source_id: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  resource_id: string;
+  /** @minimum 1 */
+  resource_version: number;
+  outcome: SourceCheckOutcome;
+  observed_at: string;
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  note: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  actor_id: string;
+  current: boolean;
+}
+
+export type SourceHealthAvailabilityState =
+  (typeof SourceHealthAvailabilityState)[keyof typeof SourceHealthAvailabilityState];
+
+export const SourceHealthAvailabilityState = {
+  active: "active",
+  unavailable: "unavailable",
+  broken: "broken",
+  restricted: "restricted",
+  removed: "removed",
+} as const;
+
+export type SourceHealthRightsStatus =
+  (typeof SourceHealthRightsStatus)[keyof typeof SourceHealthRightsStatus];
+
+export const SourceHealthRightsStatus = {
+  unknown: "unknown",
+  creator_provided: "creator_provided",
+  confirmed: "confirmed",
+  rights_review: "rights_review",
+  disputed: "disputed",
+  removed_by_request: "removed_by_request",
+} as const;
+
+export interface SourceHealth {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  source_id: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  resource_id: string;
+  /** @minimum 1 */
+  resource_version: number;
+  /**
+   * @minLength 1
+   * @maxLength 80
+   */
+  resource_slug: string;
+  /**
+   * @minLength 1
+   * @maxLength 4096
+   */
+  url: string;
+  availability_state: SourceHealthAvailabilityState;
+  rights_status: SourceHealthRightsStatus;
+  open_broken_report: boolean;
+  last_check?: SourceCheck;
+}
+
+export interface SourceHealthList {
+  items: SourceHealth[];
+  /** @minimum 1 */
+  page: number;
+  /** @minimum 1 */
+  page_size: number;
+  has_next: boolean;
+}
+
+export type AuditEntryOperation =
+  (typeof AuditEntryOperation)[keyof typeof AuditEntryOperation];
+
+export const AuditEntryOperation = {
+  create: "create",
+  core: "core",
+  localization: "localization",
+  tags: "tags",
+  source: "source",
+  source_rights: "source_rights",
+  relation: "relation",
+  external_ids: "external_ids",
+  publication: "publication",
+  soft_delete: "soft_delete",
+  taxonomy: "taxonomy",
+  distribution: "distribution",
+  trust: "trust",
+  restrict: "restrict",
+  revoke_restriction: "revoke_restriction",
+} as const;
+
+export type AuditEntryFieldsItem =
+  (typeof AuditEntryFieldsItem)[keyof typeof AuditEntryFieldsItem];
+
+export const AuditEntryFieldsItem = {
+  core: "core",
+  localization: "localization",
+  tags: "tags",
+  sources: "sources",
+  relations: "relations",
+  external_ids: "external_ids",
+  publication_state: "publication_state",
+  deleted_at: "deleted_at",
+  taxonomy: "taxonomy",
+  distribution: "distribution",
+  trust: "trust",
+  restrictions: "restrictions",
+} as const;
+
+export type AuditEntryBeforePublication =
+  (typeof AuditEntryBeforePublication)[keyof typeof AuditEntryBeforePublication];
+
+export const AuditEntryBeforePublication = {
+  draft: "draft",
+  pending: "pending",
+  published: "published",
+  restricted: "restricted",
+  removed: "removed",
+} as const;
+
+export type AuditEntryAfterPublication =
+  (typeof AuditEntryAfterPublication)[keyof typeof AuditEntryAfterPublication];
+
+export const AuditEntryAfterPublication = {
+  draft: "draft",
+  pending: "pending",
+  published: "published",
+  restricted: "restricted",
+  removed: "removed",
+} as const;
+
+export type AuditEntryBeforeRights =
+  (typeof AuditEntryBeforeRights)[keyof typeof AuditEntryBeforeRights];
+
+export const AuditEntryBeforeRights = {
+  unknown: "unknown",
+  creator_provided: "creator_provided",
+  confirmed: "confirmed",
+  rights_review: "rights_review",
+  disputed: "disputed",
+  removed_by_request: "removed_by_request",
+} as const;
+
+export type AuditEntryAfterRights =
+  (typeof AuditEntryAfterRights)[keyof typeof AuditEntryAfterRights];
+
+export const AuditEntryAfterRights = {
+  unknown: "unknown",
+  creator_provided: "creator_provided",
+  confirmed: "confirmed",
+  rights_review: "rights_review",
+  disputed: "disputed",
+  removed_by_request: "removed_by_request",
+} as const;
+
+export type AuditEntryBeforeDistribution =
+  (typeof AuditEntryBeforeDistribution)[keyof typeof AuditEntryBeforeDistribution];
+
+export const AuditEntryBeforeDistribution = {
+  normal: "normal",
+  excluded: "excluded",
+} as const;
+
+export type AuditEntryAfterDistribution =
+  (typeof AuditEntryAfterDistribution)[keyof typeof AuditEntryAfterDistribution];
+
+export const AuditEntryAfterDistribution = {
+  normal: "normal",
+  excluded: "excluded",
+} as const;
+
+export type AuditEntryBeforeTrust =
+  (typeof AuditEntryBeforeTrust)[keyof typeof AuditEntryBeforeTrust];
+
+export const AuditEntryBeforeTrust = {
+  new: "new",
+  established: "established",
+  trusted: "trusted",
+} as const;
+
+export type AuditEntryAfterTrust =
+  (typeof AuditEntryAfterTrust)[keyof typeof AuditEntryAfterTrust];
+
+export const AuditEntryAfterTrust = {
+  new: "new",
+  established: "established",
+  trusted: "trusted",
+} as const;
+
+export type AuditEntryBeforeAvailability =
+  (typeof AuditEntryBeforeAvailability)[keyof typeof AuditEntryBeforeAvailability];
+
+export const AuditEntryBeforeAvailability = {
+  active: "active",
+  unavailable: "unavailable",
+  broken: "broken",
+  restricted: "restricted",
+  removed: "removed",
+} as const;
+
+export type AuditEntryAfterAvailability =
+  (typeof AuditEntryAfterAvailability)[keyof typeof AuditEntryAfterAvailability];
+
+export const AuditEntryAfterAvailability = {
+  active: "active",
+  unavailable: "unavailable",
+  broken: "broken",
+  restricted: "restricted",
+  removed: "removed",
+} as const;
+
+export type AuditEntryBeforeTaxonomyState =
+  (typeof AuditEntryBeforeTaxonomyState)[keyof typeof AuditEntryBeforeTaxonomyState];
+
+export const AuditEntryBeforeTaxonomyState = {
+  active: "active",
+  retired: "retired",
+} as const;
+
+export type AuditEntryAfterTaxonomyState =
+  (typeof AuditEntryAfterTaxonomyState)[keyof typeof AuditEntryAfterTaxonomyState];
+
+export const AuditEntryAfterTaxonomyState = {
+  active: "active",
+  retired: "retired",
+} as const;
+
+export interface AuditEntry {
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  id: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  actor_id: string;
+  operation: AuditEntryOperation;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  resource_id?: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  category_id?: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  tag_id?: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  user_id?: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  source_id?: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  contribution_id?: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  moderation_action_id?: string;
+  fields: AuditEntryFieldsItem[];
+  /** @minimum 0 */
+  before_version?: number;
+  /** @minimum 1 */
+  after_version?: number;
+  before_publication?: AuditEntryBeforePublication;
+  after_publication?: AuditEntryAfterPublication;
+  before_rights?: AuditEntryBeforeRights;
+  after_rights?: AuditEntryAfterRights;
+  before_distribution?: AuditEntryBeforeDistribution;
+  after_distribution?: AuditEntryAfterDistribution;
+  before_trust?: AuditEntryBeforeTrust;
+  after_trust?: AuditEntryAfterTrust;
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  reason?: string;
+  occurred_at: string;
+  before_availability?: AuditEntryBeforeAvailability;
+  after_availability?: AuditEntryAfterAvailability;
+  before_taxonomy_state?: AuditEntryBeforeTaxonomyState;
+  after_taxonomy_state?: AuditEntryAfterTaxonomyState;
+}
+
+export interface AuditList {
+  items: AuditEntry[];
+  /** @minimum 1 */
+  page: number;
+  /** @minimum 1 */
+  page_size: number;
+  has_next: boolean;
+}
+
 export type ContributionChangeSourceSourceType =
   (typeof ContributionChangeSourceSourceType)[keyof typeof ContributionChangeSourceSourceType];
 
@@ -540,6 +1463,11 @@ export interface CreateTaxonomy {
 }
 
 export interface PatchTaxonomy {
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  reason?: string;
   /** @maxLength 64 */
   default_locale?: string;
   state?: TaxonomyState;
@@ -634,6 +1562,11 @@ export interface Source {
 }
 
 export interface SetSourceRights {
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  reason: string;
   rights_status: RightsStatus;
 }
 
@@ -670,6 +1603,11 @@ export interface Relation {
 }
 
 export interface SetPublication {
+  /**
+   * @minLength 1
+   * @maxLength 1000
+   */
+  reason?: string;
   state: PublicationState;
 }
 
@@ -704,7 +1642,16 @@ export interface ResourceList {
   has_next: boolean;
 }
 
+export type ResourceDetailDistributionPolicy =
+  (typeof ResourceDetailDistributionPolicy)[keyof typeof ResourceDetailDistributionPolicy];
+
+export const ResourceDetailDistributionPolicy = {
+  normal: "normal",
+  excluded: "excluded",
+} as const;
+
 export interface ResourceDetail {
+  readonly distribution_policy: ResourceDetailDistributionPolicy;
   id: string;
   /** @maxLength 80 */
   slug: string;
@@ -802,6 +1749,13 @@ export const ApiErrorCode = {
   RESOURCE_RELATION_CYCLE: "RESOURCE_RELATION_CYCLE",
   CONTRIBUTION_REQUEST_CONFLICT: "CONTRIBUTION_REQUEST_CONFLICT",
   CONTRIBUTION_LIMITED: "CONTRIBUTION_LIMITED",
+  BUSINESS_RESTRICTED: "BUSINESS_RESTRICTED",
+  REPORT_NOT_FOUND: "REPORT_NOT_FOUND",
+  REPORT_FORBIDDEN: "REPORT_FORBIDDEN",
+  REPORT_VERIFICATION_REQUIRED: "REPORT_VERIFICATION_REQUIRED",
+  REPORT_LIMITED: "REPORT_LIMITED",
+  GOVERNANCE_CONFLICT: "GOVERNANCE_CONFLICT",
+  GOVERNANCE_REQUEST_CONFLICT: "GOVERNANCE_REQUEST_CONFLICT",
 } as const;
 
 export interface ApiError {
@@ -974,6 +1928,134 @@ export type ListContributionsParams = {
   status?: ContributionStatus;
   kind?: ContributionKind;
 };
+
+export type ListReportsParams = {
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+  status?: ListReportsStatus;
+  reason?: ListReportsReason;
+  queue?: ListReportsQueue;
+};
+
+export type ListReportsStatus =
+  (typeof ListReportsStatus)[keyof typeof ListReportsStatus];
+
+export const ListReportsStatus = {
+  open: "open",
+  in_review: "in_review",
+  resolved: "resolved",
+  dismissed: "dismissed",
+  withdrawn: "withdrawn",
+} as const;
+
+export type ListReportsReason =
+  (typeof ListReportsReason)[keyof typeof ListReportsReason];
+
+export const ListReportsReason = {
+  broken_link: "broken_link",
+  rights_concern: "rights_concern",
+  malicious_link: "malicious_link",
+  privacy: "privacy",
+  content_rating: "content_rating",
+  spam: "spam",
+  other: "other",
+} as const;
+
+export type ListReportsQueue =
+  (typeof ListReportsQueue)[keyof typeof ListReportsQueue];
+
+export const ListReportsQueue = {
+  moderation: "moderation",
+  administration: "administration",
+} as const;
+
+export type ListSourceHealthParams = {
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+  availability_state?: ListSourceHealthAvailabilityState;
+  open_broken_report?: boolean;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  resource_id?: string;
+  /**
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  source_id?: string;
+};
+
+export type ListSourceHealthAvailabilityState =
+  (typeof ListSourceHealthAvailabilityState)[keyof typeof ListSourceHealthAvailabilityState];
+
+export const ListSourceHealthAvailabilityState = {
+  active: "active",
+  unavailable: "unavailable",
+  broken: "broken",
+  restricted: "restricted",
+  removed: "removed",
+} as const;
+
+export type ListAuditParams = {
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  resource_id?: string;
+  /**
+   * @minLength 36
+   * @maxLength 36
+   * @pattern ^[0-9a-fA-F-]{36}$
+   */
+  user_id?: string;
+  operation?: ListAuditOperation;
+};
+
+export type ListAuditOperation =
+  (typeof ListAuditOperation)[keyof typeof ListAuditOperation];
+
+export const ListAuditOperation = {
+  create: "create",
+  core: "core",
+  localization: "localization",
+  tags: "tags",
+  source: "source",
+  source_rights: "source_rights",
+  relation: "relation",
+  external_ids: "external_ids",
+  publication: "publication",
+  soft_delete: "soft_delete",
+  taxonomy: "taxonomy",
+  distribution: "distribution",
+  trust: "trust",
+  restrict: "restrict",
+  revoke_restriction: "revoke_restriction",
+} as const;
 
 export type loginResponse200 = {
   data: AuthenticatedResponse;
@@ -2019,12 +3101,39 @@ export const getDeleteResourceUrl = (
 
 export const deleteResource = async (
   resourceId: string,
+  governanceReason: GovernanceReason,
   params: DeleteResourceParams,
   options?: RequestInit,
 ): Promise<deleteResourceResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
   const res = await fetch(getDeleteResourceUrl(resourceId, params), {
     ...options,
     method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(governanceReason),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -3602,11 +4711,38 @@ export const getDeleteCategoryUrl = (categoryId: string) => {
 
 export const deleteCategory = async (
   categoryId: string,
+  governanceReason: GovernanceReason,
   options?: RequestInit,
 ): Promise<deleteCategoryResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
   const res = await fetch(getDeleteCategoryUrl(categoryId), {
     ...options,
     method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(governanceReason),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -4211,11 +5347,38 @@ export const getDeleteTagUrl = (tagId: string) => {
 
 export const deleteTag = async (
   tagId: string,
+  governanceReason: GovernanceReason,
   options?: RequestInit,
 ): Promise<deleteTagResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
   const res = await fetch(getDeleteTagUrl(tagId), {
     ...options,
     method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(governanceReason),
   });
 
   const body = [204, 205, 304].includes(res.status) ? null : await res.text();
@@ -4807,4 +5970,1433 @@ export const rejectContribution = async (
     status: res.status,
     headers: res.headers,
   } as rejectContributionResponse;
+};
+
+export type listReportsResponse200 = {
+  data: AdminReportList;
+  status: 200;
+};
+
+export type listReportsResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type listReportsResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type listReportsResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type listReportsResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type listReportsResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type listReportsResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type listReportsResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type listReportsResponseSuccess = listReportsResponse200 & {
+  headers: Headers;
+};
+export type listReportsResponseError = (
+  | listReportsResponse400
+  | listReportsResponse401
+  | listReportsResponse403
+  | listReportsResponse404
+  | listReportsResponse409
+  | listReportsResponse429
+  | listReportsResponse500
+) & {
+  headers: Headers;
+};
+
+export type listReportsResponse =
+  listReportsResponseSuccess | listReportsResponseError;
+
+export const getListReportsUrl = (params?: ListReportsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/reports?${stringifiedParams}`
+    : `/api/reports`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const listReports = async (
+  params?: ListReportsParams,
+  options?: RequestInit,
+): Promise<listReportsResponse> => {
+  const res = await fetch(getListReportsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listReportsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listReportsResponse;
+};
+
+export type getReportResponse200 = {
+  data: AdminReport;
+  status: 200;
+};
+
+export type getReportResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type getReportResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type getReportResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type getReportResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type getReportResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type getReportResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type getReportResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type getReportResponseSuccess = getReportResponse200 & {
+  headers: Headers;
+};
+export type getReportResponseError = (
+  | getReportResponse400
+  | getReportResponse401
+  | getReportResponse403
+  | getReportResponse404
+  | getReportResponse409
+  | getReportResponse429
+  | getReportResponse500
+) & {
+  headers: Headers;
+};
+
+export type getReportResponse =
+  getReportResponseSuccess | getReportResponseError;
+
+export const getGetReportUrl = (id: string) => {
+  return `/api/reports/${id}`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const getReport = async (
+  id: string,
+  options?: RequestInit,
+): Promise<getReportResponse> => {
+  const res = await fetch(getGetReportUrl(id), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getReportResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getReportResponse;
+};
+
+export type triageReportResponse200 = {
+  data: RequestReceipt;
+  status: 200;
+};
+
+export type triageReportResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type triageReportResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type triageReportResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type triageReportResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type triageReportResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type triageReportResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type triageReportResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type triageReportResponseSuccess = triageReportResponse200 & {
+  headers: Headers;
+};
+export type triageReportResponseError = (
+  | triageReportResponse400
+  | triageReportResponse401
+  | triageReportResponse403
+  | triageReportResponse404
+  | triageReportResponse409
+  | triageReportResponse429
+  | triageReportResponse500
+) & {
+  headers: Headers;
+};
+
+export type triageReportResponse =
+  triageReportResponseSuccess | triageReportResponseError;
+
+export const getTriageReportUrl = (id: string) => {
+  return `/api/reports/${id}/triage`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const triageReport = async (
+  id: string,
+  reportTriage: ReportTriage,
+  options?: RequestInit,
+): Promise<triageReportResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getTriageReportUrl(id), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(reportTriage),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: triageReportResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as triageReportResponse;
+};
+
+export type resolveReportResponse200 = {
+  data: RequestReceipt;
+  status: 200;
+};
+
+export type resolveReportResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type resolveReportResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type resolveReportResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type resolveReportResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type resolveReportResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type resolveReportResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type resolveReportResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type resolveReportResponseSuccess = resolveReportResponse200 & {
+  headers: Headers;
+};
+export type resolveReportResponseError = (
+  | resolveReportResponse400
+  | resolveReportResponse401
+  | resolveReportResponse403
+  | resolveReportResponse404
+  | resolveReportResponse409
+  | resolveReportResponse429
+  | resolveReportResponse500
+) & {
+  headers: Headers;
+};
+
+export type resolveReportResponse =
+  resolveReportResponseSuccess | resolveReportResponseError;
+
+export const getResolveReportUrl = (id: string) => {
+  return `/api/reports/${id}/resolve`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const resolveReport = async (
+  id: string,
+  reportResolve: ReportResolve,
+  options?: RequestInit,
+): Promise<resolveReportResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getResolveReportUrl(id), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(reportResolve),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: resolveReportResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as resolveReportResponse;
+};
+
+export type dismissReportResponse200 = {
+  data: RequestReceipt;
+  status: 200;
+};
+
+export type dismissReportResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type dismissReportResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type dismissReportResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type dismissReportResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type dismissReportResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type dismissReportResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type dismissReportResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type dismissReportResponseSuccess = dismissReportResponse200 & {
+  headers: Headers;
+};
+export type dismissReportResponseError = (
+  | dismissReportResponse400
+  | dismissReportResponse401
+  | dismissReportResponse403
+  | dismissReportResponse404
+  | dismissReportResponse409
+  | dismissReportResponse429
+  | dismissReportResponse500
+) & {
+  headers: Headers;
+};
+
+export type dismissReportResponse =
+  dismissReportResponseSuccess | dismissReportResponseError;
+
+export const getDismissReportUrl = (id: string) => {
+  return `/api/reports/${id}/dismiss`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const dismissReport = async (
+  id: string,
+  reportDismiss: ReportDismiss,
+  options?: RequestInit,
+): Promise<dismissReportResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getDismissReportUrl(id), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(reportDismiss),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: dismissReportResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as dismissReportResponse;
+};
+
+export type getUserGovernanceResponse200 = {
+  data: UserGovernance;
+  status: 200;
+};
+
+export type getUserGovernanceResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type getUserGovernanceResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type getUserGovernanceResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type getUserGovernanceResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type getUserGovernanceResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type getUserGovernanceResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type getUserGovernanceResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type getUserGovernanceResponseSuccess = getUserGovernanceResponse200 & {
+  headers: Headers;
+};
+export type getUserGovernanceResponseError = (
+  | getUserGovernanceResponse400
+  | getUserGovernanceResponse401
+  | getUserGovernanceResponse403
+  | getUserGovernanceResponse404
+  | getUserGovernanceResponse409
+  | getUserGovernanceResponse429
+  | getUserGovernanceResponse500
+) & {
+  headers: Headers;
+};
+
+export type getUserGovernanceResponse =
+  getUserGovernanceResponseSuccess | getUserGovernanceResponseError;
+
+export const getGetUserGovernanceUrl = (id: string) => {
+  return `/api/users/${id}/governance`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const getUserGovernance = async (
+  id: string,
+  options?: RequestInit,
+): Promise<getUserGovernanceResponse> => {
+  const res = await fetch(getGetUserGovernanceUrl(id), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getUserGovernanceResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getUserGovernanceResponse;
+};
+
+export type updateUserTrustResponse200 = {
+  data: RequestReceipt;
+  status: 200;
+};
+
+export type updateUserTrustResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type updateUserTrustResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type updateUserTrustResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type updateUserTrustResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type updateUserTrustResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type updateUserTrustResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type updateUserTrustResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type updateUserTrustResponseSuccess = updateUserTrustResponse200 & {
+  headers: Headers;
+};
+export type updateUserTrustResponseError = (
+  | updateUserTrustResponse400
+  | updateUserTrustResponse401
+  | updateUserTrustResponse403
+  | updateUserTrustResponse404
+  | updateUserTrustResponse409
+  | updateUserTrustResponse429
+  | updateUserTrustResponse500
+) & {
+  headers: Headers;
+};
+
+export type updateUserTrustResponse =
+  updateUserTrustResponseSuccess | updateUserTrustResponseError;
+
+export const getUpdateUserTrustUrl = (id: string) => {
+  return `/api/users/${id}/trust`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const updateUserTrust = async (
+  id: string,
+  trustUpdate: TrustUpdate,
+  options?: RequestInit,
+): Promise<updateUserTrustResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getUpdateUserTrustUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(trustUpdate),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateUserTrustResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateUserTrustResponse;
+};
+
+export type createRestrictionResponse200 = {
+  data: RequestReceipt;
+  status: 200;
+};
+
+export type createRestrictionResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type createRestrictionResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type createRestrictionResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type createRestrictionResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type createRestrictionResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type createRestrictionResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type createRestrictionResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type createRestrictionResponseSuccess = createRestrictionResponse200 & {
+  headers: Headers;
+};
+export type createRestrictionResponseError = (
+  | createRestrictionResponse400
+  | createRestrictionResponse401
+  | createRestrictionResponse403
+  | createRestrictionResponse404
+  | createRestrictionResponse409
+  | createRestrictionResponse429
+  | createRestrictionResponse500
+) & {
+  headers: Headers;
+};
+
+export type createRestrictionResponse =
+  createRestrictionResponseSuccess | createRestrictionResponseError;
+
+export const getCreateRestrictionUrl = (id: string) => {
+  return `/api/users/${id}/restrictions`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const createRestriction = async (
+  id: string,
+  restrictionCreate: RestrictionCreate,
+  options?: RequestInit,
+): Promise<createRestrictionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getCreateRestrictionUrl(id), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(restrictionCreate),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: createRestrictionResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as createRestrictionResponse;
+};
+
+export type revokeRestrictionResponse200 = {
+  data: RequestReceipt;
+  status: 200;
+};
+
+export type revokeRestrictionResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type revokeRestrictionResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type revokeRestrictionResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type revokeRestrictionResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type revokeRestrictionResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type revokeRestrictionResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type revokeRestrictionResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type revokeRestrictionResponseSuccess = revokeRestrictionResponse200 & {
+  headers: Headers;
+};
+export type revokeRestrictionResponseError = (
+  | revokeRestrictionResponse400
+  | revokeRestrictionResponse401
+  | revokeRestrictionResponse403
+  | revokeRestrictionResponse404
+  | revokeRestrictionResponse409
+  | revokeRestrictionResponse429
+  | revokeRestrictionResponse500
+) & {
+  headers: Headers;
+};
+
+export type revokeRestrictionResponse =
+  revokeRestrictionResponseSuccess | revokeRestrictionResponseError;
+
+export const getRevokeRestrictionUrl = (id: string, restrictionId: string) => {
+  return `/api/users/${id}/restrictions/${restrictionId}/revoke`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const revokeRestriction = async (
+  id: string,
+  restrictionId: string,
+  restrictionRevoke: RestrictionRevoke,
+  options?: RequestInit,
+): Promise<revokeRestrictionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getRevokeRestrictionUrl(id, restrictionId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(restrictionRevoke),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: revokeRestrictionResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as revokeRestrictionResponse;
+};
+
+export type updateResourceDistributionResponse200 = {
+  data: RequestReceipt;
+  status: 200;
+};
+
+export type updateResourceDistributionResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type updateResourceDistributionResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type updateResourceDistributionResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type updateResourceDistributionResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type updateResourceDistributionResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type updateResourceDistributionResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type updateResourceDistributionResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type updateResourceDistributionResponseSuccess =
+  updateResourceDistributionResponse200 & {
+    headers: Headers;
+  };
+export type updateResourceDistributionResponseError = (
+  | updateResourceDistributionResponse400
+  | updateResourceDistributionResponse401
+  | updateResourceDistributionResponse403
+  | updateResourceDistributionResponse404
+  | updateResourceDistributionResponse409
+  | updateResourceDistributionResponse429
+  | updateResourceDistributionResponse500
+) & {
+  headers: Headers;
+};
+
+export type updateResourceDistributionResponse =
+  | updateResourceDistributionResponseSuccess
+  | updateResourceDistributionResponseError;
+
+export const getUpdateResourceDistributionUrl = (id: string) => {
+  return `/api/resources/${id}/distribution`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const updateResourceDistribution = async (
+  id: string,
+  distributionUpdate: DistributionUpdate,
+  options?: RequestInit,
+): Promise<updateResourceDistributionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getUpdateResourceDistributionUrl(id), {
+    ...options,
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(distributionUpdate),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: updateResourceDistributionResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as updateResourceDistributionResponse;
+};
+
+export type listSourceHealthResponse200 = {
+  data: SourceHealthList;
+  status: 200;
+};
+
+export type listSourceHealthResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type listSourceHealthResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type listSourceHealthResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type listSourceHealthResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type listSourceHealthResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type listSourceHealthResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type listSourceHealthResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type listSourceHealthResponseSuccess = listSourceHealthResponse200 & {
+  headers: Headers;
+};
+export type listSourceHealthResponseError = (
+  | listSourceHealthResponse400
+  | listSourceHealthResponse401
+  | listSourceHealthResponse403
+  | listSourceHealthResponse404
+  | listSourceHealthResponse409
+  | listSourceHealthResponse429
+  | listSourceHealthResponse500
+) & {
+  headers: Headers;
+};
+
+export type listSourceHealthResponse =
+  listSourceHealthResponseSuccess | listSourceHealthResponseError;
+
+export const getListSourceHealthUrl = (params?: ListSourceHealthParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/source-checks?${stringifiedParams}`
+    : `/api/source-checks`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const listSourceHealth = async (
+  params?: ListSourceHealthParams,
+  options?: RequestInit,
+): Promise<listSourceHealthResponse> => {
+  const res = await fetch(getListSourceHealthUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listSourceHealthResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listSourceHealthResponse;
+};
+
+export type recordSourceCheckResponse200 = {
+  data: RequestReceipt;
+  status: 200;
+};
+
+export type recordSourceCheckResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type recordSourceCheckResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type recordSourceCheckResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type recordSourceCheckResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type recordSourceCheckResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type recordSourceCheckResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type recordSourceCheckResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type recordSourceCheckResponseSuccess = recordSourceCheckResponse200 & {
+  headers: Headers;
+};
+export type recordSourceCheckResponseError = (
+  | recordSourceCheckResponse400
+  | recordSourceCheckResponse401
+  | recordSourceCheckResponse403
+  | recordSourceCheckResponse404
+  | recordSourceCheckResponse409
+  | recordSourceCheckResponse429
+  | recordSourceCheckResponse500
+) & {
+  headers: Headers;
+};
+
+export type recordSourceCheckResponse =
+  recordSourceCheckResponseSuccess | recordSourceCheckResponseError;
+
+export const getRecordSourceCheckUrl = (id: string, sourceId: string) => {
+  return `/api/resources/${id}/sources/${sourceId}/checks`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const recordSourceCheck = async (
+  id: string,
+  sourceId: string,
+  sourceCheckInput: SourceCheckInput,
+  options?: RequestInit,
+): Promise<recordSourceCheckResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getRecordSourceCheckUrl(id, sourceId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(sourceCheckInput),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: recordSourceCheckResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as recordSourceCheckResponse;
+};
+
+export type listAuditResponse200 = {
+  data: AuditList;
+  status: 200;
+};
+
+export type listAuditResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type listAuditResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type listAuditResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type listAuditResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type listAuditResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type listAuditResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type listAuditResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type listAuditResponseSuccess = listAuditResponse200 & {
+  headers: Headers;
+};
+export type listAuditResponseError = (
+  | listAuditResponse400
+  | listAuditResponse401
+  | listAuditResponse403
+  | listAuditResponse404
+  | listAuditResponse409
+  | listAuditResponse429
+  | listAuditResponse500
+) & {
+  headers: Headers;
+};
+
+export type listAuditResponse =
+  listAuditResponseSuccess | listAuditResponseError;
+
+export const getListAuditUrl = (params?: ListAuditParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/audit?${stringifiedParams}`
+    : `/api/audit`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const listAudit = async (
+  params?: ListAuditParams,
+  options?: RequestInit,
+): Promise<listAuditResponse> => {
+  const res = await fetch(getListAuditUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listAuditResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listAuditResponse;
+};
+
+export type getAuditResponse200 = {
+  data: AuditEntry;
+  status: 200;
+};
+
+export type getAuditResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type getAuditResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type getAuditResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type getAuditResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type getAuditResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type getAuditResponse429 = {
+  data: ErrorResponse;
+  status: 429;
+};
+
+export type getAuditResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type getAuditResponseSuccess = getAuditResponse200 & {
+  headers: Headers;
+};
+export type getAuditResponseError = (
+  | getAuditResponse400
+  | getAuditResponse401
+  | getAuditResponse403
+  | getAuditResponse404
+  | getAuditResponse409
+  | getAuditResponse429
+  | getAuditResponse500
+) & {
+  headers: Headers;
+};
+
+export type getAuditResponse = getAuditResponseSuccess | getAuditResponseError;
+
+export const getGetAuditUrl = (id: string) => {
+  return `/api/audit/${id}`;
+};
+
+/**
+ * Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.
+ */
+export const getAudit = async (
+  id: string,
+  options?: RequestInit,
+): Promise<getAuditResponse> => {
+  const res = await fetch(getGetAuditUrl(id), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getAuditResponse["data"] = body ? JSON.parse(body) : {};
+  return { data, status: res.status, headers: res.headers } as getAuditResponse;
 };

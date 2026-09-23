@@ -8,6 +8,36 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type AppAuditEntry struct {
+	ID                  pgtype.UUID
+	ActorID             pgtype.UUID
+	Operation           string
+	ResourceID          pgtype.UUID
+	CategoryID          pgtype.UUID
+	TagID               pgtype.UUID
+	UserID              pgtype.UUID
+	SourceID            pgtype.UUID
+	ContributionID      pgtype.UUID
+	ModerationActionID  pgtype.UUID
+	Fields              []string
+	BeforeVersion       pgtype.Int8
+	AfterVersion        pgtype.Int8
+	BeforeAvailability  pgtype.Text
+	AfterAvailability   pgtype.Text
+	BeforeTaxonomyState pgtype.Text
+	AfterTaxonomyState  pgtype.Text
+	BeforePublication   pgtype.Text
+	AfterPublication    pgtype.Text
+	BeforeRights        pgtype.Text
+	AfterRights         pgtype.Text
+	BeforeDistribution  pgtype.Text
+	AfterDistribution   pgtype.Text
+	BeforeTrust         pgtype.Text
+	AfterTrust          pgtype.Text
+	Reason              pgtype.Text
+	OccurredAt          pgtype.Timestamptz
+}
+
 type AppAuthChallenge struct {
 	ID             pgtype.UUID
 	UserID         pgtype.UUID
@@ -155,12 +185,62 @@ type AppContributionTagChange struct {
 	WasBound       bool
 }
 
+type AppModerationAction struct {
+	ID                 pgtype.UUID
+	ActorID            pgtype.UUID
+	Action             string
+	ResourceID         pgtype.UUID
+	SourceID           pgtype.UUID
+	UserID             pgtype.UUID
+	RestrictionID      pgtype.UUID
+	ReportID           pgtype.UUID
+	Reason             string
+	InternalNote       pgtype.Text
+	RequestID          pgtype.UUID
+	RequestFingerprint []byte
+	OccurredAt         pgtype.Timestamptz
+}
+
 type AppPasswordCredential struct {
 	UserID            pgtype.UUID
 	PasswordHash      string
 	PasswordUpdatedAt pgtype.Timestamptz
 	CreatedAt         pgtype.Timestamptz
 	UpdatedAt         pgtype.Timestamptz
+}
+
+type AppReport struct {
+	ID                 pgtype.UUID
+	ReporterID         pgtype.UUID
+	ResourceID         pgtype.UUID
+	SourceID           pgtype.UUID
+	TargetKind         string
+	Reason             string
+	Body               string
+	RequestID          pgtype.UUID
+	RequestFingerprint []byte
+	Status             string
+	Version            int64
+	Queue              string
+	Priority           int16
+	DuplicateOf        pgtype.UUID
+	CreatedAt          pgtype.Timestamptz
+	UpdatedAt          pgtype.Timestamptz
+	DecidedAt          pgtype.Timestamptz
+}
+
+type AppReportEvent struct {
+	ID                 pgtype.UUID
+	ReportID           pgtype.UUID
+	EventType          string
+	ActorID            pgtype.UUID
+	RequestID          pgtype.UUID
+	RequestFingerprint []byte
+	SafeMessage        pgtype.Text
+	InternalNote       pgtype.Text
+	AuditID            pgtype.UUID
+	ResolutionType     pgtype.Text
+	OccurredAt         pgtype.Timestamptz
 }
 
 type AppResource struct {
@@ -176,6 +256,11 @@ type AppResource struct {
 	CreatedAt        pgtype.Timestamptz
 	UpdatedAt        pgtype.Timestamptz
 	DeletedAt        pgtype.Timestamptz
+}
+
+type AppResourceDistributionPolicy struct {
+	ResourceID pgtype.UUID
+	Policy     string
 }
 
 type AppResourceExternalID struct {
@@ -243,6 +328,21 @@ type AppSession struct {
 	RevokedAt         pgtype.Timestamptz
 }
 
+type AppSourceCheck struct {
+	ID                 pgtype.UUID
+	ResourceID         pgtype.UUID
+	SourceID           pgtype.UUID
+	UrlFingerprint     []byte
+	ResourceVersion    int64
+	Outcome            string
+	Note               string
+	ActorID            pgtype.UUID
+	RequestID          pgtype.UUID
+	RequestFingerprint []byte
+	ObservedAt         pgtype.Timestamptz
+	CreatedAt          pgtype.Timestamptz
+}
+
 type AppTag struct {
 	ID            pgtype.UUID
 	Slug          string
@@ -270,6 +370,13 @@ type AppUser struct {
 	DeletedAt    pgtype.Timestamptz
 }
 
+type AppUserGovernanceProfile struct {
+	UserID     pgtype.UUID
+	TrustLevel string
+	Revision   int64
+	UpdatedAt  pgtype.Timestamptz
+}
+
 type AppUserProfile struct {
 	UserID               pgtype.UUID
 	Handle               pgtype.Text
@@ -278,6 +385,21 @@ type AppUserProfile struct {
 	SearchEngineIndexing bool
 	CreatedAt            pgtype.Timestamptz
 	UpdatedAt            pgtype.Timestamptz
+}
+
+type AppUserRestriction struct {
+	ID           pgtype.UUID
+	UserID       pgtype.UUID
+	Scope        string
+	ReasonCode   string
+	UserMessage  string
+	InternalNote pgtype.Text
+	CreatedBy    pgtype.UUID
+	StartsAt     pgtype.Timestamptz
+	ExpiresAt    pgtype.Timestamptz
+	RevokedAt    pgtype.Timestamptz
+	RevokedBy    pgtype.UUID
+	RevokeReason pgtype.Text
 }
 
 type AppUserRole struct {

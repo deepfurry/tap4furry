@@ -15,12 +15,13 @@ const canonical = new URL(`/resources/${encodeURIComponent(data?.slug ?? slug)}`
   {data && query ? <>
     <header class="flex flex-col gap-4"><p class="resource-eyebrow">{data.category.name}</p><h1>{data.name}</h1>{data.summary && <p class="resource-summary">{data.summary}</p>}
       <a href={`/submit?resource=${encodeURIComponent(data.slug)}`}>Contribute to this Resource</a>
+      <a href={`/report?resource_id=${encodeURIComponent(data.id)}&slug=${encodeURIComponent(data.slug)}`}>Report a problem</a>
       <div class="flex flex-wrap gap-3"><span class="resource-badge">{data.lifecycle}</span><span class="resource-badge">{data.content_rating}</span></div>
       {data.tags.length > 0 && <ul aria-label="Tags" class="flex flex-wrap gap-3">{data.tags.map(tag => <li class="resource-tag">{tag.name}</li>)}</ul>}
     </header>
     {data.description && <section class="resource-card p-6 sm:p-8" aria-label="Description"><Markdown source={data.description} /></section>}
     <div class="grid gap-8 sm:grid-cols-2">
-      <section class="flex flex-col gap-4"><h2>Sources</h2>{data.sources.length ? <ul class="flex flex-col gap-4">{data.sources.map(source => <li class="flex flex-col gap-1"><a href={source.url}>{source.label ?? source.url}</a><span class="resource-muted">{source.source_type} · {source.availability_state}{source.is_primary ? ' · Primary' : ''}</span></li>)}</ul> : <p>No public sources available.</p>}</section>
+      <section class="flex flex-col gap-4"><h2>Sources</h2>{data.sources.length ? <ul class="flex flex-col gap-4">{data.sources.map(source => <li class="flex flex-col gap-1"><a href={source.url}>{source.label ?? source.url}</a><span class="resource-muted">{source.source_type} · {source.availability_state}{source.is_primary ? ' · Primary' : ''}</span><a href={`/report?resource_id=${encodeURIComponent(data.id)}&slug=${encodeURIComponent(data.slug)}&source_id=${encodeURIComponent(source.id)}`}>Report this source</a></li>)}</ul> : <p>No public sources available.</p>}</section>
       <section class="flex flex-col gap-4"><h2>Related resources</h2>{data.relations.length ? <ul class="flex flex-col gap-4">{data.relations.map(relation => <li><a href={resourceHref(relation.resource.slug, query)}>{relation.resource.name}</a><p class="resource-muted">{relation.type.replaceAll('_', ' ')} · {relation.direction}</p></li>)}</ul> : <p>No public relations yet.</p>}</section>
     </div>
     {data.external_ids.length > 0 && <section class="flex flex-col gap-4"><h2>External IDs</h2><dl class="grid gap-3 sm:grid-cols-2">{data.external_ids.map(id => <div><dt class="resource-muted">{id.namespace}</dt><dd>{id.external_id}</dd></div>)}</dl></section>}

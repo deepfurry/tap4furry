@@ -17,6 +17,13 @@ import (
 	"uuid"
 )
 
+func stringValue(v *string) string {
+	if v == nil {
+		return ""
+	}
+	return *v
+}
+
 func (h *Handler) adminAccessGuard(c fiber.Ctx) error {
 	if _, err := h.actor(c); err != nil {
 		return respondError(c, err)
@@ -165,8 +172,12 @@ func (h *Handler) PatchResource(c fiber.Ctx, raw string, p generated.PatchResour
 	})
 }
 func (h *Handler) DeleteResource(c fiber.Ctx, raw string, p generated.DeleteResourceParams) error {
+	var input generated.GovernanceReason
+	if _, err := decodeCuration(c, &input, []string{"reason"}); err != nil {
+		return respondError(c, err)
+	}
 	return h.resourceCommand(c, raw, p.ExpectedVersion, func(actor auth.AdminActor, id uuid.UUID) (curation.Revision, error) {
-		return h.options.Curation.DeleteResource(c.Context(), actor, id, p.ExpectedVersion)
+		return h.options.Curation.DeleteResource(c.Context(), actor, id, p.ExpectedVersion, input.Reason)
 	})
 }
 func (h *Handler) PutResourceLocalization(c fiber.Ctx, raw, locale string, p generated.PutResourceLocalizationParams) error {
@@ -243,10 +254,10 @@ func (h *Handler) SetSourceRights(c fiber.Ctx, raw, source string, p generated.S
 			return curation.Revision{}, err
 		}
 		var input generated.SetSourceRights
-		if _, err = decodeCuration(c, &input, []string{"rights_status"}); err != nil {
+		if _, err = decodeCuration(c, &input, []string{"rights_status", "reason"}); err != nil {
 			return curation.Revision{}, err
 		}
-		return h.options.Curation.SetSourceRights(c.Context(), actor, id, p.ExpectedVersion, sid, resource.SourceRightsStatus(input.RightsStatus))
+		return h.options.Curation.SetSourceRights(c.Context(), actor, id, p.ExpectedVersion, sid, resource.SourceRightsStatus(input.RightsStatus), input.Reason)
 	})
 }
 func (h *Handler) AddRelation(c fiber.Ctx, raw string, p generated.AddRelationParams) error {
@@ -277,6 +288,6 @@ func (h *Handler) SetPublication(c fiber.Ctx, raw string, p generated.SetPublica
 		if _, err := decodeCuration(c, &input, []string{"state"}); err != nil {
 			return curation.Revision{}, err
 		}
-		return h.options.Curation.SetPublication(c.Context(), actor, id, p.ExpectedVersion, resource.PublicationState(input.State))
+		return h.options.Curation.SetPublication(c.Context(), actor, id, p.ExpectedVersion, resource.PublicationState(input.State), stringValue(input.Reason))
 	})
 }

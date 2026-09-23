@@ -93,15 +93,12 @@ func ReadMe(ctx context.Context, q *sqlc.Queries, id uuid.UUID) (Me, error) {
 		SearchEngineIndexing: row.SearchEngineIndexing, Email: row.Email.String, EmailVerified: row.VerifiedAt.Valid}, nil
 }
 
-func (a *App) UpdateProfile(ctx context.Context, id uuid.UUID, input ProfileUpdate) (Me, error) {
+// ApplyProfileTx joins the caller's authenticated, User-locked transaction.
+// The application owns session/restriction checks and the commit.
+func ApplyProfileTx(ctx context.Context, tx pgx.Tx, id uuid.UUID, input ProfileUpdate, now time.Time) (Me, error) {
 	if err := input.Validate(); err != nil {
 		return Me{}, err
 	}
-	tx, err := a.pool.Begin(ctx)
-	if err != nil {
-		return Me{}, database.SafeError("begin profile update", err)
-	}
-	defer tx.Rollback(ctx)
 	q := sqlc.New(tx)
 	indexing := false
 	if input.SearchEngineIndexing != nil {
@@ -110,7 +107,7 @@ func (a *App) UpdateProfile(ctx context.Context, id uuid.UUID, input ProfileUpda
 	n, err := q.UpdateProfile(ctx, sqlc.UpdateProfileParams{UserID: pgtype.UUID{Bytes: id, Valid: true},
 		SetHandle: input.Handle.Set, Handle: nullableText(input.Handle.Value), SetDisplayName: input.DisplayName.Set,
 		DisplayName: nullableText(input.DisplayName.Value), SetBio: input.Bio.Set, Bio: nullableText(input.Bio.Value),
-		SetIndexing: input.SearchEngineIndexing != nil, SearchEngineIndexing: indexing, Now: pgtype.Timestamptz{Time: time.Now().UTC(), Valid: true}})
+		SetIndexing: input.SearchEngineIndexing != nil, SearchEngineIndexing: indexing, Now: pgtype.Timestamptz{Time: now, Valid: true}})
 	var pgErr *pgconn.PgError
 	if errors.As(err, &pgErr) && pgErr.Code == "23505" && pgErr.ConstraintName == "user_profiles_handle_key" {
 		return Me{}, ErrHandleUnavailable
@@ -121,14 +118,7 @@ func (a *App) UpdateProfile(ctx context.Context, id uuid.UUID, input ProfileUpda
 	if n != 1 {
 		return Me{}, ErrUnavailable
 	}
-	me, err := ReadMe(ctx, q, id)
-	if err != nil {
-		return Me{}, err
-	}
-	if err = tx.Commit(ctx); err != nil {
-		return Me{}, database.SafeError("commit profile update", err)
-	}
-	return me, nil
+	return ReadMe(ctx, q, id)
 }
 
 func (a *App) PublicProfile(ctx context.Context, handle string) (PublicProfile, error) {

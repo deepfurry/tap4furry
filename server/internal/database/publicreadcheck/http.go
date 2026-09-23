@@ -12,7 +12,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-const cache = "public, max-age=0, s-maxage=60, stale-while-revalidate=30"
+const cache = "no-store"
 
 // Request verifies the actual serialized response, including nested privacy.
 func Request(app *fiber.App, path string, status int, target any) error {

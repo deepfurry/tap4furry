@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/deepfurry/tap4furry/server/internal/database/sqlc"
+	"github.com/deepfurry/tap4furry/server/internal/governance"
 	"github.com/jackc/pgx/v5"
 	"math"
 	"time"
@@ -54,9 +55,9 @@ type AdminDetail struct {
 	ResourceChanges              []ResourceChange
 }
 type Limits struct {
-	Remaining24h, Pending int64
-	RetryAfter            int
-	Reason                string
+	Remaining24h, Pending, PendingLimit int64
+	RetryAfter                          int
+	Reason                              string
 }
 type List struct {
 	Items    []Summary
@@ -210,11 +211,22 @@ func (a *App) OwnList(ctx context.Context, actor auth.Actor, page int64, size in
 		if err != nil {
 			return err
 		}
-		out.Limits = Limits{Remaining24h: max(0, 10-quota.Recent), Pending: quota.Pending}
+		budget, err := governance.BudgetTx(ctx, q, actor.UserID)
+		if err != nil {
+			return err
+		}
+		out.Limits = Limits{Remaining24h: max(0, budget.Daily-quota.Recent), Pending: quota.Pending, PendingLimit: budget.Pending}
 		var limit *LimitError
-		if errors.As(checkQuota(quota, now), &limit) {
+		if errors.As(checkQuota(quota, now, budget), &limit) {
 			out.Limits.RetryAfter = limit.RetryAfter
 			out.Limits.Reason = limit.Reason
+		}
+		var restricted *governance.RestrictedError
+		if e := governance.CheckTx(ctx, q, actor.UserID, governance.ContributionSubmit, now); errors.As(e, &restricted) {
+			out.Limits.Reason = "business_restricted"
+			out.Limits.RetryAfter = 0
+		} else if e != nil {
+			return e
 		}
 		return nil
 	})

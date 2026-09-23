@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { DirtyFormGuard } from '../../components/admin/DirtyFormGuard';
 import {
   createSource,
   patchSource,
@@ -7,7 +9,7 @@ import {
   type Source,
 } from '@tap4furry/api-client/admin';
 import { result, writeOptions } from '../../lib/admin-api';
-import { useCanonicalMutation } from '../../lib/curation';
+import { useCanonicalMutation, useDirtyGuard } from '../../lib/curation';
 import { canAdministrate, canEditorial } from '../../lib/capabilities';
 import { useRoles } from '../../layouts/AdminShell';
 import { Panel, Field, Button } from '../../components/admin/Primitives';
@@ -16,8 +18,15 @@ import { useResource } from './ResourceLayout';
 export function ResourceSourcesPage() {
   const { resource: r, reload } = useResource();
   const roles = useRoles();
+  const [dirty, setDirty] = useState(false);
+  const blocker = useDirtyGuard(dirty);
   const mutation = useCanonicalMutation(
-    async (action: { source?: string; body?: CreateSource; rights?: RightsStatus }) => {
+    async (action: {
+      source?: string;
+      body?: CreateSource;
+      rights?: RightsStatus;
+      reason?: string;
+    }) => {
       const params = { expected_version: r.version };
       const options = await writeOptions();
       if (action.rights)
@@ -25,7 +34,7 @@ export function ResourceSourcesPage() {
           await setSourceRights(
             r.id,
             action.source!,
-            { rights_status: action.rights },
+            { rights_status: action.rights, reason: action.reason! },
             params,
             options,
           ),
@@ -34,10 +43,12 @@ export function ResourceSourcesPage() {
         ? result(await patchSource(r.id, action.source, action.body!, params, options))
         : result(await createSource(r.id, action.body!, params, options));
     },
+    () => setDirty(false),
   );
   const disabled = mutation.isPending || isVersionConflict(mutation.error);
   return (
-    <>
+    <div onChange={() => setDirty(true)}>
+      <DirtyFormGuard blocker={blocker} />
       <p>
         Sources are retained as knowledge. Set availability to Removed to hide a Source from Public.
       </p>
@@ -56,6 +67,7 @@ export function ResourceSourcesPage() {
               mutation.mutate({
                 source: source.id,
                 rights: String(data.get('rights')) as RightsStatus,
+                reason: String(data.get('reason')),
               });
             }}
           >
@@ -77,6 +89,14 @@ export function ResourceSourcesPage() {
                 ))}
               </select>
             </Field>
+            <Field label="Governance reason">
+              <input
+                name="reason"
+                required
+                maxLength={1000}
+                disabled={!canAdministrate(roles) || disabled}
+              />
+            </Field>
             <Button disabled={!canAdministrate(roles) || disabled}>Update rights</Button>
           </form>
         </Panel>
@@ -94,7 +114,7 @@ export function ResourceSourcesPage() {
           void reload();
         }}
       />
-    </>
+    </div>
   );
 }
 function SourceForm({

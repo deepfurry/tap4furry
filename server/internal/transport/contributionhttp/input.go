@@ -7,6 +7,7 @@ import (
 	"errors"
 	"github.com/deepfurry/tap4furry/server/internal/contribution"
 	"github.com/deepfurry/tap4furry/server/internal/curation"
+	"github.com/deepfurry/tap4furry/server/internal/governance"
 	"github.com/deepfurry/tap4furry/server/internal/resource"
 	"github.com/gofiber/fiber/v3"
 	"io"
@@ -137,7 +138,10 @@ func Query(c fiber.Ctx, allowed []string) error {
 }
 func Error(err error) (int, string, string, int) {
 	var limit *contribution.LimitError
+	var restricted *governance.RestrictedError
 	switch {
+	case errors.As(err, &restricted):
+		return 403, "BUSINESS_RESTRICTED", restricted.Message, 0
 	case errors.As(err, &limit):
 		return 429, "CONTRIBUTION_LIMITED", "Contribution limit reached: " + limit.Reason + ".", limit.RetryAfter
 	case errors.Is(err, contribution.ErrValidation), errors.Is(err, curation.ErrValidation):

@@ -22,6 +22,7 @@ import (
 	"github.com/deepfurry/tap4furry/server/internal/database"
 	"github.com/deepfurry/tap4furry/server/internal/database/contributioncheck"
 	"github.com/deepfurry/tap4furry/server/internal/database/curationcheck"
+	"github.com/deepfurry/tap4furry/server/internal/database/governancecheck"
 	"github.com/deepfurry/tap4furry/server/internal/identity"
 	"github.com/deepfurry/tap4furry/server/internal/mail"
 	"github.com/deepfurry/tap4furry/server/internal/redisstore"
@@ -264,7 +265,7 @@ func run() (result error) {
 	if err = curationcheck.Run(ctx, app, pub, owner, operator, email, password, cfg.AdminOrigin); err != nil {
 		return err
 	}
-	fmt.Println("Admin curation capabilities, complete Resource graph, governance, Admin-to-Public lifecycle and Goose 8 passed; temporary graph cleaned (private values withheld)")
+	fmt.Println("Admin curation capabilities, complete Resource graph, governance, Admin-to-Public lifecycle and Goose 9 passed; temporary graph cleaned (private values withheld)")
 	var authors [7]*http.Cookie
 	for i := range authors {
 		authorEmail := uuid.NewV7().String() + "@example.invalid"
@@ -286,6 +287,10 @@ func run() (result error) {
 		return err
 	}
 	fmt.Println("All seven contribution types, submit/replay, revised acceptance, Source removal, additive Tags, dual-endpoint Relations, raw translations, author privacy and atomic audits passed; temporary proposals cleaned (private values withheld)")
+	if err = governancecheck.Run(ctx, pub, app, owner, operator, authors, email, password, "http://localhost:4321", cfg.AdminOrigin); err != nil {
+		return err
+	}
+	fmt.Println("Governance role boundaries, report resolution, protected channels, trust quotas, manual checks, no-store lifecycle, audit and exact grants passed; owned fixtures cleaned (private values withheld)")
 	return nil
 }
 func cleanup(pool *pgxpool.Pool, email string) error {

@@ -81,7 +81,7 @@ func (a *App) acceptChange(ctx context.Context, actor auth.AdminActor, key uuid.
 			canonical.Locale = t.Locale
 			canonical.Localization = &curation.LocalizationInput{Name: *t.Name, Summary: t.Summary.Value, Description: t.Description.Value}
 		}
-		result, e := curation.ApplyReviewedOwnedTx(ctx, tx, actor, uid(row.TargetResourceID), row.BaseVersion.Int64, canonical)
+		result, e := curation.ApplyReviewedOwnedTx(ctx, tx, actor, uid(row.TargetResourceID), row.BaseVersion.Int64, canonical, uid(row.ID))
 		if e != nil {
 			return e
 		}

@@ -14,6 +14,7 @@ import (
 	"github.com/deepfurry/tap4furry/server/internal/curation"
 	"github.com/deepfurry/tap4furry/server/internal/database"
 	"github.com/deepfurry/tap4furry/server/internal/database/sqlc"
+	"github.com/deepfurry/tap4furry/server/internal/governance"
 	"github.com/deepfurry/tap4furry/server/internal/resource"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -49,7 +50,8 @@ func safe(err error) error {
 		return nil
 	}
 	var limit *LimitError
-	if errors.As(err, &limit) {
+	var restricted *governance.RestrictedError
+	if errors.As(err, &limit) || errors.As(err, &restricted) {
 		return err
 	}
 	for _, known := range []error{ErrValidation, ErrNotFound, ErrForbidden, ErrVerified, ErrConflict, ErrRequestConflict, ErrCanonical, auth.ErrUnauthenticated, auth.ErrAdminUnauthenticated, auth.ErrAdminForbidden, resource.ErrVersionConflict, curation.ErrConflict, curation.ErrValidation, curation.ErrNotFound, curation.ErrRelationCycle} {

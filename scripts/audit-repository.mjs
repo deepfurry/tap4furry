@@ -42,16 +42,18 @@ for (const path of files) {
   if (path.endsWith('.sql') && /CREATE\s+EXTENSION\s+(?:IF\s+NOT\s+EXISTS\s+)?"?vector\b/i.test(content)) throw new Error(`Prohibited vector extension in ${path}`);
   if (path.endsWith('.go') && !path.startsWith('server/internal/jobs/') && /"github\.com\/riverqueue\//.test(content)) throw new Error(`River import outside Jobs: ${path}`);
   if (path.endsWith('.go') && !path.startsWith('server/internal/mail/') && /"github\.com\/resend\//.test(content)) throw new Error(`Resend import outside Mail: ${path}`);
-  if (/^server\/internal\/(auth|identity|taxonomy|resource|curation|contribution)\/.*\.go$/.test(path) && /"(?:github\.com\/gofiber\/|github\.com\/google\/uuid|github\.com\/redis\/|github\.com\/deepfurry\/tap4furry\/server\/internal\/transport\/)/.test(content)) throw new Error(`Application boundary violation: ${path}`);
+  if (/^server\/internal\/(auth|identity|taxonomy|resource|curation|contribution|governance|moderation)\/.*\.go$/.test(path) && /"(?:github\.com\/gofiber\/|github\.com\/google\/uuid|github\.com\/redis\/|github\.com\/deepfurry\/tap4furry\/server\/internal\/transport\/)/.test(content)) throw new Error(`Application boundary violation: ${path}`);
   if (/^server\/internal\/(taxonomy|resource)\/.*\.go$/.test(path) && /"(?:net\/http|github\.com\/jackc\/|github\.com\/deepfurry\/tap4furry\/server\/internal\/(?:database|jobs|redisstore)(?:\/|"))/.test(content)) throw new Error(`Resource domain infrastructure dependency: ${path}`);
+  if (/^server\/internal\/governance\/.*\.go$/.test(path) && /internal\/(?:auth|identity|curation|contribution|moderation|transport)(?:\/|")/.test(content)) throw new Error(`Governance policy dependency cycle: ${path}`);
+  if (/^server\/internal\/(?:auth|identity|curation|contribution)\/.*\.go$/.test(path) && /internal\/moderation(?:\/|")/.test(content)) throw new Error(`Application dependency cycle: ${path}`);
   if (/^apps\//.test(path) && /@tap4furry\/api-client\/.*generated/.test(content)) throw new Error(`Deep generated client import: ${path}`);
   if (/^server\/internal\/oauthprovider\/.*\.go$/.test(path) && /(?:SkipClientIDCheck|SkipIssuerCheck|SkipExpiryCheck|InsecureSkipSignatureCheck)\s*:\s*true/.test(content)) throw new Error(`Unsafe OIDC verifier in ${path}`);
 }
 if (files.filter(path => path.endsWith('go.mod')).join() !== 'server/go.mod' || files.some(path => path.endsWith('go.work'))) throw new Error('Expected one server/go.mod and no go.work');
-const forbiddenDomains = ['collection', 'discovery', 'exchange', 'discussion', 'poll', 'trust', 'moderation', 'notification', 'analytics'];
+const forbiddenDomains = ['collection', 'discovery', 'exchange', 'discussion', 'poll', 'trust', 'notification', 'analytics'];
 if (files.some(path => forbiddenDomains.some(domain => path.startsWith(`server/internal/${domain}/`)))) throw new Error('Future product domain scaffold before its phase');
 const runtimeDependencies = execFileSync('go', ['-C', 'server', 'list', '-deps', './cmd/api', './cmd/admin', './cmd/worker'], { cwd: root, encoding: 'utf8', windowsHide: true });
-if (/pressly\/goose|river\/rivermigrate|pgx\/v5\/stdlib|go\.mongodb|nats-io|gorm\.io|pgvector|opentelemetry|internal\/database\/(?:resourcecheck|publicreadcheck|curationcheck|contributioncheck)/.test(runtimeDependencies)) throw new Error('Migration, acceptance fixture or forbidden dependency in a runtime binary');
+if (/pressly\/goose|river\/rivermigrate|pgx\/v5\/stdlib|go\.mongodb|nats-io|gorm\.io|pgvector|opentelemetry|internal\/database\/(?:resourcecheck|publicreadcheck|curationcheck|contributioncheck|governancecheck)/.test(runtimeDependencies)) throw new Error('Migration, acceptance fixture or forbidden dependency in a runtime binary');
 auditResourceWeb(files.filter(path => path.startsWith('apps/') && existsSync(join(root, path))).map(path => [path, readFileSync(join(root, path), 'utf8')]));
 auditAdminCuration(files.filter(path => path.startsWith('apps/admin/') && existsSync(join(root, path))).map(path => [path, readFileSync(join(root, path), 'utf8')]));
 const stagedDiff = git(['diff', '--cached', '--no-ext-diff', '--unified=0']);

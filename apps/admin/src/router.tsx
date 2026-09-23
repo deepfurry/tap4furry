@@ -23,6 +23,11 @@ import { TaxonomyPage } from './pages/taxonomy/TaxonomyPage';
 import { ContributionListPage } from './pages/contributions/ContributionListPage';
 import { ContributionReviewPage } from './pages/contributions/ContributionReviewPage';
 
+import { ReportsPage, ReportReviewPage } from './pages/governance/ReportsPage';
+import { UsersPage } from './pages/governance/UsersPage';
+import { SourcesPage } from './pages/governance/SourcesPage';
+import { AuditPage } from './pages/governance/AuditPage';
+
 const root = createRootRoute({ component: Outlet });
 const login = createRoute({
   getParentRoute: () => root,
@@ -137,6 +142,32 @@ const contribution = createRoute({
   path: '/contributions/$contributionId',
   component: ContributionReviewPage,
 });
+const reports = createRoute({
+  getParentRoute: () => shell,
+  path: '/reports',
+  component: ReportsPage,
+});
+const report = createRoute({
+  getParentRoute: () => shell,
+  path: '/reports/$reportId',
+  component: ReportReviewPage,
+});
+const users = createRoute({
+  getParentRoute: () => shell,
+  path: '/governance/users',
+  component: UsersPage,
+});
+const user = createRoute({
+  getParentRoute: () => shell,
+  path: '/governance/users/$userId',
+  component: UsersPage,
+});
+const sourceHealth = createRoute({
+  getParentRoute: () => shell,
+  path: '/sources/health',
+  component: SourcesPage,
+});
+const audit = createRoute({ getParentRoute: () => shell, path: '/audit', component: AuditPage });
 export const router = createRouter({
   routeTree: root.addChildren([
     login,
@@ -150,6 +181,12 @@ export const router = createRouter({
       taxonomyTags,
       taxonomyTag,
       account,
+      reports,
+      report,
+      users,
+      user,
+      sourceHealth,
+      audit,
       contributions,
       contribution,
     ]),

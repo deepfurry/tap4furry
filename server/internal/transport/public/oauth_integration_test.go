@@ -14,6 +14,7 @@ import (
 
 	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/deepfurry/tap4furry/server/internal/identity"
+	"github.com/deepfurry/tap4furry/server/internal/moderation"
 	"github.com/deepfurry/tap4furry/server/internal/redisstore"
 	"github.com/gofiber/fiber/v3"
 	"golang.org/x/oauth2"
@@ -95,7 +96,7 @@ func newOAuthFixture(t *testing.T) *oauthFixture {
 	}
 	baseline.auth = authentication
 	baseline.app = fiber.New()
-	Register(baseline.app, nil, authentication, baseline.identity, Options{Environment: "test", PublicOrigin: testOrigin, CSRFSecret: "tap4furry-development-only-csrf-secret"})
+	Register(baseline.app, nil, authentication, baseline.identity, Options{Environment: "test", PublicOrigin: testOrigin, CSRFSecret: "tap4furry-development-only-csrf-secret", ResourcePool: baseline.api})
 	return &oauthFixture{baseline, store, providers}
 }
 func fakeIdentity(kind auth.Provider) auth.ProviderIdentity {
@@ -158,7 +159,7 @@ func TestIntegrationOAuthIdentityAndExistingAuth(t *testing.T) {
 			t.Fatal("OAuth-only methods differ")
 		}
 		name := "User-edited name"
-		if _, err = f.identity.UpdateProfile(ctx, actor.UserID, identityProfileName(name)); err != nil {
+		if _, err = moderation.New(f.api).UpdateProfile(ctx, actor, identityProfileName(name)); err != nil {
 			t.Fatal("OAuth-only profile update failed")
 		}
 		changed := identity

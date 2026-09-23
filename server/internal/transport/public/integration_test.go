@@ -23,6 +23,7 @@ import (
 	"github.com/deepfurry/tap4furry/server/internal/database"
 	"github.com/deepfurry/tap4furry/server/internal/database/sqlc"
 	"github.com/deepfurry/tap4furry/server/internal/identity"
+	"github.com/deepfurry/tap4furry/server/internal/moderation"
 	"github.com/deepfurry/tap4furry/server/internal/transport/admin"
 	"github.com/deepfurry/tap4furry/server/internal/transport/health"
 	"github.com/gofiber/fiber/v3"
@@ -74,7 +75,7 @@ func newFixture(t *testing.T, oauth ...auth.OAuthConfig) *fixture {
 	identities := identity.New(api)
 	checker := health.New(func(ctx context.Context) error { return database.Ready(ctx, api) }, func(context.Context) error { return nil })
 	app := fiber.New()
-	Register(app, checker, authentication, identities, Options{Environment: "test", PublicOrigin: testOrigin, CSRFSecret: config.DevelopmentCSRFSecret})
+	Register(app, checker, authentication, identities, Options{Environment: "test", PublicOrigin: testOrigin, CSRFSecret: config.DevelopmentCSRFSecret, ResourcePool: api})
 	return &fixture{t: t, app: app, api: api, owner: owner, auth: authentication, identity: identities, mail: mailer}
 }
 
@@ -393,9 +394,14 @@ func TestIntegrationUpgradeAndConcurrency(t *testing.T) {
 	}
 	handle := "race" + strings.ReplaceAll(uuid.NewV7().String(), "-", "")[:20]
 	handleResults := make(chan error, 2)
-	for _, id := range []uuid.UUID{grant.Me.ID, other.Me.ID} {
+	for _, grant := range []auth.Grant{grant, other} {
 		wg.Go(func() {
-			_, err := f.identity.UpdateProfile(ctx, id, identity.ProfileUpdate{Handle: identity.Field[string]{Set: true, Value: &handle}})
+			actor, err := f.auth.Resolve(ctx, grant.Token)
+			if err != nil {
+				handleResults <- err
+				return
+			}
+			_, err = moderation.New(f.api).UpdateProfile(ctx, actor, identity.ProfileUpdate{Handle: identity.Field[string]{Set: true, Value: &handle}})
 			handleResults <- err
 		})
 	}
@@ -420,11 +426,11 @@ func TestIntegrationSchemaAndPrivileges(t *testing.T) {
 	f := newFixture(t)
 	ctx := t.Context()
 	var tables string
-	if err := f.owner.QueryRow(ctx, `SELECT string_agg(tablename,',' ORDER BY tablename) FROM pg_tables WHERE schemaname='app'`).Scan(&tables); err != nil || tables != "auth_challenges,auth_identities,categories,category_localizations,contribution_contents,contribution_events,contribution_initial_sources,contribution_localization_changes,contribution_relation_changes,contribution_review_audits,contribution_review_resource_changes,contribution_source_changes,contribution_tag_changes,contributions,goose_db_version,password_credentials,resource_external_ids,resource_localizations,resource_relations,resource_sources,resource_tags,resources,security_events,sessions,tag_localizations,tags,user_profiles,user_roles,users" {
+	if err := f.owner.QueryRow(ctx, `SELECT string_agg(tablename,',' ORDER BY tablename) FROM pg_tables WHERE schemaname='app'`).Scan(&tables); err != nil || tables != "audit_entries,auth_challenges,auth_identities,categories,category_localizations,contribution_contents,contribution_events,contribution_initial_sources,contribution_localization_changes,contribution_relation_changes,contribution_review_audits,contribution_review_resource_changes,contribution_source_changes,contribution_tag_changes,contributions,goose_db_version,moderation_actions,password_credentials,report_events,reports,resource_distribution_policies,resource_external_ids,resource_localizations,resource_relations,resource_sources,resource_tags,resources,security_events,sessions,source_checks,tag_localizations,tags,user_governance_profiles,user_profiles,user_restrictions,user_roles,users" {
 		t.Fatal("unexpected application schema or future tables")
 	}
 	var version int
-	if err := f.owner.QueryRow(ctx, "SELECT max(version_id) FROM app.goose_db_version WHERE is_applied").Scan(&version); err != nil || version != 8 {
+	if err := f.owner.QueryRow(ctx, "SELECT max(version_id) FROM app.goose_db_version WHERE is_applied").Scan(&version); err != nil || version != 9 {
 		t.Fatal("fresh migration chain failed")
 	}
 	for _, role := range []string{"gfp_api", "gfp_admin", "gfp_worker"} {

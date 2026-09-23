@@ -236,7 +236,7 @@ func (h *Handler) ListMyContributions(c fiber.Ctx, p generated.ListMyContributio
 	if err != nil {
 		return contributionError(c, err)
 	}
-	out := generated.ContributionList{Items: []generated.ContributionSummary{}, Page: result.Page, PageSize: result.PageSize, HasNext: result.HasNext, Limits: generated.ContributionLimits{Remaining24h: result.Limits.Remaining24h, PendingCount: result.Limits.Pending, PendingLimit: 5, Reason: result.Limits.Reason, RetryAfterSeconds: result.Limits.RetryAfter}}
+	out := generated.ContributionList{Items: []generated.ContributionSummary{}, Page: result.Page, PageSize: result.PageSize, HasNext: result.HasNext, Limits: generated.ContributionLimits{Remaining24h: result.Limits.Remaining24h, PendingCount: result.Limits.Pending, PendingLimit: int(result.Limits.PendingLimit), Reason: result.Limits.Reason, RetryAfterSeconds: result.Limits.RetryAfter}}
 	for _, r := range result.Items {
 		out.Items = append(out.Items, generated.ContributionSummary{Id: r.ID.String(), Kind: generated.ContributionKind(r.Kind), Status: generated.ContributionStatus(r.Status), Name: r.Name, CreatedAt: r.CreatedAt})
 	}

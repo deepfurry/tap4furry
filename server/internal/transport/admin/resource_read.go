@@ -130,7 +130,12 @@ func resourceSnapshot(ctx context.Context, q *sqlc.Queries, id pgtype.UUID) (gen
 	if err != nil {
 		return generated.ResourceDetail{}, err
 	}
-	result := generated.ResourceDetail{Id: readID(row.ID), Slug: row.Slug, DefaultLocale: row.DefaultLocale, Category: category, PublicationState: generated.PublicationState(row.PublicationState), Lifecycle: generated.Lifecycle(row.Lifecycle), ContentRating: generated.ContentRating(row.ContentRating), Version: row.Version, PublishedAt: readTime(row.PublishedAt), CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time, Localizations: []generated.ResourceLocalization{}, Tags: []generated.TaxonomySummary{}, Sources: []generated.Source{}, Relations: []generated.Relation{}, ExternalIds: []generated.ExternalID{}}
+	policy, err := q.GovernanceDistribution(ctx, id)
+	if err != nil {
+		return generated.ResourceDetail{}, err
+	}
+	distribution := generated.ResourceDetailDistributionPolicy(policy)
+	result := generated.ResourceDetail{DistributionPolicy: &distribution, Id: readID(row.ID), Slug: row.Slug, DefaultLocale: row.DefaultLocale, Category: category, PublicationState: generated.PublicationState(row.PublicationState), Lifecycle: generated.Lifecycle(row.Lifecycle), ContentRating: generated.ContentRating(row.ContentRating), Version: row.Version, PublishedAt: readTime(row.PublishedAt), CreatedAt: row.CreatedAt.Time, UpdatedAt: row.UpdatedAt.Time, Localizations: []generated.ResourceLocalization{}, Tags: []generated.TaxonomySummary{}, Sources: []generated.Source{}, Relations: []generated.Relation{}, ExternalIds: []generated.ExternalID{}}
 	localizations, err := q.AdminResourceLocalizations(ctx, id)
 	if err != nil {
 		return result, err

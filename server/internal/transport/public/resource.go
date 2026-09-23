@@ -17,7 +17,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const PublicReadCache = "public, max-age=0, s-maxage=60, stale-while-revalidate=30"
+const PublicReadCache = "no-store"
 
 var errResourceMissing = errors.New("public resource not found")
 var errCanonicalLocalization = errors.New("canonical localization missing")

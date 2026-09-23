@@ -185,8 +185,8 @@ projection; complete proposed snapshots serve review only. Source belongs to new
 Resource proposals only. IDs/defaults/terminal-result checks and one terminal event
 prevent duplicate decisions; application locks enforce cross-table state transitions.
 
-Proposal quota is 10 per rolling 24 hours, 5 pending and a 60-second interval, under
-the author User lock. Same-key same-content replay precedes quotas; changed content
+The default proposal quota is 10 per rolling 24 hours, 5 pending and a 60-second interval,
+under the author User lock; P0-6 adds the fixed trust tiers below. Same-key same-content replay precedes quotas; changed content
 with the same key conflicts. An opaque HMAC binds edit context to User/Resource/
 version/default locale; no raw context identifier is stored. Public needs no Resource
 UPDATE/locking grant. Review reads the recorded version under canonical locks and
@@ -215,3 +215,29 @@ grants are cleared first. Existing proposal terminal and canonical grants do not
 Down 8 rejects any new-kind proposal before dropping objects. Disposable acceptance
 proves refusal, removes only its owned new fixtures, round-trips 8→7→8 and preserves
 an old-kind proposal. Shared gfp_dev remains up-only.
+
+## P0-6 governance (migration 9)
+
+Eight new tables: `reports`, `report_events`, `user_governance_profiles`,
+`user_restrictions`, `resource_distribution_policies`, `source_checks`,
+`moderation_actions`, `audit_entries`. Migrations 1–8 and all existing table/column
+ACLs are immutable. New tables revoke inherited defaults before precise grants.
+API has only report input/event INSERT, owned status UPDATE and safe policy/report
+SELECT columns. Admin has SELECT and exact mutation columns; immutable history,
+checks, actions and audit have no UPDATE/DELETE. Readonly SELECT; Worker none.
+
+Trust is New/Established/Trusted: contribution budgets 10/30/60 per 24 hours,
+5/10/20 pending, intervals 60/30/15 seconds. No row means New/revision 0; mutations
+create revision 1 under User lock. Report budgets are independent. Restrictions
+have explicit starts/expiry/revocation; replacement revokes and appends atomically.
+Expiry does not rewrite history or bump configuration revision.
+
+Report originals have no runtime UPDATE grant. Request fingerprints, active-target
+uniqueness, report version and one terminal event protect replay/decision behavior.
+Safe messages and internal notes are separate columns. Composite report governance
+references its typed canonical audit; no large payloads, URLs or auth data are logged.
+Distribution changes participate in Resource CAS; source observations only bind it.
+
+Down 9 refuses any governance data. Only guarded disposable `gfp_ci` tests exercise
+9→8→9, preserving all seven proposal kinds and typed snapshots. Shared `gfp_dev`
+uses prepared migrator credentials for UP only, after disposable acceptance.

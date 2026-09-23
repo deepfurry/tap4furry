@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Link, Navigate, Outlet } from '@tanstack/react-router';
 import type { Role } from '@tap4furry/api-client/admin';
 import { AdminRequestError, errorMessage, requireAdmin } from '../lib/admin-api';
-import { canEditorial } from '../lib/capabilities';
+import { canEditorial, canModerate, canAdministrate } from '../lib/capabilities';
 import { keys } from '../lib/query-keys';
 import styles from './AdminShell.module.scss';
 const RolesContext = createContext<readonly Role[]>([]);
@@ -38,13 +38,24 @@ export function AdminShell() {
             {canEditorial(me.data.roles) && <Link to="/contributions">Contributions</Link>}
             <Link to="/taxonomy/categories">Categories</Link>
             <Link to="/taxonomy/tags">Tags</Link>
+            {canModerate(me.data.roles) && <Link to="/reports">Reports</Link>}
+            <Link to="/sources/health">Source checks</Link>
+            {canAdministrate(me.data.roles) && (
+              <>
+                <Link to="/governance/users">User governance</Link>
+                <Link to="/audit">Business audit</Link>
+              </>
+            )}
             <Link to="/account">Account</Link>
           </nav>
           <main className="flex min-w-0 flex-col gap-6">
             {!canEditorial(me.data.roles) && (
               <aside className={styles.notice}>
-                <strong>Read-only</strong>
-                <p>Your current role does not include Editorial capability.</p>
+                <strong>Resource editing is read-only</strong>
+                <p>
+                  Your current role can inspect resources and handle reports, but cannot edit
+                  canonical knowledge.
+                </p>
               </aside>
             )}
             <Outlet />

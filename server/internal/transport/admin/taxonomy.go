@@ -99,15 +99,19 @@ func (h *Handler) PatchCategory(c fiber.Ctx, raw string, _ generated.PatchCatego
 		if _, err := decodeCuration(c, &input, nil); err != nil {
 			return err
 		}
-		if err := h.options.Curation.PatchTaxonomy(c.Context(), actor, curation.Category, id, curation.TaxonomyPatch{DefaultLocale: input.DefaultLocale, State: convertPointer[generated.TaxonomyState, taxonomy.CategoryState](input.State)}); err != nil {
+		if err := h.options.Curation.PatchTaxonomy(c.Context(), actor, curation.Category, id, curation.TaxonomyPatch{Reason: stringValue(input.Reason), DefaultLocale: input.DefaultLocale, State: convertPointer[generated.TaxonomyState, taxonomy.CategoryState](input.State)}); err != nil {
 			return err
 		}
 		return c.JSON(generated.EntityID{Id: id.String()})
 	})
 }
 func (h *Handler) DeleteCategory(c fiber.Ctx, raw string, _ generated.DeleteCategoryParams) error {
+	var input generated.GovernanceReason
+	if _, err := decodeCuration(c, &input, []string{"reason"}); err != nil {
+		return respondError(c, err)
+	}
 	return h.taxonomyCommand(c, raw, func(actor auth.AdminActor, id uuid.UUID) error {
-		if err := h.options.Curation.DeleteTaxonomy(c.Context(), actor, curation.Category, id); err != nil {
+		if err := h.options.Curation.DeleteTaxonomy(c.Context(), actor, curation.Category, id, input.Reason); err != nil {
 			return err
 		}
 		return c.SendStatus(204)
@@ -203,15 +207,19 @@ func (h *Handler) PatchTag(c fiber.Ctx, raw string, _ generated.PatchTagParams) 
 		if _, err := decodeCuration(c, &input, nil); err != nil {
 			return err
 		}
-		if err := h.options.Curation.PatchTaxonomy(c.Context(), actor, curation.Tag, id, curation.TaxonomyPatch{DefaultLocale: input.DefaultLocale, State: convertPointer[generated.TaxonomyState, taxonomy.CategoryState](input.State)}); err != nil {
+		if err := h.options.Curation.PatchTaxonomy(c.Context(), actor, curation.Tag, id, curation.TaxonomyPatch{Reason: stringValue(input.Reason), DefaultLocale: input.DefaultLocale, State: convertPointer[generated.TaxonomyState, taxonomy.CategoryState](input.State)}); err != nil {
 			return err
 		}
 		return c.JSON(generated.EntityID{Id: id.String()})
 	})
 }
 func (h *Handler) DeleteTag(c fiber.Ctx, raw string, _ generated.DeleteTagParams) error {
+	var input generated.GovernanceReason
+	if _, err := decodeCuration(c, &input, []string{"reason"}); err != nil {
+		return respondError(c, err)
+	}
 	return h.taxonomyCommand(c, raw, func(actor auth.AdminActor, id uuid.UUID) error {
-		if err := h.options.Curation.DeleteTaxonomy(c.Context(), actor, curation.Tag, id); err != nil {
+		if err := h.options.Curation.DeleteTaxonomy(c.Context(), actor, curation.Tag, id, input.Reason); err != nil {
 			return err
 		}
 		return c.SendStatus(204)

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   getMe,
+  getOwnGovernance,
   listCategories,
   getContributionContext,
   getMyContribution,
@@ -35,6 +36,30 @@ type Initial = {
   reason: string;
 };
 export function SubmitForm() {
+  const [restriction, setRestriction] = useState<string>();
+  const [policyError, setPolicyError] = useState('');
+  const [policyReady, setPolicyReady] = useState(false);
+  useEffect(() => {
+    let active = true;
+    void getOwnGovernance(privateRead)
+      .then((response) => {
+        const data = checked(response);
+        if (active) {
+          setRestriction(
+            data.restrictions.find(
+              (r) => r.scope === 'all_write' || r.scope === 'contribution_submit',
+            )?.user_message,
+          );
+          setPolicyReady(true);
+        }
+      })
+      .catch((error) => {
+        if (active) setPolicyError(contributionError(error));
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
   const [route, setRoute] = useState<{
     kind: ContributionKind;
     slug: string;
@@ -70,16 +95,26 @@ export function SubmitForm() {
             ))}
         </nav>
       )}
-      {extended ? (
-        <ChangeSubmitForm
-          key={route.kind}
-          kind={route.kind}
-          slug={route.slug}
-          previous={route.previous}
-        />
-      ) : (
-        <BasicSubmitForm />
+      {restriction && (
+        <p role="status">
+          {restriction} You can still view or withdraw your contributions, report problems and
+          manage account security.
+        </p>
       )}
+      {policyError && <p role="alert">{policyError}</p>}
+      {!policyReady && !policyError && <p role="status">Checking submission availability…</p>}
+      <fieldset disabled={!policyReady || Boolean(restriction)}>
+        {extended ? (
+          <ChangeSubmitForm
+            key={route.kind}
+            kind={route.kind}
+            slug={route.slug}
+            previous={route.previous}
+          />
+        ) : (
+          <BasicSubmitForm />
+        )}
+      </fieldset>
     </div>
   );
 }

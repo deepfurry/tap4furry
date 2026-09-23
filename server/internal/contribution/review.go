@@ -61,7 +61,7 @@ func (a *App) Accept(ctx context.Context, actor auth.AdminActor, key uuid.UUID, 
 		if final.Source != nil {
 			source = &curation.SourceInput{URL: final.Source.URL, Label: final.Source.Label, Type: final.Source.Type, Availability: final.Source.Availability, Primary: true}
 		}
-		revision, err := curation.ApplyReviewedTx(ctx, tx, actor, uid(row.TargetResourceID), row.BaseVersion.Int64, base.DefaultLocale, curation.CreateInput{Slug: final.Slug, DefaultLocale: final.DefaultLocale, CategoryID: final.CategoryID, Lifecycle: final.Lifecycle, ContentRating: final.ContentRating, Localization: curation.LocalizationInput{Name: final.Name, Summary: final.Summary, Description: final.Description}}, source)
+		revision, err := curation.ApplyReviewedTx(ctx, tx, actor, uid(row.TargetResourceID), row.BaseVersion.Int64, base.DefaultLocale, curation.CreateInput{Slug: final.Slug, DefaultLocale: final.DefaultLocale, CategoryID: final.CategoryID, Lifecycle: final.Lifecycle, ContentRating: final.ContentRating, Localization: curation.LocalizationInput{Name: final.Name, Summary: final.Summary, Description: final.Description}}, source, uid(row.ID))
 		if err != nil {
 			return err
 		}

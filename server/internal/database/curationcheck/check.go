@@ -29,6 +29,14 @@ func (f *Fixture) Cleanup(pool *pgxpool.Pool) error {
 		return database.SafeError("begin curation fixture cleanup", err)
 	}
 	defer tx.Rollback(ctx)
+	if _, err = tx.Exec(ctx, "DELETE FROM app.audit_entries WHERE resource_id=ANY($1::uuid[]) OR category_id=ANY($2::uuid[]) OR tag_id=ANY($3::uuid[])", f.Resources, f.Categories, f.Tags); err != nil {
+		return database.SafeError("remove fixture business audits", err)
+	}
+	for _, table := range []string{"moderation_actions", "source_checks", "resource_distribution_policies"} {
+		if _, err = tx.Exec(ctx, "DELETE FROM app."+table+" WHERE resource_id=ANY($1::uuid[])", f.Resources); err != nil {
+			return database.SafeError("remove fixture governance children", err)
+		}
+	}
 	for _, table := range []string{"resource_relations", "resource_external_ids", "resource_sources", "resource_tags", "resource_localizations"} {
 		where := "resource_id=ANY($1::uuid[])"
 		if table == "resource_relations" {
@@ -187,34 +195,34 @@ func Run(ctx context.Context, admin, public *fiber.App, owner *pgxpool.Pool, ope
 	if err := mutate("PUT", "/external-ids", map[string]any{"items": []any{map[string]string{"namespace": "fixture", "external_id": prefix}}}, 200); err != nil {
 		return err
 	}
-	if err := mutate("PUT", "/publication", map[string]string{"state": "published"}, 200); err != nil {
+	if err := mutate("PUT", "/publication", map[string]string{"reason": "Acceptance governance reason", "state": "published"}, 200); err != nil {
 		return err
 	}
 	if err := visible(200); err != nil {
 		return err
 	}
 	for _, state := range []string{"restricted", "removed"} {
-		if err := mutate("PUT", "/publication", map[string]string{"state": state}, 403); err != nil {
+		if err := mutate("PUT", "/publication", map[string]string{"reason": "Acceptance governance reason", "state": state}, 403); err != nil {
 			return err
 		}
 	}
-	if err := mutate("PUT", "/sources/"+sid+"/rights", map[string]string{"rights_status": "confirmed"}, 403); err != nil {
+	if err := mutate("PUT", "/sources/"+sid+"/rights", map[string]string{"reason": "Acceptance governance reason", "rights_status": "confirmed"}, 403); err != nil {
 		return err
 	}
-	if err := mutate("DELETE", "", nil, 403); err != nil {
+	if err := mutate("DELETE", "", map[string]string{"reason": "Acceptance soft deletion"}, 403); err != nil {
 		return err
 	}
-	if err := c.call("PATCH", "/categories/"+cat.Id, map[string]string{"state": "retired"}, 403, nil); err != nil {
+	if err := c.call("PATCH", "/categories/"+cat.Id, map[string]string{"reason": "Acceptance governance reason", "state": "retired"}, 403, nil); err != nil {
 		return err
 	}
 	if _, err := operator.Grant(ctx, email, auth.Administrator); err != nil {
 		return err
 	}
-	if err := mutate("PUT", "/sources/"+sid+"/rights", map[string]string{"rights_status": "confirmed"}, 200); err != nil {
+	if err := mutate("PUT", "/sources/"+sid+"/rights", map[string]string{"reason": "Acceptance governance reason", "rights_status": "confirmed"}, 200); err != nil {
 		return err
 	}
 	for _, state := range []string{"restricted", "published", "removed", "published"} {
-		if err := mutate("PUT", "/publication", map[string]string{"state": state}, 200); err != nil {
+		if err := mutate("PUT", "/publication", map[string]string{"reason": "Acceptance governance reason", "state": state}, 200); err != nil {
 			return err
 		}
 		status := 404
@@ -225,19 +233,19 @@ func Run(ctx context.Context, admin, public *fiber.App, owner *pgxpool.Pool, ope
 			return err
 		}
 	}
-	if err := c.call("PATCH", "/categories/"+cat.Id, map[string]string{"state": "retired"}, 200, nil); err != nil {
+	if err := c.call("PATCH", "/categories/"+cat.Id, map[string]string{"reason": "Acceptance governance reason", "state": "retired"}, 200, nil); err != nil {
 		return err
 	}
-	if err := c.call("PATCH", "/tags/"+tag.Id, map[string]string{"state": "retired"}, 200, nil); err != nil {
+	if err := c.call("PATCH", "/tags/"+tag.Id, map[string]string{"reason": "Acceptance governance reason", "state": "retired"}, 200, nil); err != nil {
 		return err
 	}
-	if err := c.call("DELETE", "/categories/"+cat.Id, nil, 409, nil); err != nil {
+	if err := c.call("DELETE", "/categories/"+cat.Id, map[string]string{"reason": "Acceptance soft deletion"}, 409, nil); err != nil {
 		return err
 	}
-	if err := c.call("DELETE", "/tags/"+tag.Id, nil, 409, nil); err != nil {
+	if err := c.call("DELETE", "/tags/"+tag.Id, map[string]string{"reason": "Acceptance soft deletion"}, 409, nil); err != nil {
 		return err
 	}
-	if err := mutate("DELETE", "", nil, 200); err != nil {
+	if err := mutate("DELETE", "", map[string]string{"reason": "Acceptance soft deletion"}, 200); err != nil {
 		return err
 	}
 	if err := visible(404); err != nil {
@@ -249,17 +257,17 @@ func Run(ctx context.Context, admin, public *fiber.App, owner *pgxpool.Pool, ope
 	if err := c.call("GET", "/resources/"+other.Id, nil, 200, &detail); err != nil {
 		return err
 	}
-	if err := c.call("DELETE", fmt.Sprintf("/resources/%s?expected_version=%d", other.Id, detail.Version), nil, 200, nil); err != nil {
+	if err := c.call("DELETE", fmt.Sprintf("/resources/%s?expected_version=%d", other.Id, detail.Version), map[string]string{"reason": "Acceptance soft deletion"}, 200, nil); err != nil {
 		return err
 	}
-	if err := c.call("DELETE", "/categories/"+cat.Id, nil, 204, nil); err != nil {
+	if err := c.call("DELETE", "/categories/"+cat.Id, map[string]string{"reason": "Acceptance soft deletion"}, 204, nil); err != nil {
 		return err
 	}
-	if err := c.call("DELETE", "/tags/"+tag.Id, nil, 204, nil); err != nil {
+	if err := c.call("DELETE", "/tags/"+tag.Id, map[string]string{"reason": "Acceptance soft deletion"}, 204, nil); err != nil {
 		return err
 	}
 	var version int
-	if err := owner.QueryRow(ctx, "SELECT version_id FROM app.goose_db_version ORDER BY id DESC LIMIT 1").Scan(&version); err != nil || version != 8 {
+	if err := owner.QueryRow(ctx, "SELECT version_id FROM app.goose_db_version ORDER BY id DESC LIMIT 1").Scan(&version); err != nil || version != 9 {
 		return errors.New("Goose version preservation failed")
 	}
 	return nil

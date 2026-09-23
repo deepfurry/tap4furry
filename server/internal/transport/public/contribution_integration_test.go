@@ -226,7 +226,7 @@ func TestIntegrationContributionEditCASAndPrivacy(t *testing.T) {
 	f := newContributionFixture(t)
 	ctx := t.Context()
 	r := f.create()
-	r, err := f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Published)
+	r, err := f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Published, "Fixture governance reason")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -279,7 +279,7 @@ func TestIntegrationContributionEditCASAndPrivacy(t *testing.T) {
 	if _, err = f.operator.Grant(ctx, f.email, auth.Administrator); err != nil {
 		t.Fatal(err)
 	}
-	if _, err = f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Restricted); err != nil {
+	if _, err = f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Restricted, "Fixture governance reason"); err != nil {
 		t.Fatal(err)
 	}
 	own, err = f.publicReview.OwnDetail(ctx, f.author, id)
@@ -404,7 +404,7 @@ func TestIntegrationContributionAuthorProjectionRetainsOnlySubmittedFields(t *te
 	f := newContributionFixture(t)
 	ctx := t.Context()
 	r := f.create()
-	r, err := f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Published)
+	r, err := f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Published, "Fixture governance reason")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -416,7 +416,7 @@ func TestIntegrationContributionAuthorProjectionRetainsOnlySubmittedFields(t *te
 	if _, err = f.operator.Grant(ctx, f.email, auth.Administrator); err != nil {
 		t.Fatal(err)
 	}
-	if _, err = f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Restricted); err != nil {
+	if _, err = f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Restricted, "Fixture governance reason"); err != nil {
 		t.Fatal(err)
 	}
 	body, _ := f.request("GET", "/me/contributions/"+id.String(), nil, f.authorCookie, 200)
@@ -495,7 +495,7 @@ func TestIntegrationContributionTaxonomyLocaleAndCanonicalCorruption(t *testing.
 	f := newContributionFixture(t)
 	ctx := t.Context()
 	r := f.create()
-	r, err := f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Published)
+	r, err := f.curation.SetPublication(ctx, f.actor, r.ID, r.Version, resource.Published, "Fixture governance reason")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -519,7 +519,7 @@ func TestIntegrationContributionTaxonomyLocaleAndCanonicalCorruption(t *testing.
 		t.Fatal(err)
 	}
 	retired := taxonomy.Retired
-	if err = f.curation.PatchTaxonomy(ctx, f.actor, curation.Category, f.category, curation.TaxonomyPatch{State: &retired}); err != nil {
+	if err = f.curation.PatchTaxonomy(ctx, f.actor, curation.Category, f.category, curation.TaxonomyPatch{Reason: "Fixture governance reason", State: &retired}); err != nil {
 		t.Fatal(err)
 	}
 	if _, err = f.publicReview.Submit(ctx, f.author, f.input()); !errors.Is(err, contribution.ErrValidation) {

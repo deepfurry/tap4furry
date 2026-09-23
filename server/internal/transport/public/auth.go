@@ -10,6 +10,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/governance"
 	"github.com/deepfurry/tap4furry/server/internal/identity"
 	"github.com/deepfurry/tap4furry/server/internal/transport/public/generated"
 	"github.com/gofiber/fiber/v3"
@@ -156,7 +157,7 @@ func (h *Handler) UpdateProfile(c fiber.Ctx, _ generated.UpdateProfileParams) er
 	if _, setIndexing := fields["search_engine_indexing"]; setIndexing && input.SearchEngineIndexing == nil {
 		return respondError(c, identity.ErrValidation)
 	}
-	me, err := h.identity.UpdateProfile(c.Context(), actor.UserID, identity.ProfileUpdate{
+	me, err := h.moderation.UpdateProfile(c.Context(), actor, identity.ProfileUpdate{
 		Handle: identity.Field[string]{Set: setHandle, Value: input.Handle}, DisplayName: identity.Field[string]{Set: setName, Value: input.DisplayName},
 		Bio: identity.Field[string]{Set: setBio, Value: input.Bio}, SearchEngineIndexing: input.SearchEngineIndexing})
 	if err != nil {
@@ -181,7 +182,10 @@ func meDTO(me identity.Me) generated.Me {
 
 func respondError(c fiber.Ctx, err error) error {
 	status, code, message := fiber.StatusInternalServerError, generated.INTERNALERROR, "The request could not be completed."
+	var restricted *governance.RestrictedError
 	switch {
+	case errors.As(err, &restricted):
+		status, code, message = 403, generated.BUSINESSRESTRICTED, restricted.Message
 	case errors.Is(err, auth.ErrRateLimited):
 		status, code, message = 429, generated.AUTHRATELIMITED, "Too many attempts. Please try again later."
 	case errors.Is(err, identity.ErrValidation):

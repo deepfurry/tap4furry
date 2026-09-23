@@ -7,6 +7,7 @@ import (
 	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/deepfurry/tap4furry/server/internal/contribution"
 	"github.com/deepfurry/tap4furry/server/internal/curation"
+	"github.com/deepfurry/tap4furry/server/internal/moderation"
 	"github.com/deepfurry/tap4furry/server/internal/transport/admin/generated"
 	"github.com/deepfurry/tap4furry/server/internal/transport/health"
 	"github.com/gofiber/fiber/v3"
@@ -17,6 +18,7 @@ type Handler struct {
 	health        *health.Checker
 	options       Options
 	contributions *contribution.App
+	moderation    *moderation.App
 }
 type Options struct {
 	Auth                                 *auth.App
@@ -35,8 +37,9 @@ func Register(router fiber.Router, checker *health.Checker, options ...Options) 
 	h := &Handler{health: checker, options: option}
 	if option.ResourcePool != nil {
 		h.contributions = contribution.New(option.ResourcePool, "")
+		h.moderation = moderation.New(option.ResourcePool)
 	}
-	for _, path := range []string{"/auth", "/me", "/resources", "/categories", "/tags", "/contributions"} {
+	for _, path := range []string{"/auth", "/me", "/resources", "/categories", "/tags", "/contributions", "/reports", "/users", "/source-checks", "/audit"} {
 		router.Use(path, func(c fiber.Ctx) error {
 			ctx, cancel := context.WithTimeout(c.Context(), 5*time.Second)
 			defer cancel()
@@ -52,6 +55,9 @@ func Register(router fiber.Router, checker *health.Checker, options ...Options) 
 		router.Use(path, h.csrfGuard)
 	}
 	router.Use("/contributions", h.contributionBoundary, h.adminAccessGuard, h.csrfGuard)
+	for _, path := range []string{"/reports", "/users", "/source-checks", "/audit"} {
+		router.Use(path, h.moderationBoundary, h.adminAccessGuard, h.csrfGuard)
+	}
 	generated.RegisterHandlers(router, h)
 }
 func (*Handler) GetLive(c fiber.Ctx) error { return c.JSON(generated.Live{Status: "alive"}) }

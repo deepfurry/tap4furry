@@ -112,7 +112,7 @@ func run() (result error) {
 		return err
 	}
 	app := fiber.New()
-	public.Register(app, health.New(func(context.Context) error { return nil }, func(context.Context) error { return nil }), authentication, identity.New(api), public.Options{Environment: cfg.Environment, PublicOrigin: cfg.PublicOrigin, CSRFSecret: cfg.CSRFSecret})
+	public.Register(app, health.New(func(context.Context) error { return nil }, func(context.Context) error { return nil }), authentication, identity.New(api), public.Options{Environment: cfg.Environment, PublicOrigin: cfg.PublicOrigin, CSRFSecret: cfg.CSRFSecret, ResourcePool: api})
 	suffix := strings.ReplaceAll(uuid.NewV7().String(), "-", "")
 	email := "p01b-smoke-" + suffix + "@example.invalid"
 	var random [32]byte

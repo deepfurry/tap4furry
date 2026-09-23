@@ -5,6 +5,7 @@ import (
 	"errors"
 	"github.com/deepfurry/tap4furry/server/internal/auth"
 	"github.com/deepfurry/tap4furry/server/internal/database/sqlc"
+	"github.com/deepfurry/tap4furry/server/internal/governance"
 	"github.com/deepfurry/tap4furry/server/internal/resource"
 	"github.com/jackc/pgx/v5"
 	"uuid"
@@ -14,7 +15,7 @@ import (
 // is checked here too: a caller cannot manufacture an already-authorized actor.
 // A nil target creates a draft; otherwise the existing public resource is locked
 // and its default language and revision must still equal the submitted baseline.
-func ApplyReviewedTx(ctx context.Context, tx pgx.Tx, actor auth.AdminActor, target uuid.UUID, expected int64, baseLocale string, input CreateInput, source *SourceInput) (Revision, error) {
+func ApplyReviewedTx(ctx context.Context, tx pgx.Tx, actor auth.AdminActor, target uuid.UUID, expected int64, baseLocale string, input CreateInput, source *SourceInput, contributionID uuid.UUID) (Revision, error) {
 	if _, err := auth.RequireAdminCapabilityTx(ctx, tx, actor, auth.Editorial); err != nil {
 		return Revision{}, err
 	}
@@ -34,7 +35,12 @@ func ApplyReviewedTx(ctx context.Context, tx pgx.Tx, actor auth.AdminActor, targ
 				return Revision{}, safe(err)
 			}
 		}
-		return result, nil
+		fields := []string{"core", "localization"}
+		if source != nil {
+			fields = append(fields, "sources")
+		}
+		_, err = governance.Record(ctx, q, actor.UserID, governance.Change{Operation: "create", ResourceID: result.ID, ContributionID: contributionID, AfterVersion: 1, Fields: fields})
+		return result, safe(err)
 	}
 	row, err := lockedResource(ctx, q, target, expected)
 	if err != nil {
@@ -73,5 +79,15 @@ func ApplyReviewedTx(ctx context.Context, tx pgx.Tx, actor auth.AdminActor, targ
 		return Revision{}, safe(err)
 	}
 	result, err := bump(ctx, q, target, expected)
+	if err == nil {
+		fields := []string{}
+		if changed {
+			fields = append(fields, "core")
+		}
+		if n > 0 {
+			fields = append(fields, "localization")
+		}
+		_, err = governance.Record(ctx, q, actor.UserID, governance.Change{Operation: "core", ResourceID: target, ContributionID: contributionID, BeforeVersion: expected, AfterVersion: result.Version, Fields: fields})
+	}
 	return result, safe(err)
 }

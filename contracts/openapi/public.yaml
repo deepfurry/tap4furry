@@ -19,7 +19,7 @@ paths:
           headers:
             Cache-Control:
               schema: {type: string}
-              description: 'public, max-age=0, s-maxage=60, stale-while-revalidate=30'
+              description: 'no-store'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ResourceList'}
@@ -41,7 +41,7 @@ paths:
           headers:
             Cache-Control:
               schema: {type: string}
-              description: 'public, max-age=0, s-maxage=60, stale-while-revalidate=30'
+              description: 'no-store'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/ResourceDetail'}
@@ -64,7 +64,7 @@ paths:
           headers:
             Cache-Control:
               schema: {type: string}
-              description: 'public, max-age=0, s-maxage=60, stale-while-revalidate=30'
+              description: 'no-store'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/CategoryList'}
@@ -85,7 +85,7 @@ paths:
           headers:
             Cache-Control:
               schema: {type: string}
-              description: 'public, max-age=0, s-maxage=60, stale-while-revalidate=30'
+              description: 'no-store'
           content:
             application/json:
               schema: {$ref: '#/components/schemas/TagList'}
@@ -647,6 +647,16 @@ paths:
             application/json:
               schema: {"$ref":"#/components/schemas/ApiError"}
         500: {"$ref":"#/components/responses/Error"}
+  /reports:
+    post: {"operationId":"submitReport","description":"Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.","security":[{"PublicSession":[]}],"parameters":[{"$ref":"#/components/parameters/CSRF"}],"responses":{"200":{"description":"Current private result. No-store.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RequestReceipt"}}}},"400":{"$ref":"#/components/responses/Error"},"401":{"$ref":"#/components/responses/Error"},"403":{"$ref":"#/components/responses/Error"},"404":{"$ref":"#/components/responses/Error"},"409":{"$ref":"#/components/responses/Error"},"429":{"$ref":"#/components/responses/Error"},"500":{"$ref":"#/components/responses/Error"}},"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ReportInput"}}}}}
+  /me/reports:
+    get: {"operationId":"listOwnReports","description":"Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.","security":[{"PublicSession":[]}],"parameters":[{"name":"page","in":"query","required":false,"schema":{"type":"integer","format":"int64","minimum":1,"default":1}},{"name":"page_size","in":"query","required":false,"schema":{"type":"integer","minimum":1,"maximum":100,"default":20}},{"name":"status","in":"query","required":false,"schema":{"type":"string","enum":["open","in_review","resolved","dismissed","withdrawn"]}}],"responses":{"200":{"description":"Current private result. No-store.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/OwnReportList"}}}},"400":{"$ref":"#/components/responses/Error"},"401":{"$ref":"#/components/responses/Error"},"403":{"$ref":"#/components/responses/Error"},"404":{"$ref":"#/components/responses/Error"},"409":{"$ref":"#/components/responses/Error"},"429":{"$ref":"#/components/responses/Error"},"500":{"$ref":"#/components/responses/Error"}}}
+  /me/reports/{id}:
+    get: {"operationId":"getOwnReport","description":"Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.","security":[{"PublicSession":[]}],"parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$","minLength":36,"maxLength":36}}],"responses":{"200":{"description":"Current private result. No-store.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/OwnReport"}}}},"400":{"$ref":"#/components/responses/Error"},"401":{"$ref":"#/components/responses/Error"},"403":{"$ref":"#/components/responses/Error"},"404":{"$ref":"#/components/responses/Error"},"409":{"$ref":"#/components/responses/Error"},"429":{"$ref":"#/components/responses/Error"},"500":{"$ref":"#/components/responses/Error"}}}
+  /me/reports/{id}/withdraw:
+    post: {"operationId":"withdrawReport","description":"Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.","security":[{"PublicSession":[]}],"parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$","minLength":36,"maxLength":36}},{"$ref":"#/components/parameters/CSRF"}],"responses":{"200":{"description":"Current private result. No-store.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/RequestReceipt"}}}},"400":{"$ref":"#/components/responses/Error"},"401":{"$ref":"#/components/responses/Error"},"403":{"$ref":"#/components/responses/Error"},"404":{"$ref":"#/components/responses/Error"},"409":{"$ref":"#/components/responses/Error"},"429":{"$ref":"#/components/responses/Error"},"500":{"$ref":"#/components/responses/Error"}},"requestBody":{"required":true,"content":{"application/json":{"schema":{"$ref":"#/components/schemas/ReportWithdrawal"}}}}}
+  /me/governance:
+    get: {"operationId":"getOwnGovernance","description":"Private governance surface; no-store. Session, live capabilities and mutation CSRF are required. Conflicts preserve client input.","security":[{"PublicSession":[]}],"parameters":[],"responses":{"200":{"description":"Current private result. No-store.","content":{"application/json":{"schema":{"$ref":"#/components/schemas/OwnGovernance"}}}},"400":{"$ref":"#/components/responses/Error"},"401":{"$ref":"#/components/responses/Error"},"403":{"$ref":"#/components/responses/Error"},"404":{"$ref":"#/components/responses/Error"},"409":{"$ref":"#/components/responses/Error"},"429":{"$ref":"#/components/responses/Error"},"500":{"$ref":"#/components/responses/Error"}}}
 components:
   parameters:
     Locale:
@@ -732,6 +742,16 @@ components:
           schema:
             $ref: '#/components/schemas/ApiError'
   schemas:
+    RequestReceipt: {"type":"object","additionalProperties":false,"required":["id"],"properties":{"id":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$","minLength":36,"maxLength":36}}}
+    ReportInput: {"type":"object","additionalProperties":false,"required":["request_id","target_kind","resource_id","reason","body"],"properties":{"request_id":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$","minLength":36,"maxLength":36},"target_kind":{"type":"string","enum":["resource","source"]},"resource_id":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$","minLength":36,"maxLength":36},"source_id":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$","minLength":36,"maxLength":36},"reason":{"type":"string","enum":["broken_link","rights_concern","malicious_link","privacy","content_rating","spam","other"]},"body":{"type":"string","minLength":1,"maxLength":4000}}}
+    ReportWithdrawal: {"type":"object","additionalProperties":false,"required":["request_id"],"properties":{"request_id":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$","minLength":36,"maxLength":36}}}
+    ReportPublicEvent: {"type":"object","additionalProperties":false,"required":["event_type","occurred_at"],"properties":{"event_type":{"type":"string","enum":["submitted","triaged","escalated","resolved","dismissed","withdrawn"]},"safe_message":{"type":"string","minLength":1,"maxLength":1000},"occurred_at":{"type":"string","format":"date-time"}}}
+    ReportPublicTarget: {"type":"object","additionalProperties":false,"required":["resource_id","slug","name"],"properties":{"resource_id":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$","minLength":36,"maxLength":36},"slug":{"type":"string","minLength":1,"maxLength":80},"name":{"type":"string","minLength":1,"maxLength":160},"source_id":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$","minLength":36,"maxLength":36}}}
+    OwnReport: {"type":"object","additionalProperties":false,"required":["id","target_kind","resource_id","reason","body","status","created_at","events"],"properties":{"id":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$","minLength":36,"maxLength":36},"target_kind":{"type":"string","enum":["resource","source"]},"resource_id":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$","minLength":36,"maxLength":36},"source_id":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$","minLength":36,"maxLength":36},"reason":{"type":"string","enum":["broken_link","rights_concern","malicious_link","privacy","content_rating","spam","other"]},"body":{"type":"string","minLength":1,"maxLength":4000},"status":{"type":"string","enum":["open","in_review","resolved","dismissed","withdrawn"]},"created_at":{"type":"string","format":"date-time"},"decided_at":{"type":"string","format":"date-time"},"target":{"$ref":"#/components/schemas/ReportPublicTarget"},"events":{"type":"array","items":{"$ref":"#/components/schemas/ReportPublicEvent"}}}}
+    OwnReportList: {"type":"object","additionalProperties":false,"required":["items","page","page_size","has_next"],"properties":{"items":{"type":"array","items":{"$ref":"#/components/schemas/OwnReport"}},"page":{"type":"integer","format":"int64","minimum":1},"page_size":{"type":"integer","format":"int64","minimum":1},"has_next":{"type":"boolean"}}}
+    ActiveRestriction: {"type":"object","additionalProperties":false,"required":["id","scope","reason_code","user_message","starts_at"],"properties":{"id":{"type":"string","pattern":"^[0-9a-fA-F-]{36}$","minLength":36,"maxLength":36},"scope":{"type":"string","enum":["contribution_submit","public_profile_write","all_write"]},"reason_code":{"type":"string","enum":["spam","abuse","repeated_policy_violation","other"]},"user_message":{"type":"string","minLength":1,"maxLength":1000},"starts_at":{"type":"string","format":"date-time"},"expires_at":{"type":"string","format":"date-time"}}}
+    BusinessQuota: {"type":"object","additionalProperties":false,"required":["daily_limit","pending_limit","interval_seconds","remaining_24h","pending","retry_after"],"properties":{"daily_limit":{"type":"integer","format":"int64","minimum":0},"pending_limit":{"type":"integer","format":"int64","minimum":0},"interval_seconds":{"type":"integer","format":"int64","minimum":0},"remaining_24h":{"type":"integer","format":"int64","minimum":0},"pending":{"type":"integer","format":"int64","minimum":0},"retry_after":{"type":"integer","format":"int64","minimum":0}}}
+    OwnGovernance: {"type":"object","additionalProperties":false,"required":["restrictions","contribution_quota","report_quota"],"properties":{"restrictions":{"type":"array","items":{"$ref":"#/components/schemas/ActiveRestriction"}},"contribution_quota":{"$ref":"#/components/schemas/BusinessQuota"},"report_quota":{"$ref":"#/components/schemas/BusinessQuota"}}}
     ContributionChangeSource:
       {"type":"object","additionalProperties":false,"required":["url"],"properties":{"url":{"type":"string","maxLength":2048,"format":"uri"},"label":{"type":"string","maxLength":80,"nullable":true},"source_type":{"type":"string","enum":["official","store","archive","mirror","community","external","unknown"]}}}
     ContributionChangeRelation:
@@ -1280,7 +1300,7 @@ components:
       properties:
         code:
           type: string
-          enum: [VALIDATION_ERROR, AUTH_EMAIL_ALREADY_REGISTERED, AUTH_INVALID_CREDENTIALS, AUTH_UNAUTHENTICATED, AUTH_ACCOUNT_DISABLED, PROFILE_HANDLE_UNAVAILABLE, PROFILE_NOT_FOUND, ORIGIN_FORBIDDEN, CSRF_INVALID, AUTH_CHALLENGE_INVALID, AUTH_REAUTH_FAILED, AUTH_SESSION_NOT_FOUND, MAIL_UNAVAILABLE, AUTH_PROVIDER_UNAVAILABLE, AUTH_PROVIDER_INVALID, AUTH_PROVIDER_ALREADY_LINKED, AUTH_PROVIDER_NOT_LINKED, AUTH_ACCOUNT_LINK_REQUIRED, AUTH_REAUTH_REQUIRED, AUTH_LAST_METHOD, AUTH_RATE_LIMITED, RESOURCE_NOT_FOUND, INTERNAL_ERROR, CONTRIBUTION_NOT_FOUND, CONTRIBUTION_FORBIDDEN, CONTRIBUTION_VERIFICATION_REQUIRED, CONTRIBUTION_CONFLICT, RESOURCE_RELATION_CYCLE, CONTRIBUTION_REQUEST_CONFLICT, CONTRIBUTION_LIMITED, RESOURCE_VERSION_CONFLICT]
+          enum: [VALIDATION_ERROR, AUTH_EMAIL_ALREADY_REGISTERED, AUTH_INVALID_CREDENTIALS, AUTH_UNAUTHENTICATED, AUTH_ACCOUNT_DISABLED, PROFILE_HANDLE_UNAVAILABLE, PROFILE_NOT_FOUND, ORIGIN_FORBIDDEN, CSRF_INVALID, AUTH_CHALLENGE_INVALID, AUTH_REAUTH_FAILED, AUTH_SESSION_NOT_FOUND, MAIL_UNAVAILABLE, AUTH_PROVIDER_UNAVAILABLE, AUTH_PROVIDER_INVALID, AUTH_PROVIDER_ALREADY_LINKED, AUTH_PROVIDER_NOT_LINKED, AUTH_ACCOUNT_LINK_REQUIRED, AUTH_REAUTH_REQUIRED, AUTH_LAST_METHOD, AUTH_RATE_LIMITED, RESOURCE_NOT_FOUND, INTERNAL_ERROR, CONTRIBUTION_NOT_FOUND, CONTRIBUTION_FORBIDDEN, CONTRIBUTION_VERIFICATION_REQUIRED, CONTRIBUTION_CONFLICT, RESOURCE_RELATION_CYCLE, CONTRIBUTION_REQUEST_CONFLICT, CONTRIBUTION_LIMITED, RESOURCE_VERSION_CONFLICT, BUSINESS_RESTRICTED, REPORT_NOT_FOUND, REPORT_FORBIDDEN, REPORT_VERIFICATION_REQUIRED, REPORT_LIMITED, GOVERNANCE_CONFLICT, GOVERNANCE_REQUEST_CONFLICT]
         message:
           type: string
     Handle:

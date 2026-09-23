@@ -6,3 +6,6 @@ export { listContributions, getContribution, acceptContribution, rejectContribut
 export type { ContributionContent, ContributionDetail, ContributionList, ContributionKind, ContributionStatus, AcceptContribution } from './generated/admin/client';
 
 export type { ContributionChange, ContributionChangeSource, ContributionChangeTranslation, ContributionChangeRelation } from './generated/admin/client';
+
+export { listReports,getReport,triageReport,dismissReport,resolveReport,getUserGovernance,updateUserTrust,createRestriction,revokeRestriction,updateResourceDistribution,listSourceHealth,recordSourceCheck,listAudit,getAudit } from './generated/admin/client';
+export type { AdminReport,ListReportsParams,ReportResolve,ReportTriage,UserGovernance,TrustUpdate,RestrictionCreate,SourceHealth,SourceCheckInput,ListSourceHealthParams,ListAuditParams,AuditEntry,DistributionUpdate } from './generated/admin/client';
