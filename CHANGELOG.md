@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add the Chinese Stage 1.1 contribution review design draft, including the agreed
+  edit-before-accept workflow with immutable originals, accepted content and reasons;
+  outline fields, private UI/API, quotas, atomic review and least-privilege boundaries.
+
 - Refine the Chinese P0 roadmap into seven end-to-end delivery units across three
   stages. Add Stage 1 contribution/governance design covering review transactions,
   proposal types, capability/privacy boundaries, reports, restrictions and acceptance.
