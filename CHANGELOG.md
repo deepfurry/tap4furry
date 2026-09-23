@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- Reorder the product roadmap around a curated Resource directory Beta after P0-2,
+  with explicit public-journey, content, production-readiness and feedback gates.
+  Retain P0 capability scopes and engineering safeguards while making subsequent
+  search, contribution and organization slices depend on observed user needs.
+
 - Add P0-2C Admin Resource/Taxonomy curation APIs, generated clients and routed React
   Resource editors, Taxonomy pages and Account workspace. Create always starts Draft.
 - Add Application-owned transactions with live Admin capability revalidation under

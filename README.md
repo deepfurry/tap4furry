@@ -7,8 +7,10 @@ pure Taxonomy/Resource primitives, localization and Resource revision/CAS ground
 P0-2B exposes anonymous Resource/taxonomy read APIs and `/resources` Astro SSR pages,
 with field-level locale fallback and sanitized Markdown. P0-2C adds canonical Admin
 curation with transactional capabilities, Resource CAS, graph invariants and a routed
-React editor. P0-3 Contribution & Review is next; search remains a later phase.
-Production deployment sign-off remains a separate gate.
+React editor. Next is a curated Resource directory Beta: public journey, launch
+content and production readiness, followed by feedback-selected P0 capabilities.
+See the [delivery roadmap](docs/product/roadmap.md). Production deployment sign-off
+remains a separate gate.
 
 Canonical repository: [deepfurry/tap4furry](https://github.com/deepfurry/tap4furry).
 Future production origins are `https://tap4furry.com` and
