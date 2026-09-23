@@ -287,7 +287,7 @@ func (q *Queries) ContributionGet(ctx context.Context, id pgtype.UUID) (AppContr
 }
 
 const contributionListAdmin = `-- name: ContributionListAdmin :many
-SELECT c.id, c.author_id, c.kind, c.target_resource_id, c.base_version, c.status, c.reason, c.previous_id, c.request_id, c.request_fingerprint, c.submitted_fields, c.result_resource_id, c.result_version, c.created_at, c.decided_at,p.name FROM app.contributions c JOIN app.contribution_contents p ON p.contribution_id=c.id AND p.content_kind='proposed'
+SELECT c.id, c.author_id, c.kind, c.target_resource_id, c.base_version, c.status, c.reason, c.previous_id, c.request_id, c.request_fingerprint, c.submitted_fields, c.result_resource_id, c.result_version, c.created_at, c.decided_at,coalesce(p.name,c.kind)::text AS name FROM app.contributions c LEFT JOIN app.contribution_contents p ON p.contribution_id=c.id AND p.content_kind='proposed'
 WHERE ($1::text IS NULL OR c.status=$1) AND ($2::text IS NULL OR c.kind=$2)
 ORDER BY c.created_at,c.id LIMIT $4::int OFFSET $3::bigint
 `
@@ -361,7 +361,7 @@ func (q *Queries) ContributionListAdmin(ctx context.Context, arg ContributionLis
 }
 
 const contributionListOwned = `-- name: ContributionListOwned :many
-SELECT c.id, c.author_id, c.kind, c.target_resource_id, c.base_version, c.status, c.reason, c.previous_id, c.request_id, c.request_fingerprint, c.submitted_fields, c.result_resource_id, c.result_version, c.created_at, c.decided_at,CASE WHEN c.kind='create_resource' OR (c.submitted_fields & 1)<>0 THEN p.name ELSE 'Resource correction' END::text AS name FROM app.contributions c JOIN app.contribution_contents p ON p.contribution_id=c.id AND p.content_kind='proposed'
+SELECT c.id, c.author_id, c.kind, c.target_resource_id, c.base_version, c.status, c.reason, c.previous_id, c.request_id, c.request_fingerprint, c.submitted_fields, c.result_resource_id, c.result_version, c.created_at, c.decided_at,CASE WHEN c.kind='create_resource' OR (c.submitted_fields & 1)<>0 THEN p.name WHEN c.kind='update_resource' THEN 'Resource correction' ELSE c.kind END::text AS name FROM app.contributions c LEFT JOIN app.contribution_contents p ON p.contribution_id=c.id AND p.content_kind='proposed'
 WHERE c.author_id=$1 AND ($2::text IS NULL OR c.status=$2)
 ORDER BY c.created_at DESC,c.id DESC LIMIT $4::int OFFSET $3::bigint
 `

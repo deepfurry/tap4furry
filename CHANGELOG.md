@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+- Complete Stage 1.2 / P0-3B: add Source addition/removal, additive Tag sets, Relations
+  and Resource translations to the existing private submission/review/history UI.
+  Preserve originals, revised acceptance reasons, quota, replay and explicit conflict handling.
+- Add migration 8 and five typed snapshot/audit tables with precise grants; preserve
+  migrations 1–7 and Resource Core permissions. Canonical acceptance is atomic, with
+  dual-endpoint relation CAS/audits and raw-locale omission/null semantics.
+- Extend disposable migration protection, privacy, rollback, role/session/graph/taxonomy
+  concurrency and shared Admin smoke acceptance. Private reads use consistent canonical
+  snapshots plus fresh authorization; anonymous SSR, Auth and infrastructure remain unchanged.
+
 - Design Stage 1.2 / P0-3B in Chinese: five additional contribution types, shared
   review UI, dual-endpoint relation CAS/audits, raw localization editing, private
   history and additive migration compatibility. Update the roadmap as design only;

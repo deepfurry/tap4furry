@@ -33,6 +33,7 @@ const (
 	CURATIONRELATIONCYCLE            ApiErrorCode = "CURATION_RELATION_CYCLE"
 	INTERNALERROR                    ApiErrorCode = "INTERNAL_ERROR"
 	ORIGINFORBIDDEN                  ApiErrorCode = "ORIGIN_FORBIDDEN"
+	RESOURCERELATIONCYCLE            ApiErrorCode = "RESOURCE_RELATION_CYCLE"
 	RESOURCEVERSIONCONFLICT          ApiErrorCode = "RESOURCE_VERSION_CONFLICT"
 	VALIDATIONERROR                  ApiErrorCode = "VALIDATION_ERROR"
 )
@@ -75,6 +76,8 @@ func (e ApiErrorCode) Valid() bool {
 	case INTERNALERROR:
 		return true
 	case ORIGINFORBIDDEN:
+		return true
+	case RESOURCERELATIONCYCLE:
 		return true
 	case RESOURCEVERSIONCONFLICT:
 		return true
@@ -127,6 +130,111 @@ func (e ContentRating) Valid() bool {
 	case ContentRatingGeneral:
 		return true
 	case ContentRatingMature:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionChangeRelationDirection.
+const (
+	ContributionChangeRelationDirectionIncoming  ContributionChangeRelationDirection = "incoming"
+	ContributionChangeRelationDirectionOutgoing  ContributionChangeRelationDirection = "outgoing"
+	ContributionChangeRelationDirectionSymmetric ContributionChangeRelationDirection = "symmetric"
+)
+
+// Valid indicates whether the value is a known member of the ContributionChangeRelationDirection enum.
+func (e ContributionChangeRelationDirection) Valid() bool {
+	switch e {
+	case ContributionChangeRelationDirectionIncoming:
+		return true
+	case ContributionChangeRelationDirectionOutgoing:
+		return true
+	case ContributionChangeRelationDirectionSymmetric:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionChangeRelationRelationType.
+const (
+	ContributionChangeRelationRelationTypeDerivedFrom ContributionChangeRelationRelationType = "derived_from"
+	ContributionChangeRelationRelationTypePartOf      ContributionChangeRelationRelationType = "part_of"
+	ContributionChangeRelationRelationTypeRelatedTo   ContributionChangeRelationRelationType = "related_to"
+	ContributionChangeRelationRelationTypeSuccessorOf ContributionChangeRelationRelationType = "successor_of"
+)
+
+// Valid indicates whether the value is a known member of the ContributionChangeRelationRelationType enum.
+func (e ContributionChangeRelationRelationType) Valid() bool {
+	switch e {
+	case ContributionChangeRelationRelationTypeDerivedFrom:
+		return true
+	case ContributionChangeRelationRelationTypePartOf:
+		return true
+	case ContributionChangeRelationRelationTypeRelatedTo:
+		return true
+	case ContributionChangeRelationRelationTypeSuccessorOf:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionChangeSourceAvailabilityState.
+const (
+	ContributionChangeSourceAvailabilityStateActive      ContributionChangeSourceAvailabilityState = "active"
+	ContributionChangeSourceAvailabilityStateBroken      ContributionChangeSourceAvailabilityState = "broken"
+	ContributionChangeSourceAvailabilityStateRemoved     ContributionChangeSourceAvailabilityState = "removed"
+	ContributionChangeSourceAvailabilityStateRestricted  ContributionChangeSourceAvailabilityState = "restricted"
+	ContributionChangeSourceAvailabilityStateUnavailable ContributionChangeSourceAvailabilityState = "unavailable"
+)
+
+// Valid indicates whether the value is a known member of the ContributionChangeSourceAvailabilityState enum.
+func (e ContributionChangeSourceAvailabilityState) Valid() bool {
+	switch e {
+	case ContributionChangeSourceAvailabilityStateActive:
+		return true
+	case ContributionChangeSourceAvailabilityStateBroken:
+		return true
+	case ContributionChangeSourceAvailabilityStateRemoved:
+		return true
+	case ContributionChangeSourceAvailabilityStateRestricted:
+		return true
+	case ContributionChangeSourceAvailabilityStateUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionChangeSourceSourceType.
+const (
+	ContributionChangeSourceSourceTypeArchive   ContributionChangeSourceSourceType = "archive"
+	ContributionChangeSourceSourceTypeCommunity ContributionChangeSourceSourceType = "community"
+	ContributionChangeSourceSourceTypeExternal  ContributionChangeSourceSourceType = "external"
+	ContributionChangeSourceSourceTypeMirror    ContributionChangeSourceSourceType = "mirror"
+	ContributionChangeSourceSourceTypeOfficial  ContributionChangeSourceSourceType = "official"
+	ContributionChangeSourceSourceTypeStore     ContributionChangeSourceSourceType = "store"
+	ContributionChangeSourceSourceTypeUnknown   ContributionChangeSourceSourceType = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the ContributionChangeSourceSourceType enum.
+func (e ContributionChangeSourceSourceType) Valid() bool {
+	switch e {
+	case ContributionChangeSourceSourceTypeArchive:
+		return true
+	case ContributionChangeSourceSourceTypeCommunity:
+		return true
+	case ContributionChangeSourceSourceTypeExternal:
+		return true
+	case ContributionChangeSourceSourceTypeMirror:
+		return true
+	case ContributionChangeSourceSourceTypeOfficial:
+		return true
+	case ContributionChangeSourceSourceTypeStore:
+		return true
+	case ContributionChangeSourceSourceTypeUnknown:
 		return true
 	default:
 		return false
@@ -210,14 +318,29 @@ func (e ContributionEventEventType) Valid() bool {
 
 // Defines values for ContributionKind.
 const (
-	ContributionKindCreateResource ContributionKind = "create_resource"
-	ContributionKindUpdateResource ContributionKind = "update_resource"
+	ContributionKindAddRelation        ContributionKind = "add_relation"
+	ContributionKindAddSource          ContributionKind = "add_source"
+	ContributionKindAddTag             ContributionKind = "add_tag"
+	ContributionKindAddTranslation     ContributionKind = "add_translation"
+	ContributionKindCreateResource     ContributionKind = "create_resource"
+	ContributionKindRemoveBrokenSource ContributionKind = "remove_broken_source"
+	ContributionKindUpdateResource     ContributionKind = "update_resource"
 )
 
 // Valid indicates whether the value is a known member of the ContributionKind enum.
 func (e ContributionKind) Valid() bool {
 	switch e {
+	case ContributionKindAddRelation:
+		return true
+	case ContributionKindAddSource:
+		return true
+	case ContributionKindAddTag:
+		return true
+	case ContributionKindAddTranslation:
+		return true
 	case ContributionKindCreateResource:
+		return true
+	case ContributionKindRemoveBrokenSource:
 		return true
 	case ContributionKindUpdateResource:
 		return true
@@ -441,19 +564,19 @@ func (e ReadyStatus) Valid() bool {
 
 // Defines values for RelationDirection.
 const (
-	Incoming  RelationDirection = "incoming"
-	Outgoing  RelationDirection = "outgoing"
-	Symmetric RelationDirection = "symmetric"
+	RelationDirectionIncoming  RelationDirection = "incoming"
+	RelationDirectionOutgoing  RelationDirection = "outgoing"
+	RelationDirectionSymmetric RelationDirection = "symmetric"
 )
 
 // Valid indicates whether the value is a known member of the RelationDirection enum.
 func (e RelationDirection) Valid() bool {
 	switch e {
-	case Incoming:
+	case RelationDirectionIncoming:
 		return true
-	case Outgoing:
+	case RelationDirectionOutgoing:
 		return true
-	case Symmetric:
+	case RelationDirectionSymmetric:
 		return true
 	default:
 		return false
@@ -462,22 +585,22 @@ func (e RelationDirection) Valid() bool {
 
 // Defines values for RelationType.
 const (
-	DerivedFrom RelationType = "derived_from"
-	PartOf      RelationType = "part_of"
-	RelatedTo   RelationType = "related_to"
-	SuccessorOf RelationType = "successor_of"
+	RelationTypeDerivedFrom RelationType = "derived_from"
+	RelationTypePartOf      RelationType = "part_of"
+	RelationTypeRelatedTo   RelationType = "related_to"
+	RelationTypeSuccessorOf RelationType = "successor_of"
 )
 
 // Valid indicates whether the value is a known member of the RelationType enum.
 func (e RelationType) Valid() bool {
 	switch e {
-	case DerivedFrom:
+	case RelationTypeDerivedFrom:
 		return true
-	case PartOf:
+	case RelationTypePartOf:
 		return true
-	case RelatedTo:
+	case RelationTypeRelatedTo:
 		return true
-	case SuccessorOf:
+	case RelationTypeSuccessorOf:
 		return true
 	default:
 		return false
@@ -588,9 +711,11 @@ func (e TaxonomyState) Valid() bool {
 
 // AcceptContribution defines model for AcceptContribution.
 type AcceptContribution struct {
-	Content      ContributionContent `json:"content"`
-	InternalNote *string             `json:"internal_note,omitempty"`
-	Message      *string             `json:"message,omitempty"`
+	// Change Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests.
+	Change       *ContributionChange  `json:"change,omitempty"`
+	Content      *ContributionContent `json:"content,omitempty"`
+	InternalNote *string              `json:"internal_note,omitempty"`
+	Message      *string              `json:"message,omitempty"`
 }
 
 // AddRelation defines model for AddRelation.
@@ -622,6 +747,53 @@ type AvailabilityState string
 // ContentRating defines model for ContentRating.
 type ContentRating string
 
+// ContributionChange Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests.
+type ContributionChange struct {
+	Relation *ContributionChangeRelation `json:"relation,omitempty"`
+	Source   *ContributionChangeSource   `json:"source,omitempty"`
+	SourceId *string                     `json:"source_id,omitempty"`
+	TagIds   *[]string                   `json:"tag_ids,omitempty"`
+
+	// Translation Target locale is fixed. Public submission omits unchanged fields; null explicitly clears summary/description. Admin acceptance supplies complete final name/summary/description. exists is response-only; raw locale values never use display fallback.
+	Translation *ContributionChangeTranslation `json:"translation,omitempty"`
+}
+
+// ContributionChangeRelation defines model for ContributionChangeRelation.
+type ContributionChangeRelation struct {
+	Direction       ContributionChangeRelationDirection    `json:"direction"`
+	OtherResourceId string                                 `json:"other_resource_id"`
+	RelationType    ContributionChangeRelationRelationType `json:"relation_type"`
+}
+
+// ContributionChangeRelationDirection defines model for ContributionChangeRelation.Direction.
+type ContributionChangeRelationDirection string
+
+// ContributionChangeRelationRelationType defines model for ContributionChangeRelation.RelationType.
+type ContributionChangeRelationRelationType string
+
+// ContributionChangeSource defines model for ContributionChangeSource.
+type ContributionChangeSource struct {
+	AvailabilityState *ContributionChangeSourceAvailabilityState `json:"availability_state,omitempty"`
+	Label             *string                                    `json:"label,omitempty"`
+	SourceType        *ContributionChangeSourceSourceType        `json:"source_type,omitempty"`
+	Url               string                                     `json:"url"`
+}
+
+// ContributionChangeSourceAvailabilityState defines model for ContributionChangeSource.AvailabilityState.
+type ContributionChangeSourceAvailabilityState string
+
+// ContributionChangeSourceSourceType defines model for ContributionChangeSource.SourceType.
+type ContributionChangeSourceSourceType string
+
+// ContributionChangeTranslation Target locale is fixed. Public submission omits unchanged fields; null explicitly clears summary/description. Admin acceptance supplies complete final name/summary/description. exists is response-only; raw locale values never use display fallback.
+type ContributionChangeTranslation struct {
+	Description **string `json:"description,omitempty"`
+	Exists      *bool    `json:"exists,omitempty"`
+	Locale      string   `json:"locale"`
+	Name        *string  `json:"name,omitempty"`
+	Summary     **string `json:"summary,omitempty"`
+}
+
 // ContributionContent defines model for ContributionContent.
 type ContributionContent struct {
 	CategoryId    string                           `json:"category_id"`
@@ -643,24 +815,37 @@ type ContributionContentLifecycle string
 
 // ContributionDetail defines model for ContributionDetail.
 type ContributionDetail struct {
-	Accepted         *ContributionContent `json:"accepted,omitempty"`
-	AuthorId         string               `json:"author_id"`
-	Base             *ContributionContent `json:"base,omitempty"`
-	BaseVersion      *int64               `json:"base_version,omitempty"`
-	Conflict         bool                 `json:"conflict"`
-	CreatedAt        time.Time            `json:"created_at"`
-	Current          *ContributionContent `json:"current,omitempty"`
-	DecidedAt        *time.Time           `json:"decided_at,omitempty"`
-	History          []ContributionEvent  `json:"history"`
-	Id               string               `json:"id"`
-	Kind             ContributionKind     `json:"kind"`
-	PreviousId       *string              `json:"previous_id,omitempty"`
-	Proposed         ContributionContent  `json:"proposed"`
-	Reason           string               `json:"reason"`
-	ResultResourceId *string              `json:"result_resource_id,omitempty"`
-	SelfReview       bool                 `json:"self_review"`
-	Status           ContributionStatus   `json:"status"`
-	TargetResourceId *string              `json:"target_resource_id,omitempty"`
+	Accepted *ContributionContent `json:"accepted,omitempty"`
+
+	// AcceptedChange Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests.
+	AcceptedChange *ContributionChange  `json:"accepted_change,omitempty"`
+	AuthorId       string               `json:"author_id"`
+	Base           *ContributionContent `json:"base,omitempty"`
+
+	// BaseChange Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests.
+	BaseChange  *ContributionChange  `json:"base_change,omitempty"`
+	BaseVersion *int64               `json:"base_version,omitempty"`
+	Conflict    bool                 `json:"conflict"`
+	CreatedAt   time.Time            `json:"created_at"`
+	Current     *ContributionContent `json:"current,omitempty"`
+
+	// CurrentChange Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests.
+	CurrentChange *ContributionChange  `json:"current_change,omitempty"`
+	DecidedAt     *time.Time           `json:"decided_at,omitempty"`
+	History       []ContributionEvent  `json:"history"`
+	Id            string               `json:"id"`
+	Kind          ContributionKind     `json:"kind"`
+	PreviousId    *string              `json:"previous_id,omitempty"`
+	Proposed      *ContributionContent `json:"proposed,omitempty"`
+
+	// ProposedChange Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests.
+	ProposedChange   *ContributionChange           `json:"proposed_change,omitempty"`
+	Reason           string                        `json:"reason"`
+	ResourceChanges  *[]ContributionResourceChange `json:"resource_changes,omitempty"`
+	ResultResourceId *string                       `json:"result_resource_id,omitempty"`
+	SelfReview       bool                          `json:"self_review"`
+	Status           ContributionStatus            `json:"status"`
+	TargetResourceId *string                       `json:"target_resource_id,omitempty"`
 }
 
 // ContributionEvent defines model for ContributionEvent.
@@ -684,6 +869,13 @@ type ContributionList struct {
 	Items    []ContributionSummary `json:"items"`
 	Page     int64                 `json:"page"`
 	PageSize int                   `json:"page_size"`
+}
+
+// ContributionResourceChange defines model for ContributionResourceChange.
+type ContributionResourceChange struct {
+	AfterVersion  int64  `json:"after_version"`
+	BeforeVersion int64  `json:"before_version"`
+	ResourceId    string `json:"resource_id"`
 }
 
 // ContributionSource defines model for ContributionSource.

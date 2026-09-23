@@ -264,8 +264,8 @@ func run() (result error) {
 	if err = curationcheck.Run(ctx, app, pub, owner, operator, email, password, cfg.AdminOrigin); err != nil {
 		return err
 	}
-	fmt.Println("Admin curation capabilities, complete Resource graph, governance, Admin-to-Public lifecycle and Goose 7 passed; temporary graph cleaned (private values withheld)")
-	var authors [2]*http.Cookie
+	fmt.Println("Admin curation capabilities, complete Resource graph, governance, Admin-to-Public lifecycle and Goose 8 passed; temporary graph cleaned (private values withheld)")
+	var authors [7]*http.Cookie
 	for i := range authors {
 		authorEmail := uuid.NewV7().String() + "@example.invalid"
 		defer func() {
@@ -285,7 +285,7 @@ func run() (result error) {
 	if err = contributioncheck.Run(ctx, pub, app, owner, authors, email, password, "http://localhost:4321", cfg.AdminOrigin); err != nil {
 		return err
 	}
-	fmt.Println("Contribution submit/replay, revised acceptance, draft publication, correction CAS, author isolation and atomic audit passed; temporary proposals cleaned (private values withheld)")
+	fmt.Println("All seven contribution types, submit/replay, revised acceptance, Source removal, additive Tags, dual-endpoint Relations, raw translations, author privacy and atomic audits passed; temporary proposals cleaned (private values withheld)")
 	return nil
 }
 func cleanup(pool *pgxpool.Pool, email string) error {

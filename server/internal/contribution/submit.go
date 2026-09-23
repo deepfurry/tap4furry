@@ -21,6 +21,9 @@ type EditContext struct {
 	ResourceID   uuid.UUID
 	BaseRevision string
 	Content      Content
+	Change       *Change
+	Reference    *Content
+	Other        *Result
 }
 
 func (a *App) Context(ctx context.Context, actor auth.Actor, slug string) (EditContext, error) {
@@ -28,7 +31,7 @@ func (a *App) Context(ctx context.Context, actor auth.Actor, slug string) (EditC
 	if resource.ValidateSlug(slug) != nil {
 		return out, ErrValidation
 	}
-	err := a.transact(ctx, publicCheck(ctx, actor), func(_ pgx.Tx, q *sqlc.Queries, _ time.Time) error {
+	err := a.snapshot(ctx, publicCheck(ctx, actor), func(_ pgx.Tx, q *sqlc.Queries, _ time.Time) error {
 		row, err := q.ContributionResource(ctx, sqlc.ContributionResourceParams{Slug: str(slug)})
 		if err != nil {
 			return err
@@ -100,6 +103,10 @@ func (a *App) Submit(ctx context.Context, actor auth.Actor, input SubmitInput) (
 			if _, err = q.ContributionOwned(ctx, sqlc.ContributionOwnedParams{ID: id(in.PreviousID), AuthorID: id(actor.UserID)}); err != nil {
 				return err
 			}
+		}
+		if Extended(in.Kind) {
+			result, err = a.submitChange(ctx, q, actor, in)
+			return err
 		}
 		base := Content{Lifecycle: resource.Unknown}
 		var version pgtype.Int8

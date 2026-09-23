@@ -4,3 +4,5 @@ export { listResources, getResource, createResource, patchResource, deleteResour
 export type { ResourceDetail, ResourceListItem, ResourceRevision, ResourceLocalizationInput, CreateResource, PatchResource, Source, CreateSource, PatchSource, ExternalID, TaxonomyDetail, TaxonomySummary, TaxonomyLocalizationInput, CreateTaxonomy, PatchTaxonomy, PublicationState, Lifecycle, ContentRating, AvailabilityState, SourceType, RightsStatus, RelationType, ListResourcesParams } from './generated/admin/client';
 export { listContributions, getContribution, acceptContribution, rejectContribution } from './generated/admin/client';
 export type { ContributionContent, ContributionDetail, ContributionList, ContributionKind, ContributionStatus, AcceptContribution } from './generated/admin/client';
+
+export type { ContributionChange, ContributionChangeSource, ContributionChangeTranslation, ContributionChangeRelation } from './generated/admin/client';

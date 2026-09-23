@@ -21,6 +21,7 @@ import { canEditorial } from '../../lib/capabilities';
 import { useRoles } from '../../layouts/AdminShell';
 import { Panel, Field, Button, Badge } from '../../components/admin/Primitives';
 import { DirtyFormGuard } from '../../components/admin/DirtyFormGuard';
+import { ChangeReview } from './ChangeReview';
 import { ReviewFields, ReviewSnapshot, readReview } from './ReviewFields';
 export function ContributionReviewPage() {
   const { contributionId = '' } = useParams({ strict: false });
@@ -36,10 +37,22 @@ export function ContributionReviewPage() {
   if (!allowed) return <p>Editorial capability is required.</p>;
   if (query.error) return <p role="alert">{errorMessage(query.error)}</p>;
   if (!query.data) return <p role="status">Loading review…</p>;
+  if (query.data.proposed_change)
+    return (
+      <ChangeReview
+        key={contributionId + ':' + query.data.status + ':' + revision}
+        detail={{ ...query.data, proposed: query.data.proposed }}
+        reload={async () => {
+          const response = await query.refetch();
+          if (response.isSuccess) setRevision((v) => v + 1);
+        }}
+      />
+    );
+  if (!query.data.proposed) return <p role="alert">Proposal content is unavailable.</p>;
   return (
     <Review
       key={`${contributionId}:${query.data.status}:${revision}`}
-      detail={query.data}
+      detail={{ ...query.data, proposed: query.data.proposed }}
       reload={async () => {
         const response = await query.refetch();
         if (response.isSuccess) setRevision((v) => v + 1);
@@ -51,7 +64,7 @@ function Review({
   detail,
   reload,
 }: {
-  detail: ContributionDetail;
+  detail: ContributionDetail & { proposed: ContributionContent };
   reload: () => Promise<void>;
 }) {
   const client = useQueryClient();
@@ -81,11 +94,7 @@ function Review({
         );
       else
         result(
-          await rejectContribution(
-            detail.id,
-            { message, internal_note: note || null },
-            options,
-          ),
+          await rejectContribution(detail.id, { message, internal_note: note || null }, options),
         );
     },
     onSuccess: async () => {
@@ -235,10 +244,7 @@ function Review({
       {(conflict || (detail.conflict && pending)) && (
         <Button
           onClick={() => {
-            if (
-              !dirty ||
-              window.confirm('Discard unsaved input and reload the server record?')
-            ) {
+            if (!dirty || window.confirm('Discard unsaved input and reload the server record?')) {
               setDirty(false);
               void reload();
             }
@@ -256,8 +262,8 @@ function Review({
         <ol className="grid gap-4">
           {detail.history.map((event) => (
             <li key={event.event_type}>
-              <strong>{event.event_type}</strong> ·{' '}
-              {new Date(event.occurred_at).toLocaleString()} · {event.actor_id}
+              <strong>{event.event_type}</strong> · {new Date(event.occurred_at).toLocaleString()} ·{' '}
+              {event.actor_id}
               <p className="whitespace-pre-wrap">{event.message}</p>
               {event.internal_note && (
                 <p className="whitespace-pre-wrap">Private note: {event.internal_note}</p>

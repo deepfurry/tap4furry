@@ -37,8 +37,8 @@ export function ContributionListPage() {
     <>
       <h1>Contribution review</h1>
       <p>
-        Review suggestions before they change canonical knowledge. Accepting a new Resource
-        creates a draft.
+        Review suggestions before they change canonical knowledge. Accepting a new Resource creates
+        a draft.
       </p>
       <Panel title="Review queue">
         <div className="grid gap-4 sm:grid-cols-2">
@@ -67,6 +67,11 @@ export function ContributionListPage() {
               <option value="">All</option>
               <option value="create_resource">New Resource</option>
               <option value="update_resource">Correction</option>
+              <option value="add_source">Add source</option>
+              <option value="remove_broken_source">Remove broken source</option>
+              <option value="add_tag">Add tags</option>
+              <option value="add_relation">Add relation</option>
+              <option value="add_translation">Translation</option>
             </select>
           </Field>
         </div>
@@ -78,10 +83,7 @@ export function ContributionListPage() {
                 {query.data.items.map((v) => (
                   <li key={v.id} className="flex flex-wrap items-center justify-between gap-3">
                     <div>
-                      <Link
-                        to="/contributions/$contributionId"
-                        params={{ contributionId: v.id }}
-                      >
+                      <Link to="/contributions/$contributionId" params={{ contributionId: v.id }}>
                         {v.name}
                       </Link>
                       <p>

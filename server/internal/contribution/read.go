@@ -26,16 +26,17 @@ type Result struct {
 	Slug, Name string
 }
 type Detail struct {
-	ID, PreviousID       uuid.UUID
-	Kind, Status, Reason string
-	CreatedAt            time.Time
-	DecidedAt            *time.Time
-	Proposed             Content
-	SubmittedFields      int16
-	Accepted             *Content
-	Result               *Result
-	Target               *Result
-	History              []Event
+	ID, PreviousID                 uuid.UUID
+	Kind, Status, Reason           string
+	CreatedAt                      time.Time
+	DecidedAt                      *time.Time
+	Proposed                       Content
+	ProposedChange, AcceptedChange *Change
+	SubmittedFields                int16
+	Accepted                       *Content
+	Result                         *Result
+	Target                         *Result
+	History                        []Event
 }
 type AdminEvent struct {
 	Event
@@ -49,6 +50,8 @@ type AdminDetail struct {
 	Base, Current                *Content
 	Conflict, SelfReview         bool
 	ReviewHistory                []AdminEvent
+	BaseChange, CurrentChange    *Change
+	ResourceChanges              []ResourceChange
 }
 type Limits struct {
 	Remaining24h, Pending int64
@@ -64,7 +67,7 @@ type List struct {
 }
 
 func pagination(page int64, size int, status, kind string) (int64, error) {
-	if page < 1 || size < 1 || size > 100 || page-1 > math.MaxInt64/int64(size) || !validStatus(status) || (kind != "" && kind != Create && kind != Update) {
+	if page < 1 || size < 1 || size > 100 || page-1 > math.MaxInt64/int64(size) || !validStatus(status) || (kind != "" && !validKind(kind)) {
 		return 0, ErrValidation
 	}
 	return (page - 1) * int64(size), nil
@@ -79,11 +82,14 @@ func baseDetail(row sqlc.AppContribution, contents map[string]Content) Detail {
 }
 func (a *App) OwnDetail(ctx context.Context, actor auth.Actor, key uuid.UUID) (Detail, error) {
 	var out Detail
-	err := a.transact(ctx, publicCheck(ctx, actor), func(_ pgx.Tx, q *sqlc.Queries, _ time.Time) error {
+	err := a.snapshot(ctx, publicCheck(ctx, actor), func(_ pgx.Tx, q *sqlc.Queries, _ time.Time) error {
 		// Pin the mutable decision while reading its immutable snapshots/events.
 		row, err := q.ContributionLockOwned(ctx, sqlc.ContributionLockOwnedParams{ID: id(key), AuthorID: id(actor.UserID)})
 		if err != nil {
 			return err
+		}
+		if Extended(row.Kind) {
+			return ownChangeDetail(ctx, q, row, &out)
 		}
 		contents, err := readContents(ctx, q, key)
 		if err != nil {
@@ -137,10 +143,13 @@ func (a *App) OwnDetail(ctx context.Context, actor auth.Actor, key uuid.UUID) (D
 }
 func (a *App) ReviewDetail(ctx context.Context, actor auth.AdminActor, key uuid.UUID) (AdminDetail, error) {
 	var out AdminDetail
-	err := a.transact(ctx, adminCheck(ctx, actor), func(_ pgx.Tx, q *sqlc.Queries, _ time.Time) error {
+	err := a.snapshot(ctx, adminCheck(ctx, actor), func(_ pgx.Tx, q *sqlc.Queries, _ time.Time) error {
 		row, err := q.ContributionLock(ctx, id(key))
 		if err != nil {
 			return err
+		}
+		if Extended(row.Kind) {
+			return reviewChangeDetail(ctx, q, row, actor, &out)
 		}
 		contents, err := readContents(ctx, q, key)
 		if err != nil {

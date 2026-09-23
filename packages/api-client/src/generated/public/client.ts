@@ -5,12 +5,134 @@
  * Public health, authentication, profiles and anonymous Resource knowledge reads. Unsafe requests require exact PUBLIC_ORIGIN; authenticated unsafe requests also require a session-bound CSRF header.
  * OpenAPI spec version: 0.1.0
  */
+
+// https://stackoverflow.com/questions/49579094/typescript-conditional-types-filter-out-readonly-properties-pick-only-requir/49579497#49579497
+type IfEquals<X, Y, A = X, B = never> =
+  (<T>() => T extends X ? 1 : 2) extends <T>() => T extends Y ? 1 : 2 ? A : B;
+
+type WritableKeys<T> = {
+  [P in keyof T]-?: IfEquals<
+    { [Q in P]: T[P] },
+    { -readonly [Q in P]: T[P] },
+    P
+  >;
+}[keyof T];
+
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends (
+  k: infer I,
+) => void
+  ? I
+  : never;
+type DistributeReadOnlyOverUnions<T> = T extends any ? NonReadonly<T> : never;
+
+type Writable<T> = Pick<T, WritableKeys<T>>;
+type NonReadonly<T> = [T] extends [UnionToIntersection<T>]
+  ? {
+      [P in keyof Writable<T>]: T[P] extends object
+        ? NonReadonly<NonNullable<T[P]>>
+        : T[P];
+    }
+  : DistributeReadOnlyOverUnions<T>;
+
+export type ContributionChangeSourceSourceType =
+  (typeof ContributionChangeSourceSourceType)[keyof typeof ContributionChangeSourceSourceType];
+
+export const ContributionChangeSourceSourceType = {
+  official: "official",
+  store: "store",
+  archive: "archive",
+  mirror: "mirror",
+  community: "community",
+  external: "external",
+  unknown: "unknown",
+} as const;
+
+export interface ContributionChangeSource {
+  /** @maxLength 2048 */
+  url: string;
+  /**
+   * @maxLength 80
+   * @nullable
+   */
+  label?: string | null;
+  source_type?: ContributionChangeSourceSourceType;
+}
+
+export type ContributionChangeRelationRelationType =
+  (typeof ContributionChangeRelationRelationType)[keyof typeof ContributionChangeRelationRelationType];
+
+export const ContributionChangeRelationRelationType = {
+  part_of: "part_of",
+  successor_of: "successor_of",
+  derived_from: "derived_from",
+  related_to: "related_to",
+} as const;
+
+export type ContributionChangeRelationDirection =
+  (typeof ContributionChangeRelationDirection)[keyof typeof ContributionChangeRelationDirection];
+
+export const ContributionChangeRelationDirection = {
+  outgoing: "outgoing",
+  incoming: "incoming",
+  symmetric: "symmetric",
+} as const;
+
+export interface ContributionChangeRelation {
+  other_resource_id: string;
+  relation_type: ContributionChangeRelationRelationType;
+  direction: ContributionChangeRelationDirection;
+}
+
+/**
+ * Target locale is fixed. Public submission omits unchanged fields; null explicitly clears summary/description. Admin acceptance supplies complete final name/summary/description. exists is response-only; raw locale values never use display fallback.
+ */
+export interface ContributionChangeTranslation {
+  /** @maxLength 64 */
+  locale: string;
+  /**
+   * @minLength 1
+   * @maxLength 160
+   */
+  name?: string;
+  /**
+   * @maxLength 500
+   * @nullable
+   */
+  summary?: string | null;
+  /**
+   * @maxLength 50000
+   * @nullable
+   */
+  description?: string | null;
+  readonly exists?: boolean;
+}
+
+/**
+ * Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests.
+ */
+export interface ContributionChange {
+  source?: ContributionChangeSource;
+  source_id?: string;
+  /**
+   * @minItems 0
+   * @maxItems 10
+   */
+  tag_ids?: string[];
+  relation?: ContributionChangeRelation;
+  translation?: ContributionChangeTranslation;
+}
+
 export type ContributionKind =
   (typeof ContributionKind)[keyof typeof ContributionKind];
 
 export const ContributionKind = {
   create_resource: "create_resource",
   update_resource: "update_resource",
+  add_source: "add_source",
+  remove_broken_source: "remove_broken_source",
+  add_tag: "add_tag",
+  add_relation: "add_relation",
+  add_translation: "add_translation",
 } as const;
 
 export type ContributionStatus =
@@ -198,14 +320,26 @@ export interface SubmitContribution {
    * @maxLength 2000
    */
   reason: string;
-  content: ContributionPatch;
+  content?: ContributionPatch;
+  change?: ContributionChange;
+}
+
+export interface ContributionResult {
+  id: string;
+  /** @maxLength 80 */
+  slug: string;
+  /** @maxLength 160 */
+  name: string;
 }
 
 export interface ContributionContext {
   resource_id: string;
   /** @maxLength 64 */
   base_revision: string;
-  content: ContributionContent;
+  content?: ContributionContent;
+  change?: ContributionChange;
+  reference?: ContributionContent;
+  other_resource?: ContributionResult;
 }
 
 export type ContributionEventEventType =
@@ -226,14 +360,6 @@ export interface ContributionEvent {
    */
   message: string | null;
   occurred_at: string;
-}
-
-export interface ContributionResult {
-  id: string;
-  /** @maxLength 80 */
-  slug: string;
-  /** @maxLength 160 */
-  name: string;
 }
 
 export type ContributionOriginalLifecycle =
@@ -290,11 +416,13 @@ export interface ContributionDetail {
   previous_id?: string;
   created_at: string;
   decided_at?: string;
-  proposed: ContributionOriginal;
+  proposed?: ContributionOriginal;
   accepted?: ContributionContent;
   result?: ContributionResult;
   target?: ContributionResult;
   history: ContributionEvent[];
+  proposed_change?: ContributionChange;
+  accepted_change?: ContributionChange;
 }
 
 export interface ContributionLimits {
@@ -634,6 +762,7 @@ export const ApiErrorCode = {
   CONTRIBUTION_FORBIDDEN: "CONTRIBUTION_FORBIDDEN",
   CONTRIBUTION_VERIFICATION_REQUIRED: "CONTRIBUTION_VERIFICATION_REQUIRED",
   CONTRIBUTION_CONFLICT: "CONTRIBUTION_CONFLICT",
+  RESOURCE_RELATION_CYCLE: "RESOURCE_RELATION_CYCLE",
   CONTRIBUTION_REQUEST_CONFLICT: "CONTRIBUTION_REQUEST_CONFLICT",
   CONTRIBUTION_LIMITED: "CONTRIBUTION_LIMITED",
   RESOURCE_VERSION_CONFLICT: "RESOURCE_VERSION_CONFLICT",
@@ -840,6 +969,53 @@ export type CompleteOAuthParams = {
   code?: string;
   error?: string;
 };
+
+export type GetContributionContextParams = {
+  kind?: GetContributionContextKind;
+  source_id?: string;
+  /**
+   * @maxLength 64
+   */
+  locale?: string;
+  /**
+   * @maxLength 80
+   */
+  other_slug?: string;
+  direction?: GetContributionContextDirection;
+  relation_type?: GetContributionContextRelationType;
+};
+
+export type GetContributionContextKind =
+  (typeof GetContributionContextKind)[keyof typeof GetContributionContextKind];
+
+export const GetContributionContextKind = {
+  create_resource: "create_resource",
+  update_resource: "update_resource",
+  add_source: "add_source",
+  remove_broken_source: "remove_broken_source",
+  add_tag: "add_tag",
+  add_relation: "add_relation",
+  add_translation: "add_translation",
+} as const;
+
+export type GetContributionContextDirection =
+  (typeof GetContributionContextDirection)[keyof typeof GetContributionContextDirection];
+
+export const GetContributionContextDirection = {
+  outgoing: "outgoing",
+  incoming: "incoming",
+  symmetric: "symmetric",
+} as const;
+
+export type GetContributionContextRelationType =
+  (typeof GetContributionContextRelationType)[keyof typeof GetContributionContextRelationType];
+
+export const GetContributionContextRelationType = {
+  part_of: "part_of",
+  successor_of: "successor_of",
+  derived_from: "derived_from",
+  related_to: "related_to",
+} as const;
 
 export type ListMyContributionsParams = {
   /**
@@ -2764,15 +2940,31 @@ export type getContributionContextResponseError = (
 export type getContributionContextResponse =
   getContributionContextResponseSuccess | getContributionContextResponseError;
 
-export const getGetContributionContextUrl = (slug: string) => {
-  return `/api/contributions/context/${slug}`;
+export const getGetContributionContextUrl = (
+  slug: string,
+  params?: GetContributionContextParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/contributions/context/${slug}?${stringifiedParams}`
+    : `/api/contributions/context/${slug}`;
 };
 
 export const getContributionContext = async (
   slug: string,
+  params?: GetContributionContextParams,
   options?: RequestInit,
 ): Promise<getContributionContextResponse> => {
-  const res = await fetch(getGetContributionContextUrl(slug), {
+  const res = await fetch(getGetContributionContextUrl(slug, params), {
     ...options,
     method: "GET",
   });
@@ -2853,7 +3045,7 @@ export const getSubmitContributionUrl = () => {
 };
 
 export const submitContribution = async (
-  submitContributionBody: SubmitContribution,
+  submitContributionBody: NonReadonly<SubmitContribution>,
   options?: RequestInit,
 ): Promise<submitContributionResponse> => {
   const getHeaders = (

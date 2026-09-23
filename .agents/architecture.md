@@ -90,6 +90,15 @@ input from server-filled fields; author projections never expose the latter as h
 Private contribution shells use React and browser session/CSRF, independently of
 anonymous Resource SSR. No additional HTML sink, queue, cache or remote URL fetch.
 
+Migration 8 extends that lifecycle with Source addition/removal, additive Tag sets,
+dual-endpoint Relations and raw Resource translations. Typed tables preserve each
+base/proposed/accepted change; originals use fixed presence bits, never fallback
+values. `ApplyReviewedOwnedTx` shares the existing graph lock and validates both
+submitted endpoint versions before writing canonical state and per-resource audit.
+Private multi-query projections use REPEATABLE READ followed by fresh READ COMMITTED
+authorization; the transactions are sequential, without holding a second pool connection.
+All mutations remain READ COMMITTED with User/session/capability revalidation.
+
 Public web uses anonymous Astro Node SSR with isolated React interaction; Admin is
 a React SPA. Apps use API-client facades, never deep generated imports or direct DB
 access. Tailwind v4 owns layout; shared SCSS and SCSS Modules own visual appearance.

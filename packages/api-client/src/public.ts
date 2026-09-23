@@ -8,3 +8,5 @@ export { listResources, getResource, listCategories, listTags, getListResourcesU
 export type { ResourceList, ResourceListItem, ResourceDetail, CategoryRef, TagRef, ResourceRef, ResourceSource, ResourceRelation, ResourceExternalID, CategoryList, CategoryItem, TagList, TagItem, ResourceLifecycle, ResourceContentRating, ResourceSourceType, ResourceSourceAvailability, ResourceRelationType, ResourceRelationDirection, ListResourcesParams, GetResourceParams, ListCategoriesParams, ListTagsParams } from './generated/public/client';
 export { getContributionContext, submitContribution, listMyContributions, getMyContribution, withdrawContribution } from './generated/public/client';
 export type { ContributionContent, ContributionOriginal, ContributionContext, ContributionDetail, ContributionList, ContributionKind, ContributionStatus, SubmitContribution } from './generated/public/client';
+
+export type { ContributionChange, ContributionChangeSource, ContributionChangeTranslation, ContributionChangeRelation, GetContributionContextParams } from './generated/public/client';

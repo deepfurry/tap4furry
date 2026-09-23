@@ -150,6 +150,8 @@ func Error(err error) (int, string, string, int) {
 		return 403, "CONTRIBUTION_VERIFICATION_REQUIRED", "Verify your email before submitting.", 0
 	case errors.Is(err, contribution.ErrConflict), errors.Is(err, curation.ErrConflict):
 		return 409, "CONTRIBUTION_CONFLICT", "The contribution was processed or a canonical identifier is already in use. Reload before retrying.", 0
+	case errors.Is(err, curation.ErrRelationCycle):
+		return 409, "RESOURCE_RELATION_CYCLE", "This relation would create a cycle.", 0
 	case errors.Is(err, contribution.ErrRequestConflict):
 		return 409, "CONTRIBUTION_REQUEST_CONFLICT", "This request ID belongs to different content.", 0
 	case errors.Is(err, resource.ErrVersionConflict):

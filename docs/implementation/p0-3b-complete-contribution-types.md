@@ -1,6 +1,6 @@
 # P0-3B — 完整贡献类型（路线图阶段 1.2）
 
-**状态：设计草案，尚未实施。** 本文细化已确定的阶段 1.2，供本轮讨论和下一轮实施使用。
+**状态：已实施并完成验收。** 本文为阶段 1.2 的实施规格，实际命令、浏览器流程、并发/隐私与迁移验证见[验收记录](p0-3b-verification.md)。
 审计基线：`dev` / `5f3aafa303f75a4c89d7c09070df9f1c4f54ec0c`（`feat: add basic contribution review`）。
 阶段 1.1 已完成；本阶段作为一次包含前后端与验收的完整交付，不按贡献类型再次拆成独立项目。
 
@@ -180,7 +180,7 @@ Resource/Taxonomy domain 仍不依赖 pgx、sqlc、Fiber 或 OpenAPI。
 migration 8 扩展 contributions 的 kind/target CHECK，新类型都要求主资源和正数 base_version；
 保留原有 create/update 数据及字段含义，submitted_fields 的旧位值不重解释，新类型不用它伪装基础资料字段。
 
-建议新增以下五张有明确用途的类型表，DDL 在实施时按实际 sqlc/约束落实，不使用 JSONB/EAV：
+实际新增以下五张有明确用途的类型表，DDL 与 sqlc/约束均已落实，不使用 JSONB/EAV：
 
 | 表 | 保存内容 |
 | --- | --- |
@@ -191,6 +191,7 @@ migration 8 扩展 contributions 的 kind/target CHECK，新类型都要求主�
 | `contribution_review_resource_changes` | 关联既有审核记录，逐 Resource 保存 before/after version；关系有两行 |
 
 base/proposed/accepted 都不可 UPDATE/DELETE。移除来源的历史不依赖 Source 被物理删除；FK 继续 RESTRICT。
+标签的空 base 不插入行，读取时解释为选中集合尚未绑定；proposed/accepted 始终要求非空。
 每种 kind 只允许对应快照组合；原始/接受内容必须完整且不可串用，跨表不变量由事务和集成测试保证，不新增 trigger/RLS。
 新类型不要求插入 contribution_contents；更新目前内连接该表的列表/详情查询，避免新类型在队列中消失。
 旧审核审计保留主端信息；新增逐资源审计用于新类型，读取兼容旧记录，不伪造历史或为旧记录补造审核事件。
@@ -269,3 +270,7 @@ git diff --check
 最终更新 CHANGELOG、契约及中文 roadmap，记录实际命令、浏览器验收、迁移/权限、隐私/并发结果和剩余问题；
 审查完整与 staged diff 后在 dev 本地提交。建议实现 commit：`feat: complete resource contribution types`。
 不 push、不 merge main、不 tag/release 或部署。只有实现和验收完成才把 1.2 标为已完成；本设计稿不算功能交付。
+
+实现说明：私有投影采用一致快照，返回前再以 READ COMMITTED 复核授权，避免快照早于持锁的
+角色/会话撤销；mutation 仍沿用单事务实时授权。OpenAPI 使用明确的类型字段，生成请求经过
+严格 decoder 与应用层校验，强制一种 kind/一种 payload；请求拒绝响应专有字段和空标签集。

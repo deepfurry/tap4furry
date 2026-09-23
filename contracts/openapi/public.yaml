@@ -514,7 +514,7 @@ paths:
     get:
       operationId: "getContributionContext"
       security: [{"PublicSession":[]}]
-      parameters: [{"name":"slug","in":"path","required":true,"schema":{"type":"string","maxLength":80}}]
+      parameters: [{"name":"slug","in":"path","required":true,"schema":{"type":"string","maxLength":80}},{"name":"kind","in":"query","required":false,"schema":{"type":"string","enum":["create_resource","update_resource","add_source","remove_broken_source","add_tag","add_relation","add_translation"]}},{"name":"source_id","in":"query","required":false,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"name":"locale","in":"query","required":false,"schema":{"type":"string","maxLength":64}},{"name":"other_slug","in":"query","required":false,"schema":{"type":"string","maxLength":80}},{"name":"direction","in":"query","required":false,"schema":{"type":"string","enum":["outgoing","incoming","symmetric"]}},{"name":"relation_type","in":"query","required":false,"schema":{"type":"string","enum":["part_of","successor_of","derived_from","related_to"]}}]
       responses:
         200:
           description: "Private contribution response; Cache-Control no-store."
@@ -732,9 +732,16 @@ components:
           schema:
             $ref: '#/components/schemas/ApiError'
   schemas:
+    ContributionChangeSource:
+      {"type":"object","additionalProperties":false,"required":["url"],"properties":{"url":{"type":"string","maxLength":2048,"format":"uri"},"label":{"type":"string","maxLength":80,"nullable":true},"source_type":{"type":"string","enum":["official","store","archive","mirror","community","external","unknown"]}}}
+    ContributionChangeRelation:
+      {"type":"object","additionalProperties":false,"required":["other_resource_id","relation_type","direction"],"properties":{"other_resource_id":{"type":"string","format":"uuid","x-go-type":"string"},"relation_type":{"type":"string","enum":["part_of","successor_of","derived_from","related_to"]},"direction":{"type":"string","enum":["outgoing","incoming","symmetric"]}}}
+    ContributionChangeTranslation:
+      {"type":"object","additionalProperties":false,"required":["locale"],"properties":{"locale":{"type":"string","maxLength":64},"name":{"type":"string","maxLength":160,"minLength":1},"summary":{"type":"string","maxLength":500,"nullable":true,"x-go-type":"*string"},"description":{"type":"string","maxLength":50000,"nullable":true,"x-go-type":"*string"},"exists":{"type":"boolean","readOnly":true}},"description":"Target locale is fixed. Public submission omits unchanged fields; null explicitly clears summary/description. Admin acceptance supplies complete final name/summary/description. exists is response-only; raw locale values never use display fallback."}
+    ContributionChange:
+      {"type":"object","additionalProperties":false,"properties":{"source":{"$ref":"#/components/schemas/ContributionChangeSource"},"source_id":{"type":"string","format":"uuid","x-go-type":"string"},"tag_ids":{"type":"array","minItems":0,"maxItems":10,"uniqueItems":true,"items":{"type":"string","format":"uuid","x-go-type":"string"}},"relation":{"$ref":"#/components/schemas/ContributionChangeRelation"},"translation":{"$ref":"#/components/schemas/ContributionChangeTranslation"}},"description":"Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests."}
     ContributionKind:
-      type: "string"
-      enum: ["create_resource","update_resource"]
+      {"type":"string","enum":["create_resource","update_resource","add_source","remove_broken_source","add_tag","add_relation","add_translation"]}
     ContributionStatus:
       type: "string"
       enum: ["pending","accepted","rejected","withdrawn"]
@@ -862,7 +869,7 @@ components:
     SubmitContribution:
       type: "object"
       additionalProperties: false
-      required: ["kind","request_id","reason","content"]
+      required: ["kind","request_id","reason"]
       properties:
         kind: {"$ref":"#/components/schemas/ContributionKind"}
         request_id:
@@ -885,10 +892,11 @@ components:
           maxLength: 2000
           minLength: 1
         content: {"$ref":"#/components/schemas/ContributionPatch"}
+        change: {"$ref":"#/components/schemas/ContributionChange"}
     ContributionContext:
       type: "object"
       additionalProperties: false
-      required: ["resource_id","base_revision","content"]
+      required: ["resource_id","base_revision"]
       properties:
         resource_id:
           type: "string"
@@ -898,6 +906,9 @@ components:
           type: "string"
           maxLength: 64
         content: {"$ref":"#/components/schemas/ContributionContent"}
+        change: {"$ref":"#/components/schemas/ContributionChange"}
+        reference: {"$ref":"#/components/schemas/ContributionContent"}
+        other_resource: {"$ref":"#/components/schemas/ContributionResult"}
     ContributionEvent:
       type: "object"
       additionalProperties: false
@@ -931,7 +942,7 @@ components:
     ContributionDetail:
       type: "object"
       additionalProperties: false
-      required: ["id","kind","status","reason","created_at","proposed","history"]
+      required: ["id","kind","status","reason","created_at","history"]
       properties:
         id:
           type: "string"
@@ -959,6 +970,8 @@ components:
         history:
           type: "array"
           items: {"$ref":"#/components/schemas/ContributionEvent"}
+        proposed_change: {"$ref":"#/components/schemas/ContributionChange"}
+        accepted_change: {"$ref":"#/components/schemas/ContributionChange"}
     ContributionOriginal:
       type: object
       additionalProperties: false
@@ -1267,7 +1280,7 @@ components:
       properties:
         code:
           type: string
-          enum: [VALIDATION_ERROR, AUTH_EMAIL_ALREADY_REGISTERED, AUTH_INVALID_CREDENTIALS, AUTH_UNAUTHENTICATED, AUTH_ACCOUNT_DISABLED, PROFILE_HANDLE_UNAVAILABLE, PROFILE_NOT_FOUND, ORIGIN_FORBIDDEN, CSRF_INVALID, AUTH_CHALLENGE_INVALID, AUTH_REAUTH_FAILED, AUTH_SESSION_NOT_FOUND, MAIL_UNAVAILABLE, AUTH_PROVIDER_UNAVAILABLE, AUTH_PROVIDER_INVALID, AUTH_PROVIDER_ALREADY_LINKED, AUTH_PROVIDER_NOT_LINKED, AUTH_ACCOUNT_LINK_REQUIRED, AUTH_REAUTH_REQUIRED, AUTH_LAST_METHOD, AUTH_RATE_LIMITED, RESOURCE_NOT_FOUND, INTERNAL_ERROR, CONTRIBUTION_NOT_FOUND, CONTRIBUTION_FORBIDDEN, CONTRIBUTION_VERIFICATION_REQUIRED, CONTRIBUTION_CONFLICT, CONTRIBUTION_REQUEST_CONFLICT, CONTRIBUTION_LIMITED, RESOURCE_VERSION_CONFLICT]
+          enum: [VALIDATION_ERROR, AUTH_EMAIL_ALREADY_REGISTERED, AUTH_INVALID_CREDENTIALS, AUTH_UNAUTHENTICATED, AUTH_ACCOUNT_DISABLED, PROFILE_HANDLE_UNAVAILABLE, PROFILE_NOT_FOUND, ORIGIN_FORBIDDEN, CSRF_INVALID, AUTH_CHALLENGE_INVALID, AUTH_REAUTH_FAILED, AUTH_SESSION_NOT_FOUND, MAIL_UNAVAILABLE, AUTH_PROVIDER_UNAVAILABLE, AUTH_PROVIDER_INVALID, AUTH_PROVIDER_ALREADY_LINKED, AUTH_PROVIDER_NOT_LINKED, AUTH_ACCOUNT_LINK_REQUIRED, AUTH_REAUTH_REQUIRED, AUTH_LAST_METHOD, AUTH_RATE_LIMITED, RESOURCE_NOT_FOUND, INTERNAL_ERROR, CONTRIBUTION_NOT_FOUND, CONTRIBUTION_FORBIDDEN, CONTRIBUTION_VERIFICATION_REQUIRED, CONTRIBUTION_CONFLICT, RESOURCE_RELATION_CYCLE, CONTRIBUTION_REQUEST_CONFLICT, CONTRIBUTION_LIMITED, RESOURCE_VERSION_CONFLICT]
         message:
           type: string
     Handle:

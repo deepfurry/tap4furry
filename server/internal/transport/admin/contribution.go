@@ -95,7 +95,16 @@ func (h *Handler) GetContribution(c fiber.Ctx, raw string) error {
 	if err != nil {
 		return contributionError(c, err)
 	}
-	out := generated.ContributionDetail{Id: r.ID.String(), AuthorId: r.AuthorID.String(), Kind: generated.ContributionKind(r.Kind), Status: generated.ContributionStatus(r.Status), Reason: r.Reason, PreviousId: ch.IDPointer(r.PreviousID), CreatedAt: r.CreatedAt, DecidedAt: r.DecidedAt, Proposed: adminContributionContent(r.Proposed), TargetResourceId: ch.IDPointer(r.TargetID), ResultResourceId: ch.IDPointer(r.ResultID), Conflict: r.Conflict, SelfReview: r.SelfReview, History: []generated.ContributionEvent{}}
+	out := generated.ContributionDetail{Id: r.ID.String(), AuthorId: r.AuthorID.String(), Kind: generated.ContributionKind(r.Kind), Status: generated.ContributionStatus(r.Status), Reason: r.Reason, PreviousId: ch.IDPointer(r.PreviousID), CreatedAt: r.CreatedAt, DecidedAt: r.DecidedAt, ProposedChange: adminChange(r.ProposedChange), BaseChange: adminChange(r.BaseChange), CurrentChange: adminChange(r.CurrentChange), AcceptedChange: adminChange(r.AcceptedChange), TargetResourceId: ch.IDPointer(r.TargetID), ResultResourceId: ch.IDPointer(r.ResultID), Conflict: r.Conflict, SelfReview: r.SelfReview, History: []generated.ContributionEvent{}}
+	if !contribution.Extended(r.Kind) {
+		v := adminContributionContent(r.Proposed)
+		out.Proposed = &v
+	}
+	changes := []generated.ContributionResourceChange{}
+	for _, v := range r.ResourceChanges {
+		changes = append(changes, generated.ContributionResourceChange{ResourceId: v.ID.String(), BeforeVersion: v.Before, AfterVersion: v.After})
+	}
+	out.ResourceChanges = &changes
 	if r.BaseVersion > 0 {
 		out.BaseVersion = &r.BaseVersion
 	}
@@ -126,9 +135,25 @@ func (h *Handler) AcceptContribution(c fiber.Ctx, raw string, _ generated.Accept
 		return contributionError(c, err)
 	}
 	var body generated.AcceptContribution
-	fields, err := ch.Decode(c, &body, []string{"content"}, []string{"content", "message", "internal_note"}, []string{"message", "internal_note"})
+	fields, err := ch.Decode(c, &body, nil, []string{"content", "change", "message", "internal_note"}, []string{"message", "internal_note"})
 	if err != nil {
 		return contributionError(c, err)
+	}
+	if body.Change != nil {
+		if body.Content != nil {
+			return contributionError(c, contribution.ErrValidation)
+		}
+		change, e := ch.ParseChange(fields["change"], true)
+		if e != nil {
+			return contributionError(c, e)
+		}
+		if e = h.contributions.Accept(c.Context(), actor, key, contribution.AcceptInput{Change: change, Message: body.Message, InternalNote: body.InternalNote}); e != nil {
+			return contributionError(c, e)
+		}
+		return c.SendStatus(204)
+	}
+	if body.Content == nil {
+		return contributionError(c, contribution.ErrValidation)
 	}
 	fields, err = ch.Object(fields["content"], []string{"default_locale", "category_id", "name", "summary", "description", "lifecycle", "content_rating"}, []string{"default_locale", "category_id", "name", "summary", "description", "lifecycle", "content_rating", "slug", "source"}, []string{"summary", "description"})
 	if err != nil {

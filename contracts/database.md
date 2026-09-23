@@ -117,7 +117,8 @@ relationship identities cannot be updated. No cluster-role/default-privilege cha
 
 Only a `_test.go` migration helper can perform the migration round-trip. It requires
 `CI=true`, `GFP_DISPOSABLE_INFRA=1`, `GFP_RESOURCE_INTEGRATION=1`, fixed loopback
-`gfp_ci`/migrator identity and exactly current/target version 7 (7→6→5→7). Shared `migrate:dev`
+`gfp_ci`/migrator identity and exactly current/target version 8. It exercises guarded
+8→7→8 compatibility, then 8→7→6→5→8 regressions. Shared `migrate:dev`
 remains up-only. Resource smoke cleanup uses migrator only and randomly owned fixture
 IDs in FK-safe order; it never rolls back shared schema or touches existing Resources.
 
@@ -190,3 +191,27 @@ with the same key conflicts. An opaque HMAC binds edit context to User/Resource/
 version/default locale; no raw context identifier is stored. Public needs no Resource
 UPDATE/locking grant. Review reads the recorded version under canonical locks and
 commits canonical write, accepted content, decision event and audit atomically.
+
+## P0-3B typed changes (migration 8)
+
+Migration 8 expands only proposal kind/target constraints and adds
+`contribution_source_changes`, `contribution_tag_changes`,
+`contribution_relation_changes`, `contribution_localization_changes` and
+`contribution_review_resource_changes`. Migrations 1–7, Resource Core objects/grants,
+roles and Redis ACLs remain unchanged. No JSONB/EAV, trigger or RLS.
+
+The four change tables store immutable base/proposed/accepted snapshots. An empty
+Tag baseline has no rows and means none of the selected additions was bound; proposed
+and accepted sets remain nonempty. Localization bits name=1/summary=2/description=4
+are separate from the legacy content bits. Relation snapshots carry the other base
+version and accepted endpoint versions; per-resource audits reference the existing
+review audit and require after_version=before_version+1.
+
+API has SELECT and exact input-column INSERT on the four change tables, excluding
+relation result-version columns. Admin has SELECT/exact INSERT on all five; readonly
+has SELECT, Worker none. Neither runtime may UPDATE/DELETE typed history. Default
+grants are cleared first. Existing proposal terminal and canonical grants do not expand.
+
+Down 8 rejects any new-kind proposal before dropping objects. Disposable acceptance
+proves refusal, removes only its owned new fixtures, round-trips 8→7→8 and preserves
+an old-kind proposal. Shared gfp_dev remains up-only.

@@ -99,6 +99,28 @@ type AppContributionInitialSource struct {
 	AvailabilityState string
 }
 
+type AppContributionLocalizationChange struct {
+	ContributionID pgtype.UUID
+	SnapshotKind   string
+	Locale         string
+	RowExists      bool
+	Name           pgtype.Text
+	Summary        pgtype.Text
+	Description    pgtype.Text
+	SuppliedFields int16
+}
+
+type AppContributionRelationChange struct {
+	ContributionID      pgtype.UUID
+	SnapshotKind        string
+	OtherResourceID     pgtype.UUID
+	RelationType        string
+	Direction           string
+	OtherBaseVersion    int64
+	AnchorResultVersion pgtype.Int8
+	OtherResultVersion  pgtype.Int8
+}
+
 type AppContributionReviewAudit struct {
 	ContributionID pgtype.UUID
 	ActorID        pgtype.UUID
@@ -107,6 +129,30 @@ type AppContributionReviewAudit struct {
 	BeforeVersion  pgtype.Int8
 	AfterVersion   pgtype.Int8
 	OccurredAt     pgtype.Timestamptz
+}
+
+type AppContributionReviewResourceChange struct {
+	ContributionID pgtype.UUID
+	ResourceID     pgtype.UUID
+	BeforeVersion  int64
+	AfterVersion   int64
+}
+
+type AppContributionSourceChange struct {
+	ContributionID    pgtype.UUID
+	SnapshotKind      string
+	SourceID          pgtype.UUID
+	Url               pgtype.Text
+	Label             pgtype.Text
+	SourceType        pgtype.Text
+	AvailabilityState pgtype.Text
+}
+
+type AppContributionTagChange struct {
+	ContributionID pgtype.UUID
+	SnapshotKind   string
+	TagID          pgtype.UUID
+	WasBound       bool
 }
 
 type AppPasswordCredential struct {

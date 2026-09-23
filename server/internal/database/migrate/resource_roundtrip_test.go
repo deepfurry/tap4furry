@@ -48,9 +48,10 @@ func TestIntegrationResourceMigrationRoundTrip(t *testing.T) {
 		t.Fatal("migration provider unavailable")
 	}
 	current, target, err := provider.GetVersions(ctx)
-	if err != nil || current != 7 || target != 7 {
-		t.Fatal("round-trip only accepts exactly migration 7")
+	if err != nil || current != 8 || target != 8 {
+		t.Fatal("round-trip only accepts exactly migration 8")
 	}
+	completeContributionRoundTrip(t, provider, pool)
 	if _, err := provider.Down(ctx); err != nil {
 		t.Fatal(database.SafeError("disposable 00007 down", err))
 	}
@@ -82,8 +83,8 @@ func TestIntegrationResourceMigrationRoundTrip(t *testing.T) {
 		t.Fatal(database.SafeError("disposable 00006 up", err))
 	}
 	version, err = provider.GetDBVersion(ctx)
-	if err != nil || version != 7 {
-		t.Fatal("00006/00007 reapply failed")
+	if err != nil || version != 8 {
+		t.Fatal("00006/00007/00008 reapply failed")
 	}
 	var categories int
 	if err := pool.QueryRow(ctx, "SELECT count(*) FROM app.categories").Scan(&categories); err != nil || categories != 0 {

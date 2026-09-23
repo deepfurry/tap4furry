@@ -6,6 +6,7 @@ security, account recovery, explicit Google/GitHub linking and isolated Admin au
 MAIL-0 adds Resend; P0-2A adds Resource/Taxonomy schema and domain primitives.
 P0-2B adds anonymous Resource reads and Astro SSR; P0-2C adds Admin curation.
 P0-3A (roadmap 1.1) adds typed Resource proposals and atomic Editorial review.
+P0-3B (roadmap 1.2) completes Source/Tag/Relation/Translation proposals.
 
 ## Start here
 
@@ -78,6 +79,13 @@ are pattern references only and never override this repository.
   Originals are immutable. Author DTOs expose only supplied fields, safe messages and
   currently public links; never canonical-only baseline fields or internal notes.
   Reviewers cannot decide their own proposals. No automatic rebase/merge/retry, jobs or Redis keys.
+- P0-3B adds migration 8 only; migrations 1–7 and Resource Core grants remain immutable.
+  Five typed change/audit tables extend the same lifecycle and quota. Reviewed owned
+  changes join `curation.ApplyReviewedOwnedTx`; relations require both submitted
+  versions and both resource audits under the existing graph lock. Translation
+  presence bits preserve omission/null/raw locale values. Private projections use
+  one canonical snapshot and fresh authorization before return. No Source hard-delete,
+  rights proposal, taxonomy creation or separate review system.
 - Auth owns transactions and the challenge-mail interface. Raw challenge tokens
   never enter jobs; mail delivers once after commit to Resend or private local capture.
   Production requires explicit Resend config; provider payloads/errors stay private.

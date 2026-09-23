@@ -420,11 +420,11 @@ func TestIntegrationSchemaAndPrivileges(t *testing.T) {
 	f := newFixture(t)
 	ctx := t.Context()
 	var tables string
-	if err := f.owner.QueryRow(ctx, `SELECT string_agg(tablename,',' ORDER BY tablename) FROM pg_tables WHERE schemaname='app'`).Scan(&tables); err != nil || tables != "auth_challenges,auth_identities,categories,category_localizations,contribution_contents,contribution_events,contribution_initial_sources,contribution_review_audits,contributions,goose_db_version,password_credentials,resource_external_ids,resource_localizations,resource_relations,resource_sources,resource_tags,resources,security_events,sessions,tag_localizations,tags,user_profiles,user_roles,users" {
+	if err := f.owner.QueryRow(ctx, `SELECT string_agg(tablename,',' ORDER BY tablename) FROM pg_tables WHERE schemaname='app'`).Scan(&tables); err != nil || tables != "auth_challenges,auth_identities,categories,category_localizations,contribution_contents,contribution_events,contribution_initial_sources,contribution_localization_changes,contribution_relation_changes,contribution_review_audits,contribution_review_resource_changes,contribution_source_changes,contribution_tag_changes,contributions,goose_db_version,password_credentials,resource_external_ids,resource_localizations,resource_relations,resource_sources,resource_tags,resources,security_events,sessions,tag_localizations,tags,user_profiles,user_roles,users" {
 		t.Fatal("unexpected application schema or future tables")
 	}
 	var version int
-	if err := f.owner.QueryRow(ctx, "SELECT max(version_id) FROM app.goose_db_version WHERE is_applied").Scan(&version); err != nil || version != 7 {
+	if err := f.owner.QueryRow(ctx, "SELECT max(version_id) FROM app.goose_db_version WHERE is_applied").Scan(&version); err != nil || version != 8 {
 		t.Fatal("fresh migration chain failed")
 	}
 	for _, role := range []string{"gfp_api", "gfp_admin", "gfp_worker"} {

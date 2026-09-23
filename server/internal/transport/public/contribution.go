@@ -8,6 +8,7 @@ import (
 	"github.com/deepfurry/tap4furry/server/internal/transport/public/generated"
 	"github.com/gofiber/fiber/v3"
 	"strconv"
+	"strings"
 )
 
 func contributionError(c fiber.Ctx, err error) error {
@@ -23,7 +24,11 @@ func contributionError(c fiber.Ctx, err error) error {
 }
 func (h *Handler) contributionBoundary(c fiber.Ctx) error {
 	c.Set("Cache-Control", "no-store")
-	if err := ch.Query(c, []string{"page", "page_size", "status"}); err != nil {
+	allowed := []string{"page", "page_size", "status"}
+	if strings.Contains(c.Path(), "/contributions/context/") {
+		allowed = []string{"kind", "source_id", "locale", "other_slug", "direction", "relation_type"}
+	}
+	if err := ch.Query(c, allowed); err != nil {
 		return contributionError(c, err)
 	}
 	if h.contributions == nil {
@@ -85,16 +90,42 @@ func originalContribution(v contribution.Detail) generated.ContributionOriginal 
 	}
 	return out
 }
-func (h *Handler) GetContributionContext(c fiber.Ctx, slug string) error {
+func (h *Handler) GetContributionContext(c fiber.Ctx, slug string, p generated.GetContributionContextParams) error {
 	actor, err := h.actor(c)
 	if err != nil {
 		return contributionError(c, err)
 	}
-	result, err := h.contributions.Context(c.Context(), actor, slug)
+	input := contribution.ContextInput{Locale: ch.Value(p.Locale), OtherSlug: ch.Value(p.OtherSlug)}
+	if p.Kind != nil {
+		input.Kind = string(*p.Kind)
+	}
+	if p.Direction != nil {
+		input.Direction = string(*p.Direction)
+	}
+	if p.RelationType != nil {
+		input.RelationType = resource.RelationType(*p.RelationType)
+	}
+	input.SourceID, err = ch.OptionalID(p.SourceId)
 	if err != nil {
 		return contributionError(c, err)
 	}
-	return c.JSON(generated.ContributionContext{ResourceId: result.ResourceID.String(), BaseRevision: result.BaseRevision, Content: publicContributionContent(result.Content)})
+	result, err := h.contributions.ContextFor(c.Context(), actor, slug, input)
+	if err != nil {
+		return contributionError(c, err)
+	}
+	out := generated.ContributionContext{ResourceId: result.ResourceID.String(), BaseRevision: result.BaseRevision, Change: publicChange(result.Change, true)}
+	if !contribution.Extended(input.Kind) {
+		v := publicContributionContent(result.Content)
+		out.Content = &v
+	}
+	if result.Reference != nil {
+		v := publicContributionContent(*result.Reference)
+		out.Reference = &v
+	}
+	if r := result.Other; r != nil {
+		out.OtherResource = &generated.ContributionResult{Id: r.ID.String(), Slug: r.Slug, Name: r.Name}
+	}
+	return c.JSON(out)
 }
 func (h *Handler) SubmitContribution(c fiber.Ctx, _ generated.SubmitContributionParams) error {
 	actor, err := h.actor(c)
@@ -102,9 +133,39 @@ func (h *Handler) SubmitContribution(c fiber.Ctx, _ generated.SubmitContribution
 		return contributionError(c, err)
 	}
 	var body generated.SubmitContribution
-	fields, err := ch.Decode(c, &body, []string{"kind", "request_id", "reason", "content"}, []string{"kind", "request_id", "target_resource_id", "base_revision", "previous_id", "reason", "content"}, nil)
+	fields, err := ch.Decode(c, &body, []string{"kind", "request_id", "reason"}, []string{"kind", "request_id", "target_resource_id", "base_revision", "previous_id", "reason", "content", "change"}, nil)
 	if err != nil {
 		return contributionError(c, err)
+	}
+	if contribution.Extended(string(body.Kind)) {
+		if body.Content != nil || body.Change == nil {
+			return contributionError(c, contribution.ErrValidation)
+		}
+		in := contribution.SubmitInput{Kind: string(body.Kind), Reason: body.Reason, BaseRevision: ch.Value(body.BaseRevision)}
+		in.RequestID, err = ch.ID(body.RequestId)
+		if err != nil {
+			return contributionError(c, err)
+		}
+		in.TargetID, err = ch.OptionalID(body.TargetResourceId)
+		if err != nil {
+			return contributionError(c, err)
+		}
+		in.PreviousID, err = ch.OptionalID(body.PreviousId)
+		if err != nil {
+			return contributionError(c, err)
+		}
+		in.Change, err = ch.ParseChange(fields["change"], false)
+		if err != nil {
+			return contributionError(c, err)
+		}
+		result, err := h.contributions.Submit(c.Context(), actor, in)
+		if err != nil {
+			return contributionError(c, err)
+		}
+		return c.Status(201).JSON(generated.ContributionCreated{Id: result.String()})
+	}
+	if body.Change != nil || body.Content == nil {
+		return contributionError(c, contribution.ErrValidation)
 	}
 	content, err := ch.Object(fields["content"], nil, []string{"default_locale", "category_id", "name", "summary", "description", "lifecycle", "content_rating", "source"}, []string{"summary", "description"})
 	if err != nil {
@@ -194,7 +255,11 @@ func (h *Handler) GetMyContribution(c fiber.Ctx, raw string) error {
 	if err != nil {
 		return contributionError(c, err)
 	}
-	out := generated.ContributionDetail{Id: result.ID.String(), Kind: generated.ContributionKind(result.Kind), Status: generated.ContributionStatus(result.Status), Reason: result.Reason, PreviousId: ch.IDPointer(result.PreviousID), CreatedAt: result.CreatedAt, DecidedAt: result.DecidedAt, Proposed: originalContribution(result), History: []generated.ContributionEvent{}}
+	out := generated.ContributionDetail{Id: result.ID.String(), Kind: generated.ContributionKind(result.Kind), Status: generated.ContributionStatus(result.Status), Reason: result.Reason, PreviousId: ch.IDPointer(result.PreviousID), CreatedAt: result.CreatedAt, DecidedAt: result.DecidedAt, ProposedChange: publicChange(result.ProposedChange, false), AcceptedChange: publicChange(result.AcceptedChange, false), History: []generated.ContributionEvent{}}
+	if !contribution.Extended(result.Kind) {
+		v := originalContribution(result)
+		out.Proposed = &v
+	}
 	if result.Accepted != nil {
 		v := publicContributionContent(*result.Accepted)
 		out.Accepted = &v

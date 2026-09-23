@@ -52,7 +52,7 @@ func safe(err error) error {
 	if errors.As(err, &limit) {
 		return err
 	}
-	for _, known := range []error{ErrValidation, ErrNotFound, ErrForbidden, ErrVerified, ErrConflict, ErrRequestConflict, ErrCanonical, auth.ErrUnauthenticated, auth.ErrAdminUnauthenticated, auth.ErrAdminForbidden, resource.ErrVersionConflict, curation.ErrConflict, curation.ErrValidation, curation.ErrNotFound} {
+	for _, known := range []error{ErrValidation, ErrNotFound, ErrForbidden, ErrVerified, ErrConflict, ErrRequestConflict, ErrCanonical, auth.ErrUnauthenticated, auth.ErrAdminUnauthenticated, auth.ErrAdminForbidden, resource.ErrVersionConflict, curation.ErrConflict, curation.ErrValidation, curation.ErrNotFound, curation.ErrRelationCycle} {
 		if errors.Is(err, known) {
 			return err
 		}
@@ -72,7 +72,10 @@ func safe(err error) error {
 	return database.SafeError("contribution operation", err)
 }
 func (a *App) transact(ctx context.Context, check func(pgx.Tx) (time.Time, error), work func(pgx.Tx, *sqlc.Queries, time.Time) error) error {
-	tx, err := a.pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: pgx.ReadCommitted})
+	return a.transactLevel(ctx, pgx.ReadCommitted, check, work)
+}
+func (a *App) transactLevel(ctx context.Context, level pgx.TxIsoLevel, check func(pgx.Tx) (time.Time, error), work func(pgx.Tx, *sqlc.Queries, time.Time) error) error {
+	tx, err := a.pool.BeginTx(ctx, pgx.TxOptions{IsoLevel: level})
 	if err != nil {
 		return safe(err)
 	}

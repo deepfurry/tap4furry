@@ -32,7 +32,7 @@ func (f *Fixture) Cleanup(owner *pgxpool.Pool) error {
 		return database.SafeError("begin contribution fixture cleanup", err)
 	}
 	defer tx.Rollback(ctx)
-	for _, table := range []string{"contribution_review_audits", "contribution_events", "contribution_initial_sources", "contribution_contents", "contributions"} {
+	for _, table := range []string{"contribution_review_resource_changes", "contribution_localization_changes", "contribution_relation_changes", "contribution_tag_changes", "contribution_source_changes", "contribution_review_audits", "contribution_events", "contribution_initial_sources", "contribution_contents", "contributions"} {
 		key := "contribution_id"
 		if table == "contributions" {
 			key = "id"
@@ -94,9 +94,9 @@ func (c *client) token() error {
 	return nil
 }
 
-// Callers own two temporary verified Public accounts and an Editorial reviewer.
+// Callers own seven temporary verified Public accounts and an Editorial reviewer.
 // No quota bypass, clock manipulation, secret logging or shared fixture reuse.
-func Run(ctx context.Context, pub, adm *fiber.App, owner *pgxpool.Pool, authors [2]*http.Cookie, reviewerEmail, password, publicOrigin, adminOrigin string) (result error) {
+func Run(ctx context.Context, pub, adm *fiber.App, owner *pgxpool.Pool, authors [7]*http.Cookie, reviewerEmail, password, publicOrigin, adminOrigin string) (result error) {
 	if err := VerifyGrants(ctx, owner); err != nil {
 		return err
 	}
@@ -206,5 +206,5 @@ func Run(ctx context.Context, pub, adm *fiber.App, owner *pgxpool.Pool, authors 
 	if err := owner.QueryRow(ctx, "SELECT count(*) FROM app.contribution_review_audits WHERE contribution_id=ANY($1::uuid[])", f.IDs).Scan(&audits); err != nil || audits != 2 {
 		return errors.New("atomic review audit missing")
 	}
-	return nil
+	return runChanges(f, a, anon, authors, rid, prefix, cat.Id)
 }

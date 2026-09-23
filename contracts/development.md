@@ -40,6 +40,13 @@ history. New-table grants are checked column by column; fixture cleanup is owner
 and limited to generated IDs. Use `pnpm migrate:dev` for migration 7 up only after
 disposable 7→6→5→7 acceptance. Never run Down against shared development.
 
+P0-3B extends this smoke to seven temporary verified authors: the two old flows plus
+five new typed changes. Independent authors respect the real 60-second quota rather
+than bypassing it. Migration 8 applies only after disposable downgrade protection,
+old-proposal preservation and 8→7→8 acceptance. Shared checks assert Goose=8,
+unchanged Resource Core grants and all ten Contribution table/column grant matrices;
+cleanup remains restricted to owned fixture IDs. No new smoke command or Infra changes.
+
 `ADMIN_CSRF_SECRET` is separate from Public `CSRF_SECRET`; API/Admin share
 `AUTH_THROTTLE_SECRET`. Production requires explicit private values of at least
 32 bytes; development/test have public defaults. Existing private files stay intact.

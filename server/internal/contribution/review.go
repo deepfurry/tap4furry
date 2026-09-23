@@ -12,6 +12,9 @@ import (
 )
 
 func (a *App) Accept(ctx context.Context, actor auth.AdminActor, key uuid.UUID, input AcceptInput) error {
+	if input.Change != nil {
+		return a.acceptChange(ctx, actor, key, input)
+	}
 	final, err := normalizeContent(input.Content)
 	if err != nil {
 		return err
@@ -34,6 +37,9 @@ func (a *App) Accept(ctx context.Context, actor auth.AdminActor, key uuid.UUID, 
 		}
 		if row.Status != "pending" {
 			return ErrConflict
+		}
+		if Extended(row.Kind) {
+			return ErrValidation
 		}
 		contents, err := readContents(ctx, q, key)
 		if err != nil {

@@ -88,7 +88,13 @@ func TestIntegrationContributionHTTPAndLifecycle(t *testing.T) {
 	f := newContributionFixture(t)
 	_, _, second := f.register()
 	f.request("POST", "/auth/email/verification", map[string]string{"token": f.lastToken("email_verify")}, nil, 204)
-	if err := contributioncheck.Run(t.Context(), f.app, f.adminApp, f.owner, [2]*http.Cookie{f.authorCookie, second}, f.email, testPassword, testOrigin, adminOrigin); err != nil {
+	authors := [7]*http.Cookie{f.authorCookie, second}
+	for i := 2; i < len(authors); i++ {
+		_, _, cookie := f.register()
+		f.request("POST", "/auth/email/verification", map[string]string{"token": f.lastToken("email_verify")}, nil, 204)
+		authors[i] = cookie
+	}
+	if err := contributioncheck.Run(t.Context(), f.app, f.adminApp, f.owner, authors, f.email, testPassword, testOrigin, adminOrigin); err != nil {
 		t.Fatal(err)
 	}
 }

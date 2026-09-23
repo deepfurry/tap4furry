@@ -65,9 +65,11 @@ type SubmitInput struct {
 	RequestID, TargetID, PreviousID uuid.UUID
 	Kind, Reason, BaseRevision      string
 	Content                         Patch
+	Change                          *Change
 }
 type AcceptInput struct {
 	Content               Content
+	Change                *Change
 	Message, InternalNote *string
 }
 
@@ -110,15 +112,25 @@ func normalizeContent(in Content) (Content, error) {
 // Normalize the request itself before fingerprinting. BaseRevision is compared
 // as an opaque MAC, never persisted except as part of this one-way digest.
 func normalizeInput(in SubmitInput) (SubmitInput, error) {
-	if in.RequestID == uuid.Nil() || (in.Kind != Create && in.Kind != Update) {
+	if in.RequestID == uuid.Nil() || !validKind(in.Kind) {
 		return in, ErrValidation
 	}
-	if (in.Kind == Create && (in.TargetID != uuid.Nil() || in.BaseRevision != "")) || (in.Kind == Update && (in.TargetID == uuid.Nil() || in.BaseRevision == "")) {
+	if (in.Kind == Create && (in.TargetID != uuid.Nil() || in.BaseRevision != "")) || (in.Kind != Create && (in.TargetID == uuid.Nil() || in.BaseRevision == "")) {
 		return in, ErrValidation
 	}
 	var err error
 	in.Reason, err = taxonomy.RequiredText(in.Reason, 2000)
 	if err != nil {
+		return in, ErrValidation
+	}
+	if Extended(in.Kind) {
+		if !reflect.DeepEqual(in.Content, Patch{}) {
+			return in, ErrValidation
+		}
+		in.Change, err = normalizeChange(in.Kind, in.Change, false)
+		return in, err
+	}
+	if in.Change != nil {
 		return in, ErrValidation
 	}
 	p := &in.Content

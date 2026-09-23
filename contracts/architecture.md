@@ -22,6 +22,28 @@
   clients, no HTML sink/persisted drafts, and explicit submission/preview/decision.
   Reviewer edits require a reason; conflicts preserve input and never retry automatically.
 
+## P0-3B complete contribution types
+
+- The same lifecycle supports add_source, remove_broken_source, add_tag,
+  add_relation and add_translation. Closed typed payloads reject unknown/mixed
+  variants; old create/update contracts remain compatible. No generic command bus.
+- `curation.ApplyReviewedOwnedTx` joins the review transaction without committing.
+  Sources start rights=unknown/non-primary; removal only changes availability.
+  Tags add 1–10 active bindings without replacing unrelated/retired bindings.
+- Relation acceptance takes the same graph advisory lock before UUID-ordered
+  endpoints, compares both submitted versions, checks cycles per type and writes
+  both version audits. Either endpoint stale or any audit failure rolls back everything.
+- Translation context uses the raw non-default locale, separately from the default
+  reference. Fixed presence bits preserve omitted versus explicitly cleared fields.
+  Authors never receive server-filled original fields or hidden accepted snapshots.
+- Multi-query private projections share one REPEATABLE READ snapshot. A subsequent
+  READ COMMITTED authorization check prevents an older snapshot from surviving a
+  role/session revocation that held User first. No concurrent nested connection.
+  Mutations continue to revalidate live authorization in their own READ COMMITTED transaction.
+- A single private form/review surface covers all seven kinds. Explicit previews,
+  revision explanations, dirty guards and conflict preservation remain mandatory;
+  anonymous Resource SSR and its sole sanitized HTML sink are unchanged.
+
 ## Core boundaries
 
 - One Go module, three runtime processes: Public API, Admin API, Worker.

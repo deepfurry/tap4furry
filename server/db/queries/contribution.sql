@@ -36,12 +36,12 @@ SELECT * FROM app.contributions WHERE id=$1 FOR UPDATE;
 SELECT * FROM app.contributions WHERE id=$1;
 
 -- name: ContributionListOwned :many
-SELECT c.*,CASE WHEN c.kind='create_resource' OR (c.submitted_fields & 1)<>0 THEN p.name ELSE 'Resource correction' END::text AS name FROM app.contributions c JOIN app.contribution_contents p ON p.contribution_id=c.id AND p.content_kind='proposed'
+SELECT c.*,CASE WHEN c.kind='create_resource' OR (c.submitted_fields & 1)<>0 THEN p.name WHEN c.kind='update_resource' THEN 'Resource correction' ELSE c.kind END::text AS name FROM app.contributions c LEFT JOIN app.contribution_contents p ON p.contribution_id=c.id AND p.content_kind='proposed'
 WHERE c.author_id=sqlc.arg(author_id) AND (sqlc.narg(status)::text IS NULL OR c.status=sqlc.narg(status))
 ORDER BY c.created_at DESC,c.id DESC LIMIT sqlc.arg(fetch_limit)::int OFFSET sqlc.arg(page_offset)::bigint;
 
 -- name: ContributionListAdmin :many
-SELECT c.*,p.name FROM app.contributions c JOIN app.contribution_contents p ON p.contribution_id=c.id AND p.content_kind='proposed'
+SELECT c.*,coalesce(p.name,c.kind)::text AS name FROM app.contributions c LEFT JOIN app.contribution_contents p ON p.contribution_id=c.id AND p.content_kind='proposed'
 WHERE (sqlc.narg(status)::text IS NULL OR c.status=sqlc.narg(status)) AND (sqlc.narg(kind)::text IS NULL OR c.kind=sqlc.narg(kind))
 ORDER BY c.created_at,c.id LIMIT sqlc.arg(fetch_limit)::int OFFSET sqlc.arg(page_offset)::bigint;
 

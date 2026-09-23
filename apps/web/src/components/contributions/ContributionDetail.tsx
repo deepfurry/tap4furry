@@ -2,19 +2,28 @@ import { useEffect, useState } from 'react';
 import {
   getMyContribution,
   listCategories,
+  listTags,
   withdrawContribution,
   type ContributionDetail as Detail,
 } from '@tap4furry/api-client/public';
 import { checked, privateRead, contributionError } from '../../lib/contributions';
 import { authenticatedRequest } from '../../lib/security';
+import { ChangeSnapshot, changeNames } from './ChangeSnapshot';
 import { ContentSnapshot } from './ContentSnapshot';
 export function ContributionDetail({ id }: { id: string }) {
   const [data, setData] = useState<Detail>();
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [categoryNames, setCategoryNames] = useState<Record<string, string>>({});
+  const [tagNames, setTagNames] = useState<Record<string, string>>({});
   useEffect(() => {
     let active = true;
+    void listTags(undefined, privateRead)
+      .then((r) => {
+        if (active && r.status === 200)
+          setTagNames(Object.fromEntries(r.data.items.map((t) => [t.id, t.name])));
+      })
+      .catch(() => {});
     void listCategories(undefined, privateRead)
       .then((response) => {
         if (active && response.status === 200)
@@ -41,18 +50,29 @@ export function ContributionDetail({ id }: { id: string }) {
       {error && <p role="alert">{error}</p>}
       {data ? (
         <>
-          <h2>{data.proposed.name ?? 'Resource correction'}</h2>
+          <h2>{data.proposed?.name ?? changeNames[data.kind]}</h2>
           <p>Status: {data.status}</p>
           <section className="grid gap-3">
             <h3>Your original proposal</h3>
-            <ContentSnapshot
-              content={data.proposed}
-              categoryName={
-                data.proposed.category_id ? categoryNames[data.proposed.category_id] : undefined
-              }
-            />
+            {data.proposed && (
+              <ContentSnapshot
+                content={data.proposed}
+                categoryName={
+                  data.proposed.category_id ? categoryNames[data.proposed.category_id] : undefined
+                }
+              />
+            )}
+            {data.proposed_change && (
+              <ChangeSnapshot tagNames={tagNames} value={data.proposed_change} />
+            )}
             <p className="whitespace-pre-wrap">Reason: {data.reason}</p>
           </section>
+          {data.accepted_change && (
+            <section className="grid gap-3">
+              <h3>Accepted change</h3>
+              <ChangeSnapshot tagNames={tagNames} value={data.accepted_change} />
+            </section>
+          )}
           {data.accepted && (
             <section className="grid gap-3">
               <h3>Accepted content</h3>
@@ -106,7 +126,7 @@ export function ContributionDetail({ id }: { id: string }) {
               <a href={`/submit?previous=${data.id}`}>Revise and submit a new proposal</a>
             ) : data.target ? (
               <a
-                href={`/submit?previous=${data.id}&resource=${encodeURIComponent(data.target.slug)}`}
+                href={`/submit?previous=${data.id}&resource=${encodeURIComponent(data.target.slug)}&kind=${data.kind}`}
               >
                 Revise using the current Resource
               </a>

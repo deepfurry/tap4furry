@@ -43,6 +43,7 @@ const (
 	PROFILEHANDLEUNAVAILABLE         ApiErrorCode = "PROFILE_HANDLE_UNAVAILABLE"
 	PROFILENOTFOUND                  ApiErrorCode = "PROFILE_NOT_FOUND"
 	RESOURCENOTFOUND                 ApiErrorCode = "RESOURCE_NOT_FOUND"
+	RESOURCERELATIONCYCLE            ApiErrorCode = "RESOURCE_RELATION_CYCLE"
 	RESOURCEVERSIONCONFLICT          ApiErrorCode = "RESOURCE_VERSION_CONFLICT"
 	VALIDATIONERROR                  ApiErrorCode = "VALIDATION_ERROR"
 )
@@ -106,9 +107,89 @@ func (e ApiErrorCode) Valid() bool {
 		return true
 	case RESOURCENOTFOUND:
 		return true
+	case RESOURCERELATIONCYCLE:
+		return true
 	case RESOURCEVERSIONCONFLICT:
 		return true
 	case VALIDATIONERROR:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionChangeRelationDirection.
+const (
+	ContributionChangeRelationDirectionIncoming  ContributionChangeRelationDirection = "incoming"
+	ContributionChangeRelationDirectionOutgoing  ContributionChangeRelationDirection = "outgoing"
+	ContributionChangeRelationDirectionSymmetric ContributionChangeRelationDirection = "symmetric"
+)
+
+// Valid indicates whether the value is a known member of the ContributionChangeRelationDirection enum.
+func (e ContributionChangeRelationDirection) Valid() bool {
+	switch e {
+	case ContributionChangeRelationDirectionIncoming:
+		return true
+	case ContributionChangeRelationDirectionOutgoing:
+		return true
+	case ContributionChangeRelationDirectionSymmetric:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionChangeRelationRelationType.
+const (
+	ContributionChangeRelationRelationTypeDerivedFrom ContributionChangeRelationRelationType = "derived_from"
+	ContributionChangeRelationRelationTypePartOf      ContributionChangeRelationRelationType = "part_of"
+	ContributionChangeRelationRelationTypeRelatedTo   ContributionChangeRelationRelationType = "related_to"
+	ContributionChangeRelationRelationTypeSuccessorOf ContributionChangeRelationRelationType = "successor_of"
+)
+
+// Valid indicates whether the value is a known member of the ContributionChangeRelationRelationType enum.
+func (e ContributionChangeRelationRelationType) Valid() bool {
+	switch e {
+	case ContributionChangeRelationRelationTypeDerivedFrom:
+		return true
+	case ContributionChangeRelationRelationTypePartOf:
+		return true
+	case ContributionChangeRelationRelationTypeRelatedTo:
+		return true
+	case ContributionChangeRelationRelationTypeSuccessorOf:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionChangeSourceSourceType.
+const (
+	ContributionChangeSourceSourceTypeArchive   ContributionChangeSourceSourceType = "archive"
+	ContributionChangeSourceSourceTypeCommunity ContributionChangeSourceSourceType = "community"
+	ContributionChangeSourceSourceTypeExternal  ContributionChangeSourceSourceType = "external"
+	ContributionChangeSourceSourceTypeMirror    ContributionChangeSourceSourceType = "mirror"
+	ContributionChangeSourceSourceTypeOfficial  ContributionChangeSourceSourceType = "official"
+	ContributionChangeSourceSourceTypeStore     ContributionChangeSourceSourceType = "store"
+	ContributionChangeSourceSourceTypeUnknown   ContributionChangeSourceSourceType = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the ContributionChangeSourceSourceType enum.
+func (e ContributionChangeSourceSourceType) Valid() bool {
+	switch e {
+	case ContributionChangeSourceSourceTypeArchive:
+		return true
+	case ContributionChangeSourceSourceTypeCommunity:
+		return true
+	case ContributionChangeSourceSourceTypeExternal:
+		return true
+	case ContributionChangeSourceSourceTypeMirror:
+		return true
+	case ContributionChangeSourceSourceTypeOfficial:
+		return true
+	case ContributionChangeSourceSourceTypeStore:
+		return true
+	case ContributionChangeSourceSourceTypeUnknown:
 		return true
 	default:
 		return false
@@ -192,16 +273,31 @@ func (e ContributionEventEventType) Valid() bool {
 
 // Defines values for ContributionKind.
 const (
-	CreateResource ContributionKind = "create_resource"
-	UpdateResource ContributionKind = "update_resource"
+	ContributionKindAddRelation        ContributionKind = "add_relation"
+	ContributionKindAddSource          ContributionKind = "add_source"
+	ContributionKindAddTag             ContributionKind = "add_tag"
+	ContributionKindAddTranslation     ContributionKind = "add_translation"
+	ContributionKindCreateResource     ContributionKind = "create_resource"
+	ContributionKindRemoveBrokenSource ContributionKind = "remove_broken_source"
+	ContributionKindUpdateResource     ContributionKind = "update_resource"
 )
 
 // Valid indicates whether the value is a known member of the ContributionKind enum.
 func (e ContributionKind) Valid() bool {
 	switch e {
-	case CreateResource:
+	case ContributionKindAddRelation:
 		return true
-	case UpdateResource:
+	case ContributionKindAddSource:
+		return true
+	case ContributionKindAddTag:
+		return true
+	case ContributionKindAddTranslation:
+		return true
+	case ContributionKindCreateResource:
+		return true
+	case ContributionKindRemoveBrokenSource:
+		return true
+	case ContributionKindUpdateResource:
 		return true
 	default:
 		return false
@@ -585,19 +681,19 @@ func (e ResourceLifecycle) Valid() bool {
 
 // Defines values for ResourceRelationDirection.
 const (
-	Incoming  ResourceRelationDirection = "incoming"
-	Outgoing  ResourceRelationDirection = "outgoing"
-	Symmetric ResourceRelationDirection = "symmetric"
+	ResourceRelationDirectionIncoming  ResourceRelationDirection = "incoming"
+	ResourceRelationDirectionOutgoing  ResourceRelationDirection = "outgoing"
+	ResourceRelationDirectionSymmetric ResourceRelationDirection = "symmetric"
 )
 
 // Valid indicates whether the value is a known member of the ResourceRelationDirection enum.
 func (e ResourceRelationDirection) Valid() bool {
 	switch e {
-	case Incoming:
+	case ResourceRelationDirectionIncoming:
 		return true
-	case Outgoing:
+	case ResourceRelationDirectionOutgoing:
 		return true
-	case Symmetric:
+	case ResourceRelationDirectionSymmetric:
 		return true
 	default:
 		return false
@@ -606,22 +702,22 @@ func (e ResourceRelationDirection) Valid() bool {
 
 // Defines values for ResourceRelationType.
 const (
-	DerivedFrom ResourceRelationType = "derived_from"
-	PartOf      ResourceRelationType = "part_of"
-	RelatedTo   ResourceRelationType = "related_to"
-	SuccessorOf ResourceRelationType = "successor_of"
+	ResourceRelationTypeDerivedFrom ResourceRelationType = "derived_from"
+	ResourceRelationTypePartOf      ResourceRelationType = "part_of"
+	ResourceRelationTypeRelatedTo   ResourceRelationType = "related_to"
+	ResourceRelationTypeSuccessorOf ResourceRelationType = "successor_of"
 )
 
 // Valid indicates whether the value is a known member of the ResourceRelationType enum.
 func (e ResourceRelationType) Valid() bool {
 	switch e {
-	case DerivedFrom:
+	case ResourceRelationTypeDerivedFrom:
 		return true
-	case PartOf:
+	case ResourceRelationTypePartOf:
 		return true
-	case RelatedTo:
+	case ResourceRelationTypeRelatedTo:
 		return true
-	case SuccessorOf:
+	case ResourceRelationTypeSuccessorOf:
 		return true
 	default:
 		return false
@@ -709,6 +805,84 @@ func (e SessionAuthMethod) Valid() bool {
 	}
 }
 
+// Defines values for GetContributionContextParamsKind.
+const (
+	GetContributionContextParamsKindAddRelation        GetContributionContextParamsKind = "add_relation"
+	GetContributionContextParamsKindAddSource          GetContributionContextParamsKind = "add_source"
+	GetContributionContextParamsKindAddTag             GetContributionContextParamsKind = "add_tag"
+	GetContributionContextParamsKindAddTranslation     GetContributionContextParamsKind = "add_translation"
+	GetContributionContextParamsKindCreateResource     GetContributionContextParamsKind = "create_resource"
+	GetContributionContextParamsKindRemoveBrokenSource GetContributionContextParamsKind = "remove_broken_source"
+	GetContributionContextParamsKindUpdateResource     GetContributionContextParamsKind = "update_resource"
+)
+
+// Valid indicates whether the value is a known member of the GetContributionContextParamsKind enum.
+func (e GetContributionContextParamsKind) Valid() bool {
+	switch e {
+	case GetContributionContextParamsKindAddRelation:
+		return true
+	case GetContributionContextParamsKindAddSource:
+		return true
+	case GetContributionContextParamsKindAddTag:
+		return true
+	case GetContributionContextParamsKindAddTranslation:
+		return true
+	case GetContributionContextParamsKindCreateResource:
+		return true
+	case GetContributionContextParamsKindRemoveBrokenSource:
+		return true
+	case GetContributionContextParamsKindUpdateResource:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for GetContributionContextParamsDirection.
+const (
+	GetContributionContextParamsDirectionIncoming  GetContributionContextParamsDirection = "incoming"
+	GetContributionContextParamsDirectionOutgoing  GetContributionContextParamsDirection = "outgoing"
+	GetContributionContextParamsDirectionSymmetric GetContributionContextParamsDirection = "symmetric"
+)
+
+// Valid indicates whether the value is a known member of the GetContributionContextParamsDirection enum.
+func (e GetContributionContextParamsDirection) Valid() bool {
+	switch e {
+	case GetContributionContextParamsDirectionIncoming:
+		return true
+	case GetContributionContextParamsDirectionOutgoing:
+		return true
+	case GetContributionContextParamsDirectionSymmetric:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for GetContributionContextParamsRelationType.
+const (
+	GetContributionContextParamsRelationTypeDerivedFrom GetContributionContextParamsRelationType = "derived_from"
+	GetContributionContextParamsRelationTypePartOf      GetContributionContextParamsRelationType = "part_of"
+	GetContributionContextParamsRelationTypeRelatedTo   GetContributionContextParamsRelationType = "related_to"
+	GetContributionContextParamsRelationTypeSuccessorOf GetContributionContextParamsRelationType = "successor_of"
+)
+
+// Valid indicates whether the value is a known member of the GetContributionContextParamsRelationType enum.
+func (e GetContributionContextParamsRelationType) Valid() bool {
+	switch e {
+	case GetContributionContextParamsRelationTypeDerivedFrom:
+		return true
+	case GetContributionContextParamsRelationTypePartOf:
+		return true
+	case GetContributionContextParamsRelationTypeRelatedTo:
+		return true
+	case GetContributionContextParamsRelationTypeSuccessorOf:
+		return true
+	default:
+		return false
+	}
+}
+
 // Accepted defines model for Accepted.
 type Accepted struct {
 	Message string `json:"message"`
@@ -754,6 +928,49 @@ type ChallengeToken struct {
 	Token *string `json:"token,omitempty"`
 }
 
+// ContributionChange Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests.
+type ContributionChange struct {
+	Relation *ContributionChangeRelation `json:"relation,omitempty"`
+	Source   *ContributionChangeSource   `json:"source,omitempty"`
+	SourceId *string                     `json:"source_id,omitempty"`
+	TagIds   *[]string                   `json:"tag_ids,omitempty"`
+
+	// Translation Target locale is fixed. Public submission omits unchanged fields; null explicitly clears summary/description. Admin acceptance supplies complete final name/summary/description. exists is response-only; raw locale values never use display fallback.
+	Translation *ContributionChangeTranslation `json:"translation,omitempty"`
+}
+
+// ContributionChangeRelation defines model for ContributionChangeRelation.
+type ContributionChangeRelation struct {
+	Direction       ContributionChangeRelationDirection    `json:"direction"`
+	OtherResourceId string                                 `json:"other_resource_id"`
+	RelationType    ContributionChangeRelationRelationType `json:"relation_type"`
+}
+
+// ContributionChangeRelationDirection defines model for ContributionChangeRelation.Direction.
+type ContributionChangeRelationDirection string
+
+// ContributionChangeRelationRelationType defines model for ContributionChangeRelation.RelationType.
+type ContributionChangeRelationRelationType string
+
+// ContributionChangeSource defines model for ContributionChangeSource.
+type ContributionChangeSource struct {
+	Label      *string                             `json:"label,omitempty"`
+	SourceType *ContributionChangeSourceSourceType `json:"source_type,omitempty"`
+	Url        string                              `json:"url"`
+}
+
+// ContributionChangeSourceSourceType defines model for ContributionChangeSource.SourceType.
+type ContributionChangeSourceSourceType string
+
+// ContributionChangeTranslation Target locale is fixed. Public submission omits unchanged fields; null explicitly clears summary/description. Admin acceptance supplies complete final name/summary/description. exists is response-only; raw locale values never use display fallback.
+type ContributionChangeTranslation struct {
+	Description **string `json:"description,omitempty"`
+	Exists      *bool    `json:"exists,omitempty"`
+	Locale      string   `json:"locale"`
+	Name        *string  `json:"name,omitempty"`
+	Summary     **string `json:"summary,omitempty"`
+}
+
 // ContributionContent defines model for ContributionContent.
 type ContributionContent struct {
 	CategoryId    string                           `json:"category_id"`
@@ -774,9 +991,14 @@ type ContributionContentLifecycle string
 
 // ContributionContext defines model for ContributionContext.
 type ContributionContext struct {
-	BaseRevision string              `json:"base_revision"`
-	Content      ContributionContent `json:"content"`
-	ResourceId   string              `json:"resource_id"`
+	BaseRevision string `json:"base_revision"`
+
+	// Change Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests.
+	Change        *ContributionChange  `json:"change,omitempty"`
+	Content       *ContributionContent `json:"content,omitempty"`
+	OtherResource *ContributionResult  `json:"other_resource,omitempty"`
+	Reference     *ContributionContent `json:"reference,omitempty"`
+	ResourceId    string               `json:"resource_id"`
 }
 
 // ContributionCreated defines model for ContributionCreated.
@@ -786,20 +1008,26 @@ type ContributionCreated struct {
 
 // ContributionDetail defines model for ContributionDetail.
 type ContributionDetail struct {
-	Accepted   *ContributionContent `json:"accepted,omitempty"`
-	CreatedAt  time.Time            `json:"created_at"`
-	DecidedAt  *time.Time           `json:"decided_at,omitempty"`
-	History    []ContributionEvent  `json:"history"`
-	Id         string               `json:"id"`
-	Kind       ContributionKind     `json:"kind"`
-	PreviousId *string              `json:"previous_id,omitempty"`
+	Accepted *ContributionContent `json:"accepted,omitempty"`
+
+	// AcceptedChange Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests.
+	AcceptedChange *ContributionChange `json:"accepted_change,omitempty"`
+	CreatedAt      time.Time           `json:"created_at"`
+	DecidedAt      *time.Time          `json:"decided_at,omitempty"`
+	History        []ContributionEvent `json:"history"`
+	Id             string              `json:"id"`
+	Kind           ContributionKind    `json:"kind"`
+	PreviousId     *string             `json:"previous_id,omitempty"`
 
 	// Proposed Only fields actually supplied by the author; omitted canonical fields never appear. Null text means explicitly cleared.
-	Proposed ContributionOriginal `json:"proposed"`
-	Reason   string               `json:"reason"`
-	Result   *ContributionResult  `json:"result,omitempty"`
-	Status   ContributionStatus   `json:"status"`
-	Target   *ContributionResult  `json:"target,omitempty"`
+	Proposed *ContributionOriginal `json:"proposed,omitempty"`
+
+	// ProposedChange Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests.
+	ProposedChange *ContributionChange `json:"proposed_change,omitempty"`
+	Reason         string              `json:"reason"`
+	Result         *ContributionResult `json:"result,omitempty"`
+	Status         ContributionStatus  `json:"status"`
+	Target         *ContributionResult `json:"target,omitempty"`
 }
 
 // ContributionEvent defines model for ContributionEvent.
@@ -1138,13 +1366,16 @@ type SessionList struct {
 
 // SubmitContribution defines model for SubmitContribution.
 type SubmitContribution struct {
-	BaseRevision     *string           `json:"base_revision,omitempty"`
-	Content          ContributionPatch `json:"content"`
-	Kind             ContributionKind  `json:"kind"`
-	PreviousId       *string           `json:"previous_id,omitempty"`
-	Reason           string            `json:"reason"`
-	RequestId        string            `json:"request_id"`
-	TargetResourceId *string           `json:"target_resource_id,omitempty"`
+	BaseRevision *string `json:"base_revision,omitempty"`
+
+	// Change Closed kind-specific change: source for add_source, source_id for remove_broken_source, tag_ids for add_tag, relation for add_relation, translation for add_translation. Requests supply exactly one matching member; content and change are mutually exclusive. Tag submissions require 1–10 IDs; empty arrays describe an unbound review baseline. Snapshots may include server-populated fields, which are rejected in requests.
+	Change           *ContributionChange `json:"change,omitempty"`
+	Content          *ContributionPatch  `json:"content,omitempty"`
+	Kind             ContributionKind    `json:"kind"`
+	PreviousId       *string             `json:"previous_id,omitempty"`
+	Reason           string              `json:"reason"`
+	RequestId        string              `json:"request_id"`
+	TargetResourceId *string             `json:"target_resource_id,omitempty"`
 }
 
 // TagItem defines model for TagItem.
@@ -1233,6 +1464,25 @@ type SubmitContributionParams struct {
 	// XCSRFToken Obtain from GET /auth/csrf for the current session. Exact PUBLIC_ORIGIN is also required.
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
 }
+
+// GetContributionContextParams defines parameters for GetContributionContext.
+type GetContributionContextParams struct {
+	Kind         *GetContributionContextParamsKind         `form:"kind,omitempty" json:"kind,omitempty"`
+	SourceId     *string                                   `form:"source_id,omitempty" json:"source_id,omitempty"`
+	Locale       *string                                   `form:"locale,omitempty" json:"locale,omitempty"`
+	OtherSlug    *string                                   `form:"other_slug,omitempty" json:"other_slug,omitempty"`
+	Direction    *GetContributionContextParamsDirection    `form:"direction,omitempty" json:"direction,omitempty"`
+	RelationType *GetContributionContextParamsRelationType `form:"relation_type,omitempty" json:"relation_type,omitempty"`
+}
+
+// GetContributionContextParamsKind defines parameters for GetContributionContext.
+type GetContributionContextParamsKind string
+
+// GetContributionContextParamsDirection defines parameters for GetContributionContext.
+type GetContributionContextParamsDirection string
+
+// GetContributionContextParamsRelationType defines parameters for GetContributionContext.
+type GetContributionContextParamsRelationType string
 
 // UnlinkOAuthProviderParams defines parameters for UnlinkOAuthProvider.
 type UnlinkOAuthProviderParams struct {
@@ -1376,7 +1626,7 @@ type ServerInterface interface {
 	SubmitContribution(c fiber.Ctx, params SubmitContributionParams) error
 
 	// (GET /contributions/context/{slug})
-	GetContributionContext(c fiber.Ctx, slug string) error
+	GetContributionContext(c fiber.Ctx, slug string, params GetContributionContextParams) error
 
 	// (GET /health/live)
 	GetLive(c fiber.Ctx) error
@@ -1914,8 +2164,59 @@ func (siw *ServerInterfaceWrapper) GetContributionContext(c fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter slug: %w", err).Error())
 	}
 
+	// Parameter object where we will unmarshal all parameters from the context
+	var params GetContributionContextParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "kind" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "kind", query, &params.Kind, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter kind: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "source_id" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "source_id", query, &params.SourceId, runtime.BindQueryParameterOptions{Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter source_id: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "locale" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "locale", query, &params.Locale, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter locale: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "other_slug" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "other_slug", query, &params.OtherSlug, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter other_slug: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "direction" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "direction", query, &params.Direction, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter direction: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "relation_type" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "relation_type", query, &params.RelationType, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter relation_type: %w", err).Error())
+	}
+
 	handler := func(c fiber.Ctx) error {
-		return siw.Handler.GetContributionContext(c, slug)
+		return siw.Handler.GetContributionContext(c, slug, params)
 	}
 
 	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
