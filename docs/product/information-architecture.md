@@ -1,8 +1,8 @@
 # Tap4Furry — Information Architecture
 
-This is the target product structure, not a first-launch checklist. Follow the
-[delivery roadmap](roadmap.md) for current scope and order. The curated Resource Beta
-exposes only implemented journeys; do not add placeholder navigation for future areas.
+This is the target product structure. Follow the [Chinese roadmap](roadmap.md) for
+the agreed launch scope and implementation order. Deliver complete usable journeys
+for the included areas; placeholder navigation does not count as implementation.
 
 ## Primary Navigation
 

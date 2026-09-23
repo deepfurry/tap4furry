@@ -2,10 +2,9 @@
 
 ## Unreleased
 
-- Reorder the product roadmap around a curated Resource directory Beta after P0-2,
-  with explicit public-journey, content, production-readiness and feedback gates.
-  Retain P0 capability scopes and engineering safeguards while making subsequent
-  search, contribution and organization slices depend on observed user needs.
+- Replace the early curated-directory Beta plan with a Chinese product roadmap:
+  complete all of P0 in three integrated stages before launch, then improve it from
+  real feedback. Keep P0.5/P1/P2 as later phases and preserve engineering safeguards.
 
 - Add P0-2C Admin Resource/Taxonomy curation APIs, generated clients and routed React
   Resource editors, Taxonomy pages and Account workspace. Create always starts Draft.

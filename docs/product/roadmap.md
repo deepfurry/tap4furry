@@ -1,208 +1,140 @@
-# Tap4Furry — Product Roadmap
+# Tap4Furry 开发路线图
 
-## Current Position
+## 路线原则
 
-Reviewed on 2026-09-23 against `dev` at `96ef1d5`.
+**先集中完成完整 P0，再正式上线；上线后根据反馈持续改进。**
 
-| Stage | Status | Delivered outcome |
+首发是可用的资源平台，覆盖「发现 → 理解 → 整理 → 贡献 → 审核治理」完整流程。
+不采用先上线精选目录、再逐步补齐 P0 的方案。P0.5、P1、P2 保持总纲中的后续定位，不纳入此次首发。
+
+后续按三个大阶段推进，每阶段统一完成相关数据模型、接口、后台、前台和必要验证。
+内部按依赖安排编码顺序，但不拆成数十份实施文档、独立审批或零散交付。
+首版允许界面朴素、算法简单、运营自动化有限；已经纳入 P0 的功能必须真实可用，不能用占位页面或人工代办冒充完成。
+
+本文件面向项目负责人，维护范围、顺序和完成标准。详细产品语义以相关设计和工程契约为准，
+具体实现前只补齐当前大阶段必要的接口、数据与权限约定，不预先编写所有未来阶段的详细规格。
+
+## 当前进度
+
+截至 2026-09-23，功能实现基线为 `96ef1d5`，开发分支为 `dev`。
+
+| 范围 | 状态 | 已具备的能力 |
 | --- | --- | --- |
-| P0-0 | Completed | Engineering foundation, generated contracts, disposable CI and runtime images |
-| P0-1A/B/C/D | Completed | Identity, local/OAuth auth, recovery, sessions and isolated Admin auth |
-| BRAND-0 / MAIL-0 | Completed | Tap4Furry branding and Resend transactional mail |
-| P0-2A | Completed | Resource/Taxonomy domain and ten-table Resource Core |
-| P0-2B | Completed | Anonymous Resource/taxonomy APIs and Resource list/detail Astro SSR |
-| P0-2C | Completed | Admin curation, publication, live capabilities and transactional Resource CAS |
-| P0-3–P0-7 | Planned | Contributions, discovery, organization, governance and full P0 integration |
+| P0-0 工程基础 | 已完成 | 单仓库工程、代码生成、持续集成、容器构建与运行基础 |
+| P0-1 账号与认证 | 已完成 | 本地登录、邮箱验证、恢复、会话、Google/GitHub OAuth、独立后台认证与角色 |
+| BRAND-0 / MAIL-0 | 已完成 | Tap4Furry 品牌迁移、Resend 事务邮件 |
+| P0-2 资源基础 | 已完成 | 资源与分类标签模型、公开读取、资源页面、后台编辑和发布、权限与并发控制 |
+| P0-3～P0-6 产品能力 | 待完成 | 社区贡献、审核、搜索发现、收藏整理、举报与治理 |
+| P0-7 整体收尾 | 待完成 | 完整产品联调、生产准备、恢复演练与上线验收 |
 
-The implemented loop is **curate → publish → browse → visit a Source**.
-[P0-2 acceptance](../implementation/p0-2c-verification.md) records the implementation
-checks; it does not establish production readiness. The homepage still emphasizes
-accounts and engineering health. Launch content, production operation and real user
-feedback remain to be accepted separately.
+现有能力已打通「管理员编辑 → 发布 → 用户浏览 → 访问来源」。
+[P0-2 验收记录](../implementation/p0-2c-verification.md)记录了已执行的验证；这不代表完整 P0 或生产部署已经完成。
+总纲中仍将 MAIL-0、P0-2 标为待做的进度描述已过时，以仓库实际实现为准。
 
-## Delivery Strategy
+## 首发范围：完整 P0
 
-Ship a **curated Resource directory Beta before completing all of P0**. Anonymous
-visitors should find and understand useful resources without registering. Curators
-use the existing Admin application; community contribution remains the longer-term
-direction, with manual feedback handling as the initial bridge.
+| 产品部分 | 首发必须交付 |
+| --- | --- |
+| 首页与发现 | 可用的资源首页、发现入口、分类与标签浏览、合理的排序和基础内容推荐；展示规则区分可公开与可推荐 |
+| 资源与搜索 | 资源列表与详情、来源与关系、语言回退、文本搜索、结构化筛选、排序和分页 |
+| 账号与个人资料 | 接通现有认证与账号安全流程，完成公开资料展示与隐私边界 |
+| 整理与收藏 | Save / Want / Have、收藏列表及集合管理；个人行为默认私密，公开内容遵守资格与隐私规则 |
+| 贡献与审核 | 提交资源、建议编辑、添加或移除失效来源、标签、关系与翻译提议；后台审核、差异查看、处理结果与历史 |
+| 治理与运营 | 举报、限制、治理操作、基础信任与贡献额度、内容资格、操作审计、来源健康基础 |
+| 完整使用体验 | 公共端与后台导航、移动端、空状态与错误状态、必要的政策和联系页面；所有首发入口均有真实功能 |
+| 上线基础 | 生产配置、访问保护、邮件与 OAuth 验证、备份恢复、回滚、必要的运行检查 |
 
-This roadmap owns delivery order. Product/architecture designs describe the target
-system; their full menus and domains are not first-launch requirements. Existing
-implementation specifications retain their historical scope and acceptance evidence.
-P0 phase numbers remain capability identifiers, not a mandatory serial release order.
-The older external implementation outline is background, not the current progress list.
+来源健康基础应能记录、识别和处理失效来源；完整自动抓取与复杂巡检策略不作为首版目标。
+推荐先使用可解释的内容与关系信号，不引入向量搜索或复杂个性化。
+界面、推荐质量和运营效率可以上线后优化，但不将表内功能延期到上线之后。
+
+## 三个集中交付阶段
 
 ```text
-Completed P0-2
-  → BETA-1: usable public journey
-  → BETA-2 + BETA-3: launch content and production readiness
-  → BETA-4: small-cohort launch and feedback
-  → one evidence-selected P0 capability slice at a time
+当前：P0-2 已完成
+    ↓
+阶段一：社区贡献与平台治理（P0-3 + P0-6）
+    ↓
+阶段二：搜索发现、收藏整理与完整产品界面（P0-4 + P0-5）
+    ↓
+阶段三：整体联调、生产验收与正式上线（P0-7）
+    ↓
+上线后优化，并按总纲推进 P0.5 → P1 → P2
 ```
 
-Content preparation and operator readiness can proceed alongside BETA-1; public
-launch waits for all three gates. These are work milestones, not release versions
-or promised dates. Planning does not authorize deployment, image publishing, push,
-main merges, tags or releases; those remain explicit operator decisions.
+原 P0 编号继续用于追踪能力，执行时合并为上述三个大阶段。
+治理提前与贡献一起完成，避免开放用户写入之后再补必要的审核与滥用控制。
 
-## First Launch — Curated Resource Beta
+### 阶段一：社区贡献与平台治理
 
-### BETA-1 — Public Journey
+**状态：下一阶段。目标：用户能贡献，运营能审核、追踪和处理问题。**
 
-**Status:** Next. **Depends on:** completed P0-2.
+集中完成贡献提议模型、差异与历史、提交和查看结果页面、后台审核队列及审核操作。
+覆盖总纲规定的资源、来源、标签、关系和翻译提议；接受提议后通过应用层更新正式资源，复用已有权限、事务与版本控制。
+同时完成举报、限制、治理记录、基础信任状态、贡献额度、内容资格、业务审计及来源健康基础。
+贡献历史、治理审计和账号安全事件保持各自语义，不混成一套日志。
 
-**Outcome:** A new visitor can reach a useful Resource and its Source from the homepage.
+**阶段完成标准：** 普通用户能够提交和跟踪提议，审核者能查看差异、接受或拒绝；
+接受后公开资源呈现正确结果，拒绝不会改变正式内容。
+举报可以得到处理并留下记录，限制和额度真实生效，来源异常可处理。
+权限、并发冲突及隐私验证通过，前台和后台均可实际操作；不能只交付数据库或接口。
 
-- [ ] Replace the engineering welcome/health surface with a resource-first homepage
-  and clear Resources navigation; keep account access secondary.
-- [ ] Reuse the existing anonymous list/detail APIs and SSR pages. Make titles,
-  summaries, category/tag labels, availability and Source actions understandable.
-- [ ] Finish mobile layout, keyboard navigation, empty/error states and basic visual
-  consistency for this journey. Show only implemented navigation/actions.
-- [ ] Add `/privacy`, `/terms` and visible feedback/content-concern contact information,
-  describing actual behavior and the Beta's limits.
+### 阶段二：搜索发现、收藏整理与完整产品界面
 
-**Acceptance:** On desktop and mobile, an anonymous visitor can follow homepage →
-Resource list → detail → Source without a dead end or login requirement. Existing
-visibility, locale, Markdown safety, canonical/status/cache and DTO privacy tests pass.
-No new domain, schema, search engine, media upload or Resource-page hydration is needed.
+**状态：待阶段一完成。目标：用户能找到、理解、整理资源，并进入贡献流程。**
 
-### BETA-2 — Useful Launch Content
+集中完成 PostgreSQL 文本搜索与结构化筛选、排序和分页，接通首页、发现、分类标签与资源详情。
+搜索无结果时能进入资源提交流程；发现与基础推荐遵守内容资格、隐私和公开可见性规则。
+完成 Save / Want / Have、集合与集合条目管理、个人资料及相关用户页面，明确所有权、默认私密和公开展示边界。
+整合公共端与后台导航、移动端、表单反馈、空状态和错误状态，补齐隐私、条款、内容政策及反馈联系入口。
 
-**Status:** Planned; preparation can start now. **Depends on:** existing Admin curation;
-final content acceptance uses BETA-1 and the BETA-3 target environment.
+**阶段完成标准：** 用户可以从首页搜索或浏览到资源、查看和访问来源、保存或整理到集合，
+并在需要时提交补充或纠错。集合与个人行为不会越权泄漏，隐藏资源不会从搜索、推荐、收藏公开页等旁路暴露。
+首页与后台不再是工程演示入口，完整 P0 各功能可以通过实际页面到达并使用。
 
-**Outcome:** The directory offers a coherent, useful collection rather than test fixtures.
+### 阶段三：整体联调、生产验收与正式上线
 
-- [ ] Choose one initial resource niche and launch language; define its content/rating
-  boundary using the [content policy](content-policy.md).
-- [ ] Prepare roughly 30–50 useful resources as a planning target, with consistent
-  taxonomy, informative summaries, canonical localization and reviewed Source links.
-- [ ] Enter and publish through authorized Admin workflows in the approved launch
-  environment. Keep smoke fixtures and shared development data separate from launch data.
-- [ ] Name the curator/operator responsible for corrections and rights/content concerns;
-  exercise the contact → review → correct/restrict/remove process with a test report.
+**状态：待前两阶段完成。目标：完整 P0 可上线、可运营、可恢复。**
 
-**Acceptance:** A curator has checked the launch set through the Public surface,
-including duplicate/rights/availability review. Visitors have meaningful choices;
-content quality takes precedence over the target count. The manual concern-handling
-path works before public exposure. Automated ingestion and Report/Trust domains wait.
+统一验证跨模块流程、数据约束、权限、缓存与 SEO、错误处理和基本性能，解决阻断使用的问题。
+准备真实初始资源、分类标签和运营账号；开发测试夹具不作为生产内容。
+按照现有部署设计完成不可变镜像、显式迁移、域名与 HTTPS、反向代理、后台访问保护、生产密钥注入、邮件和 OAuth 验证。
+完成异地备份、恢复演练、应用回滚、健康检查和日志轮转，记录实际发布版本及操作步骤。
+生产准备可在前两阶段期间提前开展，但不据此提前开放一个缺少 P0 功能的版本。
 
-### BETA-3 — Minimum Production Readiness
+**阶段完成标准：** 首发范围全部有可用实现，端到端验收通过，无未解决的关键权限、隐私或数据完整性问题；
+规定的生成、检查、集成、镜像及适用的真实环境验收通过，备份能恢复、应用能回滚。
+对界面精细度、算法效果和非阻断性体验问题建立上线后改进清单，不无限打磨而推迟发布。
+实际部署、推送、合并 `main`、发布镜像或创建版本仍按明确授权执行。
 
-**Status:** Planned. **Depends on:** an operator-approved production environment and
-the BETA-1 release candidate. Pull forward the necessary launch gates from P0-7.
+## 开发节奏与完成口径
 
-**Outcome:** The selected revision can be operated, recovered and rolled back safely.
+- **一次推进一个完整大阶段。** 每阶段只维护一份必要的实施说明和统一验收结果，不按按钮、接口或表拆成独立项目。
+- **连续完成工作。** 在已确认范围内自主处理常规实现选择，不要求负责人逐项确认。仅在范围、架构、权限、安全或外部条件出现实质冲突时提出问题。
+- **先保证功能完整可用。** 复用现有架构和组件，不重新打磨已验收的认证基础，不提前建设未使用的抽象、依赖或通用平台。
+- **验证集中且有针对性。** 开发时检查受影响行为，大阶段收尾执行 `pnpm check`、再次生成与差异检查，以及该阶段要求的集成、迁移、真实环境 smoke 和镜像验证；不在实现未变化时反复重跑同一套昂贵流程。
+- **安全与数据底线保留。** 不跳过认证、授权、隐私、事务、并发或恢复保障；不改写已应用的迁移，不放宽数据库权限来绕过实现问题，不泄露私密配置。CI 始终使用一次性基础设施。
+- **进度按真实完成更新。** 接口、页面和关键流程一并可用才算功能完成；测试记录写实际执行结果。文档、占位 UI 和未验证代码不计为交付。
 
-- [ ] Implement the missing release/deployment artifacts using the existing
-  [deployment design](../architecture/deployment.md) and [CI/CD design](../engineering/ci-cd.md):
-  immutable SHA images, explicit migrations, health checks and current/previous SHA.
-  Production pulls images; it never uses shared development databases or credentials.
-- [ ] Verify HTTPS, same-origin API routing, internal SSR origin, private DB/Redis
-  access and Cloudflare Access + MFA for Admin. Validate public abuse protections
-  appropriate to the exposed auth surfaces; preserve application throttling.
-- [ ] Inject production secrets privately. Exercise deployed registration, verification,
-  recovery, Google/GitHub flows, Admin login/role revocation and curator publication.
-  Keep provider-specific setup and any required provider approval explicitly tracked.
-- [ ] Verify SEO/cache behavior and secret-safe logs on the real proxy path; establish
-  health inspection, log rotation, maintenance handling and an incident contact.
-- [ ] Set up off-host PostgreSQL backups and restore verification according to the
-  [backup contract](../engineering/backup-restore.md). Record a disposable restore
-  rehearsal, application rollback and the measured recovery result before opening.
-- [ ] Run the candidate's required repository/integration/image gates and deployed
-  smoke/human acceptance; record exact SHA, results and remaining blockers.
+可内部按依赖安排工作和形成逻辑提交，但这些不变成需要逐个立项、等待审批的小里程碑。
+路线图不承诺未经工作量和环境核对的日期；通过减少范围反复、重复设计和零散验收缩短周期。
 
-**Acceptance:** An operator can deploy, diagnose, restore data and roll back application
-images using the recorded procedure. The Beta journey and all exposed auth methods
-work on the real domains. No unresolved access/privacy/data-loss blocker remains.
-Actual publishing and deployment need separate authorization. No observability stack,
-new queue architecture or shared-development infrastructure changes are prerequisites.
+## 上线后的演进
 
-### BETA-4 — Small-Cohort Launch and Feedback
+先根据真实反馈改进完整 P0 的体验、搜索推荐质量、内容质量、性能和运营效率，再按总纲推进以下阶段。
 
-**Status:** Planned. **Depends on:** BETA-1/2/3 accepted and explicit launch authorization.
-
-**Outcome:** Real usage determines the next development investment.
-
-- [ ] Invite an initial 10–20 target users as a planning target; clearly label the
-  Beta and its available features. Anonymous browsing remains open to those visitors.
-- [ ] Observe whether users can find a relevant resource and understand/visit its
-  Source. Ask what is missing and whether they would return; use voluntary feedback
-  and manual notes, without introducing behavioral tracking or an analytics stack.
-- [ ] Hold the first review after roughly one to two weeks of use, then review after
-  each small delivery. Record concrete examples, severity, frequency and the chosen
-  next slice; insufficient feedback calls for more outreach/content, not more domains.
-
-**Acceptance:** Initial feedback is reviewed and one next outcome is selected. Fix
-blocking defects first; expand the audience only when operation and concern handling
-are manageable. Beta launch is a milestone, not a claim that all of P0 is complete.
-
-## P0 — Feedback-Driven Resource Platform
-
-The full goal remains **Find → Understand → Organize → Contribute**. Complete it in
-small vertical slices after Beta, with the following dependency and priority rules.
-
-| Capability | First useful slice and acceptance | When to prioritize / dependency |
+| 阶段 | 主要内容 | 与首发的关系 |
 | --- | --- | --- |
-| P0-4 Search & Discovery | Basic text query and a small set of category/tag filters with bounded pagination; relevant results preserve Public visibility, locale and Source/Relation privacy | First if visitors repeatedly cannot find existing resources; PostgreSQL/pg_trgm only, no new engine |
-| P0-3 Contribution & Review | Resource suggestion or correction → bounded proposal → Admin review → accepted canonical update with traceable outcome | First if missing/corrected content and curator workload dominate; reuse curation invariants, add minimum anti-abuse and reviewer history before enabling submissions |
-| P0-5 Collections + Save / Want / Have | Start with private Save and a saved list; add Collections and Want/Have only when their distinct use is demonstrated | After repeat visitors ask to keep/organize resources; ownership and default privacy tested before exposure |
-| P0-6 Trust / Reports / Moderation | Structured report → operator decision → recorded action; then restrictions, contribution budgets and trust evidence as needed | Manual handling starts in Beta; required abuse controls accompany each new public-write capability, never wait for the entire phase |
-| P0-7 Integration & Hardening | Validate the implemented cross-domain journeys, constraints, privacy, performance, recovery and operational readiness | Launch-critical work is already required in BETA-3; broaden regression and readiness as capabilities expand |
+| P0.5 交换与认领 | Want / Trade / Offer、自动过期、联系请求、屏蔽、资源认领、创作者或维护者关系及基础组织资料 | P0 上线后的下一轮产品扩展；不做支付、托管、订单或交易担保 |
+| P1 社区与公共洞察 | 讨论与回复、投票、关注、通知、公共聚合洞察与资源生态信号 | 后续阶段；保持投票与个人行为隐私，不建设泛社交信息流 |
+| P2 高级智能 | 高级推荐、语义或混合搜索、图谱与趋势分析、个性化、调查、开放数据及公共 API 等评估项 | 按数据质量和真实需要逐项评估，不为了实现总纲而提前引入复杂基础设施 |
 
-Prefer P0-4's basic findability slice when discovery friction is the first observed
-problem; choose P0-3 first when contribution demand is stronger. Record that choice
-before implementation instead of starting both full phases. No new architecture is
-needed to make this priority decision.
+当前不引入 pgvector、NATS、MongoDB 或新的可观测性栈。未来确有需求时另作架构决策。
+River 保持现有基础设施边界，仅在具体业务需要时使用；`gfp_*` 与 `gfp:` 基础设施标识继续保留。
 
-The remaining P0 backlog also includes public profile presentation, richer Discover
-surfaces, content eligibility, audit and Source-health basics. Account identity,
-manual content review and Resource eligibility already have foundations; distinguish
-those from the unfinished public UI and automated workflows. None of this backlog
-silently becomes a Beta launch gate. Preserve the separation between contribution
-history, governance audit and authentication security events.
+## 相关依据
 
-## Working Rhythm and Verification
-
-- Select one user-visible outcome per implementation slice, with a short scope,
-  non-goals, dependencies and observable acceptance criteria. Write only the next
-  slice's detailed specification, not every future phase in advance.
-- Reuse Auth, curation, generated clients and existing UI/runtime boundaries. Add
-  abstractions, dependencies, jobs or schemas only when the selected slice uses them.
-- During implementation run focused checks for changed behavior. At completion follow
-  the [engineering playbook](../../.agents/playbook.md): `pnpm check`, regeneration
-  and drift validation, plus integration, migration, smoke and image gates required
-  by the active specification. CI retains disposable infrastructure and full gates.
-  Repeat expensive checks when changes or failures invalidate prior evidence.
-- Keep security, authorization, CAS, migration history, grants, privacy and recovery
-  requirements intact. Simplify initial UX and manual operations rather than weakening
-  these boundaries. Migrations 1–6 and stable `gfp_*` / `gfp:` identifiers remain protected.
-- Record actual completion and verification evidence here/by link after each milestone;
-  separate code acceptance, operational readiness and user feedback. Do not claim a
-  deployment or product capability from a design document alone.
-
-## Deferred / Long-term
-
-These preserve product direction; they are not commitments for the next release.
-
-| Stage | Scope | Entry condition |
-| --- | --- | --- |
-| P0.5 — Exchange & Claims | Want/Trade/Offer, expiration, contact requests, blocking, creator/maintainer claims and basic organizations | Resource usage is established and demand plus operator capacity justify exchange |
-| P1 — Community & Public Signals | Discussions, polls, following, notifications, aggregate Insights/Most Wanted/Hidden Gems/landscape/availability/growing tags | Recurring usage and useful public data justify each surface |
-| P2 — Ecosystem Intelligence | Semantic/hybrid search, recommendations, graph visualization, advanced personalization, surveys, trends, Open Data and a public API | Measured needs exceed the simpler resource/discovery model |
-
-Payments, escrow, transaction guarantees, generic file hosting and generic social
-feeds remain [product non-goals](PRODUCT.md#non-goals). No real-time DM or advanced
-organization management in P0.
-
-### Evolution Gates
-
-- **pgvector:** only after semantic search/recommendation demonstrates value and a
-  separate architecture decision changes the current no-vector boundary.
-- **NATS:** only for a genuinely distributed system requiring durable independent
-  consumers; reassess transactional outbox needs then, not for Beta.
-- **MongoDB:** no planned role; reconsider only for a justified independent domain.
-- **River:** existing infrastructure boundary remains; add durable business jobs only
-  when a delivered capability needs them. No speculative workers or mail queues.
+- [产品定位](PRODUCT.md)、[信息架构](information-architecture.md)、[领域模型](domain-model.md)
+- [发现与推荐](discovery.md)、[内容政策](content-policy.md)、[信任与治理](trust-safety.md)
+- [部署设计](../architecture/deployment.md)、[持续集成与发布](../engineering/ci-cd.md)、[备份恢复](../engineering/backup-restore.md)
+- [工程执行流程](../../.agents/playbook.md)、[开发契约](../../contracts/development.md)
