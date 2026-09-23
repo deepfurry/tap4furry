@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Refine the Chinese P0 roadmap into seven end-to-end delivery units across three
+  stages. Add Stage 1 contribution/governance design covering review transactions,
+  proposal types, capability/privacy boundaries, reports, restrictions and acceptance.
+
 - Replace the early curated-directory Beta plan with a Chinese product roadmap:
   complete all of P0 in three integrated stages before launch, then improve it from
   real feedback. Keep P0.5/P1/P2 as later phases and preserve engineering safeguards.
