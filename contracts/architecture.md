@@ -1,5 +1,29 @@
 # Architecture contract
 
+## P0-3A basic contribution review
+
+- `internal/contribution` owns typed new-Resource/default-language correction proposals.
+  Author transactions lock User, revalidate Public session and verified email for
+  submission, then serialize request replay and rolling quotas. Reads/withdrawals
+  remain available to valid unverified accounts; ownership is in SQL predicates.
+- Editorial review locks reviewer User then proposal, rejects self/terminal decisions,
+  and joins `curation.ApplyReviewedTx` in the same READ COMMITTED transaction.
+  Existing Resources require the exact submitted version and default language and
+  must still be public. New Resources start as drafts at version 1. No-op is rejected.
+- Original/base/accepted snapshots, decision events and business audits are typed,
+  immutable history. No JSONB/EAV, new Redis keys, business jobs, automatic merging,
+  notifications or later contribution types are introduced.
+- Author DTOs project only explicitly supplied original fields, safe messages and
+  current public links. Accepted content is visible only at its exact current public
+  revision; subsequent changes suppress historical content. Baselines, internal notes,
+  actor IDs and governance fields stay in Editorial DTOs.
+- Public submission and private history use session-bound CSRF and no-store.
+  Resource pages remain anonymous Astro SSR. Private React forms use generated
+  clients, no HTML sink/persisted drafts, and explicit submission/preview/decision.
+  Reviewer edits require a reason; conflicts preserve input and never retry automatically.
+
+## Core boundaries
+
 - One Go module, three runtime processes: Public API, Admin API, Worker.
 - Public/Admin remain separate transport/security boundaries; no inter-process HTTP
   calls to share business behavior. Composition belongs in `cmd/*`.

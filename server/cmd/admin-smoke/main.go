@@ -20,6 +20,7 @@ import (
 	"github.com/deepfurry/tap4furry/server/internal/config"
 	"github.com/deepfurry/tap4furry/server/internal/curation"
 	"github.com/deepfurry/tap4furry/server/internal/database"
+	"github.com/deepfurry/tap4furry/server/internal/database/contributioncheck"
 	"github.com/deepfurry/tap4furry/server/internal/database/curationcheck"
 	"github.com/deepfurry/tap4furry/server/internal/identity"
 	"github.com/deepfurry/tap4furry/server/internal/mail"
@@ -263,7 +264,28 @@ func run() (result error) {
 	if err = curationcheck.Run(ctx, app, pub, owner, operator, email, password, cfg.AdminOrigin); err != nil {
 		return err
 	}
-	fmt.Println("Admin curation capabilities, complete Resource graph, governance, Admin-to-Public lifecycle and Goose 6 passed; temporary graph cleaned (private values withheld)")
+	fmt.Println("Admin curation capabilities, complete Resource graph, governance, Admin-to-Public lifecycle and Goose 7 passed; temporary graph cleaned (private values withheld)")
+	var authors [2]*http.Cookie
+	for i := range authors {
+		authorEmail := uuid.NewV7().String() + "@example.invalid"
+		defer func() {
+			result = errors.Join(result, cleanup(owner, authorEmail))
+			_ = apiThrottle.ClearSubject(context.Background(), auth.RegistrationLimit, authorEmail)
+		}()
+		account, e := publicAuth.Register(ctx, authorEmail, password)
+		if e != nil {
+			return e
+		}
+		if e = publicAuth.VerifyEmail(ctx, capture.token); e != nil {
+			return e
+		}
+		capture.token = ""
+		authors[i] = &http.Cookie{Name: "tap4furry_session", Value: account.Token}
+	}
+	if err = contributioncheck.Run(ctx, pub, app, owner, authors, email, password, "http://localhost:4321", cfg.AdminOrigin); err != nil {
+		return err
+	}
+	fmt.Println("Contribution submit/replay, revised acceptance, draft publication, correction CAS, author isolation and atomic audit passed; temporary proposals cleaned (private values withheld)")
 	return nil
 }
 func cleanup(pool *pgxpool.Pool, email string) error {

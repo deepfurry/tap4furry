@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+- Add Stage 1.1 / P0-3A basic contribution review: verified authors submit new
+  Resources or default-language corrections, inspect private history and withdraw;
+  Editors/Admins review, revise with reasons, accept atomically or reject.
+- Add migration 7 with five typed proposal/history/audit tables and least-privilege
+  grants. Preserve migrations 1–6, Resource Core grants and pure domain boundaries.
+  Enforce actor/session/role checks, strict Resource CAS, immutable originals,
+  idempotency, rolling quotas and one terminal decision; no jobs or Redis keys.
+- Add generated Public/Admin contracts and complete routed forms/review UI with
+  explicit previews, dirty guards and conflict preservation. Author projections
+  exclude server-filled baseline fields, private notes and hidden Resource content.
+- Extend disposable integration, guarded migration round-trips, SSR privacy checks
+  and shared Admin smoke with contribution lifecycle, concurrency and rollback tests.
+
 - Add the Chinese Stage 1.1 contribution review design draft, including the agreed
   edit-before-accept workflow with immutable originals, accepted content and reasons;
   outline fields, private UI/API, quotas, atomic review and least-privilege boundaries.

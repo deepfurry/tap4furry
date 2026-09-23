@@ -115,9 +115,9 @@ mutable-column UPDATE grants, and DELETE only on localization/mapping/relation t
 No Admin hard DELETE exists for Category/Tag/Resource/Source, and IDs/created_at and
 relationship identities cannot be updated. No cluster-role/default-privilege changes.
 
-Only a `_test.go` migration helper can perform the 6→5→6 round-trip. It requires
+Only a `_test.go` migration helper can perform the migration round-trip. It requires
 `CI=true`, `GFP_DISPOSABLE_INFRA=1`, `GFP_RESOURCE_INTEGRATION=1`, fixed loopback
-`gfp_ci`/migrator identity and exactly current/target version 6. Shared `migrate:dev`
+`gfp_ci`/migrator identity and exactly current/target version 7 (7→6→5→7). Shared `migrate:dev`
 remains up-only. Resource smoke cleanup uses migrator only and randomly owned fixture
 IDs in FK-safe order; it never rolls back shared schema or touches existing Resources.
 
@@ -161,3 +161,32 @@ exist before switching, and the current default cannot be deleted. In-use checks
 prevent taxonomy soft deletion while non-deleted Resources reference it. Sources
 are retained via availability=removed; setting primary clears the previous primary
 in the same transaction. External IDs remain globally unique and never auto-transfer.
+
+## P0-3A proposal schema (migration 7)
+
+`contributions`, `contribution_contents`, `contribution_initial_sources`,
+`contribution_events` and `contribution_review_audits` are five additional tables.
+Migrations 1–6 and all existing object grants remain unchanged. The migration clears
+inherited privileges on its five new tables before explicit grants; no cluster changes.
+
+| Role | New-table grants |
+| --- | --- |
+| API | SELECT proposal/content/source; SELECT only contribution_id/event_type/message/occurred_at on events; INSERT proposal input columns/content/source and public event columns; UPDATE only proposal status/decided_at |
+| Admin | SELECT all five; INSERT content/source/event/audit; UPDATE only proposal status/decided_at/result_resource_id/result_version |
+| Worker | None |
+| Readonly | SELECT all five; no writes |
+
+No runtime has UPDATE on snapshots/history/audits or DELETE on proposal objects.
+The unique author/request_id and stored normalized SHA-256 digest support replay.
+Closed submitted_fields bits (name=1, summary=2, description=4, category=8,
+lifecycle=16, rating=32, locale=64) preserve omission versus explicit null for author
+projection; complete proposed snapshots serve review only. Source belongs to new
+Resource proposals only. IDs/defaults/terminal-result checks and one terminal event
+prevent duplicate decisions; application locks enforce cross-table state transitions.
+
+Proposal quota is 10 per rolling 24 hours, 5 pending and a 60-second interval, under
+the author User lock. Same-key same-content replay precedes quotas; changed content
+with the same key conflicts. An opaque HMAC binds edit context to User/Resource/
+version/default locale; no raw context identifier is stored. Public needs no Resource
+UPDATE/locking grant. Review reads the recorded version under canonical locks and
+commits canonical write, accepted content, decision event and audit atomically.

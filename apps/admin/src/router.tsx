@@ -20,9 +20,15 @@ import { ResourceRelationsPage } from './pages/resources/ResourceRelationsPage';
 import { ResourceExternalIDsPage } from './pages/resources/ResourceExternalIDsPage';
 import { TaxonomyListPage } from './pages/taxonomy/TaxonomyListPage';
 import { TaxonomyPage } from './pages/taxonomy/TaxonomyPage';
+import { ContributionListPage } from './pages/contributions/ContributionListPage';
+import { ContributionReviewPage } from './pages/contributions/ContributionReviewPage';
 
 const root = createRootRoute({ component: Outlet });
-const login = createRoute({ getParentRoute: () => root, path: '/login', component: LoginPage });
+const login = createRoute({
+  getParentRoute: () => root,
+  path: '/login',
+  component: LoginPage,
+});
 const shell = createRoute({
   getParentRoute: () => root,
   id: 'admin',
@@ -121,6 +127,16 @@ const account = createRoute({
   path: '/account',
   component: AccountPage,
 });
+const contributions = createRoute({
+  getParentRoute: () => shell,
+  path: '/contributions',
+  component: ContributionListPage,
+});
+const contribution = createRoute({
+  getParentRoute: () => shell,
+  path: '/contributions/$contributionId',
+  component: ContributionReviewPage,
+});
 export const router = createRouter({
   routeTree: root.addChildren([
     login,
@@ -134,6 +150,8 @@ export const router = createRouter({
       taxonomyTags,
       taxonomyTag,
       account,
+      contributions,
+      contribution,
     ]),
   ]),
 });

@@ -25,7 +25,7 @@ Astro.response.headers.set('Cache-Control', status === 200 ? PUBLIC_READ_CACHE :
   <body>
     <header class="mx-auto flex max-w-5xl items-center justify-between gap-6 px-6 py-6">
       <a class="resource-brand" href="/">Tap4Furry</a>
-      <nav aria-label="Main navigation" class="flex gap-6"><a href="/resources">Resources</a><a href="/account">Account</a></nav>
+      <nav aria-label="Main navigation" class="flex flex-wrap gap-6"><a href="/resources">Resources</a><a href="/submit">Suggest a Resource</a><a href="/account">Account</a></nav>
     </header>
     <main class="mx-auto flex max-w-5xl flex-col gap-8 px-6 pb-16"><slot /></main>
     <footer class="mx-auto max-w-5xl px-6 pb-8 resource-muted">Knowledge for the furry community.</footer>

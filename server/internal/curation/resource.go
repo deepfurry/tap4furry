@@ -36,8 +36,18 @@ type CreateInput struct {
 }
 
 func (a *App) CreateResource(ctx context.Context, actor auth.AdminActor, input CreateInput) (Revision, error) {
-	result := Revision{uuid.NewV7(), 1}
+	var result Revision
 	err := a.transact(ctx, actor, auth.Editorial, func(q *sqlc.Queries, _ []auth.Role) error {
+		var err error
+		result, err = createResource(ctx, q, input)
+		return err
+	})
+	return result, err
+}
+
+func createResource(ctx context.Context, q *sqlc.Queries, input CreateInput) (Revision, error) {
+	result := Revision{uuid.NewV7(), 1}
+	err := func() error {
 		if resource.ValidateSlug(input.Slug) != nil || input.CategoryID == uuid.Nil() || !input.ContentRating.Valid() {
 			return ErrValidation
 		}
@@ -63,7 +73,7 @@ func (a *App) CreateResource(ctx context.Context, actor auth.AdminActor, input C
 		}
 		_, err = putLocalization(ctx, q, result.ID, l)
 		return err
-	})
+	}()
 	return result, err
 }
 

@@ -89,6 +89,15 @@ try {
     await wait(250);
   }
   assert.ok(ready, 'Astro acceptance listener unavailable');
+  for (const path of ['/submit', '/me/contributions', `/contributions/${id}`]) {
+    const before = calls.length;
+    const response = await fetch(origin + path);
+    assert.equal(response.status, 200); assert.equal(response.headers.get('cache-control'), 'no-store');
+    const html = await response.text();
+    assert.match(html, /name="robots" content="noindex, nofollow"/);
+    assert.doesNotMatch(html, /browser-fixture|Private upstream diagnostic fixture/);
+    assert.equal(calls.length, before, 'Private shells must not proxy credentials into anonymous SSR reads');
+  }
   async function page(path, status) {
     const response = await fetch(origin + path, { headers: { Cookie: 'tap4furry_session=browser-fixture', Authorization: 'Bearer browser-fixture', 'X-CSRF-Token': 'browser-fixture' } });
     assert.equal(response.status, status, path);

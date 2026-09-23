@@ -48,6 +48,9 @@ func (h *Handler) cookie(token string, expires time.Time, clear bool) *fiber.Coo
 
 func (h *Handler) actor(c fiber.Ctx) (auth.Actor, error) {
 	c.Set("Cache-Control", "no-store")
+	if h.auth == nil {
+		return auth.Actor{}, auth.ErrUnauthenticated
+	}
 	if actor, ok := c.Locals(actorKey{}).(auth.Actor); ok {
 		return actor, nil
 	}

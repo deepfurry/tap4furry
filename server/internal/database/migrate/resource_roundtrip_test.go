@@ -48,13 +48,24 @@ func TestIntegrationResourceMigrationRoundTrip(t *testing.T) {
 		t.Fatal("migration provider unavailable")
 	}
 	current, target, err := provider.GetVersions(ctx)
-	if err != nil || current != 6 || target != 6 {
-		t.Fatal("round-trip only accepts exactly migration 6")
+	if err != nil || current != 7 || target != 7 {
+		t.Fatal("round-trip only accepts exactly migration 7")
+	}
+	if _, err := provider.Down(ctx); err != nil {
+		t.Fatal(database.SafeError("disposable 00007 down", err))
+	}
+	version, err := provider.GetDBVersion(ctx)
+	if err != nil || version != 6 {
+		t.Fatal("00007 down did not stop at version 6")
+	}
+	var preserved bool
+	if err := pool.QueryRow(ctx, `SELECT to_regclass('app.resources') IS NOT NULL AND to_regclass('app.contributions') IS NULL AND to_regclass('app.contribution_contents') IS NULL AND to_regclass('app.contribution_initial_sources') IS NULL AND to_regclass('app.contribution_events') IS NULL AND to_regclass('app.contribution_review_audits') IS NULL`).Scan(&preserved); err != nil || !preserved {
+		t.Fatal("00007 down did not preserve Resource Core or remove all contribution tables")
 	}
 	if _, err := provider.Down(ctx); err != nil {
 		t.Fatal(database.SafeError("disposable 00006 down", err))
 	}
-	version, err := provider.GetDBVersion(ctx)
+	version, err = provider.GetDBVersion(ctx)
 	if err != nil || version != 5 {
 		t.Fatal("00006 down did not stop at version 5")
 	}
@@ -71,8 +82,8 @@ func TestIntegrationResourceMigrationRoundTrip(t *testing.T) {
 		t.Fatal(database.SafeError("disposable 00006 up", err))
 	}
 	version, err = provider.GetDBVersion(ctx)
-	if err != nil || version != 6 {
-		t.Fatal("00006 reapply failed")
+	if err != nil || version != 7 {
+		t.Fatal("00006/00007 reapply failed")
 	}
 	var categories int
 	if err := pool.QueryRow(ctx, "SELECT count(*) FROM app.categories").Scan(&categories); err != nil || categories != 0 {

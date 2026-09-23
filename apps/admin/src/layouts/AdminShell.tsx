@@ -9,7 +9,11 @@ import styles from './AdminShell.module.scss';
 const RolesContext = createContext<readonly Role[]>([]);
 export const useRoles = () => useContext(RolesContext);
 export function AdminShell() {
-  const me = useQuery({ queryKey: keys.me, queryFn: requireAdmin, retry: false });
+  const me = useQuery({
+    queryKey: keys.me,
+    queryFn: requireAdmin,
+    retry: false,
+  });
   if (me.error instanceof AdminRequestError && [401, 403].includes(me.error.status))
     return <Navigate to="/login" replace />;
   if (me.error) return <p role="alert">{errorMessage(me.error)}</p>;
@@ -31,6 +35,7 @@ export function AdminShell() {
             className="flex flex-wrap content-start gap-3 md:flex-col"
           >
             <Link to="/resources">Resources</Link>
+            {canEditorial(me.data.roles) && <Link to="/contributions">Contributions</Link>}
             <Link to="/taxonomy/categories">Categories</Link>
             <Link to="/taxonomy/tags">Tags</Link>
             <Link to="/account">Account</Link>

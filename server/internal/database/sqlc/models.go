@@ -50,6 +50,65 @@ type AppCategoryLocalization struct {
 	UpdatedAt   pgtype.Timestamptz
 }
 
+type AppContribution struct {
+	ID                 pgtype.UUID
+	AuthorID           pgtype.UUID
+	Kind               string
+	TargetResourceID   pgtype.UUID
+	BaseVersion        pgtype.Int8
+	Status             string
+	Reason             string
+	PreviousID         pgtype.UUID
+	RequestID          pgtype.UUID
+	RequestFingerprint []byte
+	SubmittedFields    int16
+	ResultResourceID   pgtype.UUID
+	ResultVersion      pgtype.Int8
+	CreatedAt          pgtype.Timestamptz
+	DecidedAt          pgtype.Timestamptz
+}
+
+type AppContributionContent struct {
+	ContributionID pgtype.UUID
+	ContentKind    string
+	DefaultLocale  string
+	CategoryID     pgtype.UUID
+	Name           string
+	Summary        pgtype.Text
+	Description    pgtype.Text
+	Lifecycle      string
+	ContentRating  string
+	Slug           pgtype.Text
+}
+
+type AppContributionEvent struct {
+	ContributionID pgtype.UUID
+	EventType      string
+	ActorID        pgtype.UUID
+	Message        pgtype.Text
+	InternalNote   pgtype.Text
+	OccurredAt     pgtype.Timestamptz
+}
+
+type AppContributionInitialSource struct {
+	ContributionID    pgtype.UUID
+	ContentKind       string
+	Url               string
+	Label             pgtype.Text
+	SourceType        string
+	AvailabilityState string
+}
+
+type AppContributionReviewAudit struct {
+	ContributionID pgtype.UUID
+	ActorID        pgtype.UUID
+	Action         string
+	ResourceID     pgtype.UUID
+	BeforeVersion  pgtype.Int8
+	AfterVersion   pgtype.Int8
+	OccurredAt     pgtype.Timestamptz
+}
+
 type AppPasswordCredential struct {
 	UserID            pgtype.UUID
 	PasswordHash      string

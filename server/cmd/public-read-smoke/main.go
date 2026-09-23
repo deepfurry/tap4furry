@@ -42,8 +42,8 @@ func run() (result error) {
 		return err
 	}
 	var version int
-	if err = owner.QueryRow(ctx, "SELECT version_id FROM app.goose_db_version ORDER BY id DESC LIMIT 1").Scan(&version); err != nil || version != 6 {
-		return errors.New("public read smoke requires unchanged Goose version 6")
+	if err = owner.QueryRow(ctx, "SELECT version_id FROM app.goose_db_version ORDER BY id DESC LIMIT 1").Scan(&version); err != nil || version != 7 {
+		return errors.New("public read smoke requires current Goose version 7")
 	}
 	f := publicreadcheck.NewFixture()
 	defer func() {
@@ -64,6 +64,6 @@ func run() (result error) {
 		return err
 	}
 	fmt.Println("Four anonymous Public endpoints, visibility, locale, Source/Relation privacy, pagination and cache PASS")
-	fmt.Println("Serialized Public DTO privacy and unchanged Goose version 6 PASS")
+	fmt.Println("Serialized Public DTO privacy and current Goose version 7 PASS")
 	return nil
 }

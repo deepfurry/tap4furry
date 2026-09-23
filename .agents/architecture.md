@@ -50,7 +50,7 @@ Resource CAS is checked under the parent lock before child diffs; changes bump o
 no-ops preserve version and updated_at. Graph writes additionally use one fixed
 advisory xact lock and UUID-ordered endpoint locks, with separate directed-type DAG
 checks. Taxonomy row locks serialize binding/retirement/deletion decisions. All
-canonical timestamps use transaction_timestamp(); migrations and grants stay at 6.
+canonical timestamps use transaction_timestamp(); Resource Core grants remain those of migration 6.
 Admin read snapshots use purpose-built sqlc, without rebuilding domain objects.
 
 Admin React routes separate Resources, six editor tabs, Taxonomy and Account.
@@ -78,6 +78,17 @@ pages have no React islands. Public cache headers are short-lived; all errors no
 
 OpenAPI owns Go transport and TypeScript clients. Goose migrations plus SQL queries
 own sqlc output. Generated files are committed, reviewed, and never manually edited.
+
+Contribution application transactions add a separate typed proposal lifecycle at
+migration 7. Public uses only its own pool; new-table DML does not expand canonical
+Resource privileges. Author User locks serialize quota/idempotency and revocation.
+Review locks reviewer User then proposal then canonical parents, rechecks Editorial
+and rejects self-review. `curation.ApplyReviewedTx` independently revalidates capability
+and joins without committing. Canonical mutations, accepted snapshot, terminal event
+and review audit commit together. Fixed field-presence bits distinguish original
+input from server-filled fields; author projections never expose the latter as history.
+Private contribution shells use React and browser session/CSRF, independently of
+anonymous Resource SSR. No additional HTML sink, queue, cache or remote URL fetch.
 
 Public web uses anonymous Astro Node SSR with isolated React interaction; Admin is
 a React SPA. Apps use API-client facades, never deep generated imports or direct DB

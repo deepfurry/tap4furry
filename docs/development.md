@@ -339,8 +339,9 @@ It starts no listener: a real Fiber Handler uses prepared API SELECT permissions
 while migrator creates and removes only this run's UUIDv7 graph in FK-safe order.
 It covers four endpoints, non-public nodes, historical taxonomy, locale fallback,
 30 Source combinations, relation privacy, pagination, serialized DTOs and cache.
-It changes no schema/grants and requires Goose version 6. No migrate command is
-needed in this phase; migrations 1–6 remain immutable and 00007 must not exist.
+The read smoke itself changes no schema/grants and checks current Goose version 7.
+P0-2B originally froze version 6; P0-3A adds migration 7 independently. Migrations
+1–6 remain immutable.
 
 `pnpm integration:ci` retains P0-1/P0-2A checks and adds real Public Handler reads,
 canonical-corruption tests (500, never 404) and a locked-table five-second deadline
@@ -482,7 +483,8 @@ P0-2A extends the same CI command with guarded migration 6→5→6 acceptance, R
 schema/privilege/CAS/localization tests and the Resource smoke against `gfp_ci`.
 The Down helper exists only in `server/internal/database/migrate/*_test.go`, requires
 `CI=true`, `GFP_DISPOSABLE_INFRA=1`, `GFP_RESOURCE_INTEGRATION=1`, hard-codes loopback
-and verifies `gfp_ci`/`gfp_migrator` plus current/target version 6 before one Down.
+and verifies `gfp_ci`/`gfp_migrator` plus current/target version 7. P0-3A extends
+the round-trip to 7→6→5→7 and checks that Down 7 preserves Resource Core.
 It never consults developer env URLs. To rerun only Resource tests on an already
 initialized disposable fixture, set those three guards and run:
 

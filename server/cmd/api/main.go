@@ -73,7 +73,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	app := fiber.New(fiber.Config{ReadTimeout: 5 * time.Second, WriteTimeout: 20 * time.Second, IdleTimeout: 30 * time.Second, BodyLimit: 8192})
+	app := fiber.New(fiber.Config{ReadTimeout: 5 * time.Second, WriteTimeout: 20 * time.Second, IdleTimeout: 30 * time.Second, BodyLimit: 256 * 1024})
 	public.Register(app, checker, authentication, identity.New(pool), public.Options{Environment: c.Environment, PublicOrigin: c.PublicOrigin, CSRFSecret: c.CSRFSecret, ResourcePool: pool})
 	return platformruntime.HTTP(ctx, app, c.HTTPAddr, checker, logger)
 }

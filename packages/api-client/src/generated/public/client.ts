@@ -5,6 +5,319 @@
  * Public health, authentication, profiles and anonymous Resource knowledge reads. Unsafe requests require exact PUBLIC_ORIGIN; authenticated unsafe requests also require a session-bound CSRF header.
  * OpenAPI spec version: 0.1.0
  */
+export type ContributionKind =
+  (typeof ContributionKind)[keyof typeof ContributionKind];
+
+export const ContributionKind = {
+  create_resource: "create_resource",
+  update_resource: "update_resource",
+} as const;
+
+export type ContributionStatus =
+  (typeof ContributionStatus)[keyof typeof ContributionStatus];
+
+export const ContributionStatus = {
+  pending: "pending",
+  accepted: "accepted",
+  rejected: "rejected",
+  withdrawn: "withdrawn",
+} as const;
+
+export interface ContributionSummary {
+  id: string;
+  kind: ContributionKind;
+  status: ContributionStatus;
+  /** @maxLength 160 */
+  name: string;
+  created_at: string;
+}
+
+export interface ContributionCreated {
+  id: string;
+}
+
+export type ContributionSourceInputSourceType =
+  (typeof ContributionSourceInputSourceType)[keyof typeof ContributionSourceInputSourceType];
+
+export const ContributionSourceInputSourceType = {
+  official: "official",
+  store: "store",
+  archive: "archive",
+  mirror: "mirror",
+  community: "community",
+  external: "external",
+  unknown: "unknown",
+} as const;
+
+export interface ContributionSourceInput {
+  /** @maxLength 2048 */
+  url: string;
+  /**
+   * @maxLength 80
+   * @nullable
+   */
+  label?: string | null;
+  source_type?: ContributionSourceInputSourceType;
+}
+
+export type ContributionSourceSourceType =
+  (typeof ContributionSourceSourceType)[keyof typeof ContributionSourceSourceType];
+
+export const ContributionSourceSourceType = {
+  official: "official",
+  store: "store",
+  archive: "archive",
+  mirror: "mirror",
+  community: "community",
+  external: "external",
+  unknown: "unknown",
+} as const;
+
+export type ContributionSourceAvailabilityState =
+  (typeof ContributionSourceAvailabilityState)[keyof typeof ContributionSourceAvailabilityState];
+
+export const ContributionSourceAvailabilityState = {
+  active: "active",
+  unavailable: "unavailable",
+  broken: "broken",
+  removed: "removed",
+  restricted: "restricted",
+} as const;
+
+export interface ContributionSource {
+  /** @maxLength 2048 */
+  url: string;
+  /**
+   * @maxLength 80
+   * @nullable
+   */
+  label: string | null;
+  source_type: ContributionSourceSourceType;
+  availability_state: ContributionSourceAvailabilityState;
+}
+
+export type ContributionContentLifecycle =
+  (typeof ContributionContentLifecycle)[keyof typeof ContributionContentLifecycle];
+
+export const ContributionContentLifecycle = {
+  active: "active",
+  inactive: "inactive",
+  discontinued: "discontinued",
+  delisted: "delisted",
+  archived: "archived",
+  unknown: "unknown",
+} as const;
+
+export type ContributionContentContentRating =
+  (typeof ContributionContentContentRating)[keyof typeof ContributionContentContentRating];
+
+export const ContributionContentContentRating = {
+  general: "general",
+  mature: "mature",
+  explicit: "explicit",
+} as const;
+
+export interface ContributionContent {
+  /** @maxLength 64 */
+  default_locale: string;
+  category_id: string;
+  /**
+   * @minLength 1
+   * @maxLength 160
+   */
+  name: string;
+  /**
+   * @maxLength 500
+   * @nullable
+   */
+  summary: string | null;
+  /**
+   * @maxLength 50000
+   * @nullable
+   */
+  description: string | null;
+  lifecycle: ContributionContentLifecycle;
+  content_rating: ContributionContentContentRating;
+  source?: ContributionSource;
+}
+
+export type ContributionPatchLifecycle =
+  (typeof ContributionPatchLifecycle)[keyof typeof ContributionPatchLifecycle];
+
+export const ContributionPatchLifecycle = {
+  active: "active",
+  inactive: "inactive",
+  discontinued: "discontinued",
+  delisted: "delisted",
+  archived: "archived",
+  unknown: "unknown",
+} as const;
+
+export type ContributionPatchContentRating =
+  (typeof ContributionPatchContentRating)[keyof typeof ContributionPatchContentRating];
+
+export const ContributionPatchContentRating = {
+  general: "general",
+  mature: "mature",
+  explicit: "explicit",
+} as const;
+
+export interface ContributionPatch {
+  /** @maxLength 64 */
+  default_locale?: string;
+  category_id?: string;
+  /**
+   * @minLength 1
+   * @maxLength 160
+   */
+  name?: string;
+  /**
+   * @maxLength 500
+   * @nullable
+   */
+  summary?: string | null;
+  /**
+   * @maxLength 50000
+   * @nullable
+   */
+  description?: string | null;
+  lifecycle?: ContributionPatchLifecycle;
+  content_rating?: ContributionPatchContentRating;
+  source?: ContributionSourceInput;
+}
+
+export interface SubmitContribution {
+  kind: ContributionKind;
+  request_id: string;
+  target_resource_id?: string;
+  /** @maxLength 64 */
+  base_revision?: string;
+  previous_id?: string;
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  reason: string;
+  content: ContributionPatch;
+}
+
+export interface ContributionContext {
+  resource_id: string;
+  /** @maxLength 64 */
+  base_revision: string;
+  content: ContributionContent;
+}
+
+export type ContributionEventEventType =
+  (typeof ContributionEventEventType)[keyof typeof ContributionEventEventType];
+
+export const ContributionEventEventType = {
+  submitted: "submitted",
+  accepted: "accepted",
+  rejected: "rejected",
+  withdrawn: "withdrawn",
+} as const;
+
+export interface ContributionEvent {
+  event_type: ContributionEventEventType;
+  /**
+   * @maxLength 2000
+   * @nullable
+   */
+  message: string | null;
+  occurred_at: string;
+}
+
+export interface ContributionResult {
+  id: string;
+  /** @maxLength 80 */
+  slug: string;
+  /** @maxLength 160 */
+  name: string;
+}
+
+export type ContributionOriginalLifecycle =
+  (typeof ContributionOriginalLifecycle)[keyof typeof ContributionOriginalLifecycle];
+
+export const ContributionOriginalLifecycle = {
+  active: "active",
+  inactive: "inactive",
+  discontinued: "discontinued",
+  delisted: "delisted",
+  archived: "archived",
+  unknown: "unknown",
+} as const;
+
+export type ContributionOriginalContentRating =
+  (typeof ContributionOriginalContentRating)[keyof typeof ContributionOriginalContentRating];
+
+export const ContributionOriginalContentRating = {
+  general: "general",
+  mature: "mature",
+  explicit: "explicit",
+} as const;
+
+/**
+ * Only fields actually supplied by the author; omitted canonical fields never appear. Null text means explicitly cleared.
+ */
+export interface ContributionOriginal {
+  /** @maxLength 160 */
+  name?: string;
+  /** @maxLength 64 */
+  default_locale?: string;
+  category_id?: string;
+  lifecycle?: ContributionOriginalLifecycle;
+  content_rating?: ContributionOriginalContentRating;
+  /**
+   * @maxLength 500
+   * @nullable
+   */
+  summary?: string | null;
+  /**
+   * @maxLength 50000
+   * @nullable
+   */
+  description?: string | null;
+  source?: ContributionSourceInput;
+}
+
+export interface ContributionDetail {
+  id: string;
+  kind: ContributionKind;
+  status: ContributionStatus;
+  /** @maxLength 2000 */
+  reason: string;
+  previous_id?: string;
+  created_at: string;
+  decided_at?: string;
+  proposed: ContributionOriginal;
+  accepted?: ContributionContent;
+  result?: ContributionResult;
+  target?: ContributionResult;
+  history: ContributionEvent[];
+}
+
+export interface ContributionLimits {
+  /** @minimum 0 */
+  remaining_24h: number;
+  /** @minimum 0 */
+  pending_count: number;
+  pending_limit: number;
+  /** @minimum 0 */
+  retry_after_seconds: number;
+  /** @maxLength 40 */
+  reason: string;
+}
+
+export interface ContributionList {
+  items: ContributionSummary[];
+  /** @minimum 1 */
+  page: number;
+  page_size: number;
+  has_next: boolean;
+  limits: ContributionLimits;
+}
+
 export type ResourceLifecycle =
   (typeof ResourceLifecycle)[keyof typeof ResourceLifecycle];
 
@@ -317,6 +630,13 @@ export const ApiErrorCode = {
   AUTH_RATE_LIMITED: "AUTH_RATE_LIMITED",
   RESOURCE_NOT_FOUND: "RESOURCE_NOT_FOUND",
   INTERNAL_ERROR: "INTERNAL_ERROR",
+  CONTRIBUTION_NOT_FOUND: "CONTRIBUTION_NOT_FOUND",
+  CONTRIBUTION_FORBIDDEN: "CONTRIBUTION_FORBIDDEN",
+  CONTRIBUTION_VERIFICATION_REQUIRED: "CONTRIBUTION_VERIFICATION_REQUIRED",
+  CONTRIBUTION_CONFLICT: "CONTRIBUTION_CONFLICT",
+  CONTRIBUTION_REQUEST_CONFLICT: "CONTRIBUTION_REQUEST_CONFLICT",
+  CONTRIBUTION_LIMITED: "CONTRIBUTION_LIMITED",
+  RESOURCE_VERSION_CONFLICT: "RESOURCE_VERSION_CONFLICT",
 } as const;
 
 export interface ApiError {
@@ -519,6 +839,19 @@ export type CompleteOAuthParams = {
   state?: string;
   code?: string;
   error?: string;
+};
+
+export type ListMyContributionsParams = {
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+  status?: ContributionStatus;
 };
 
 export type listResourcesResponse200 = {
@@ -2370,4 +2703,459 @@ export const getReady = async (
 
   const data: getReadyResponse["data"] = body ? JSON.parse(body) : {};
   return { data, status: res.status, headers: res.headers } as getReadyResponse;
+};
+
+export type getContributionContextResponse200 = {
+  data: ContributionContext;
+  status: 200;
+};
+
+export type getContributionContextResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type getContributionContextResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type getContributionContextResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type getContributionContextResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type getContributionContextResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type getContributionContextResponse429 = {
+  data: ApiError;
+  status: 429;
+};
+
+export type getContributionContextResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type getContributionContextResponseSuccess =
+  getContributionContextResponse200 & {
+    headers: Headers;
+  };
+export type getContributionContextResponseError = (
+  | getContributionContextResponse400
+  | getContributionContextResponse401
+  | getContributionContextResponse403
+  | getContributionContextResponse404
+  | getContributionContextResponse409
+  | getContributionContextResponse429
+  | getContributionContextResponse500
+) & {
+  headers: Headers;
+};
+
+export type getContributionContextResponse =
+  getContributionContextResponseSuccess | getContributionContextResponseError;
+
+export const getGetContributionContextUrl = (slug: string) => {
+  return `/api/contributions/context/${slug}`;
+};
+
+export const getContributionContext = async (
+  slug: string,
+  options?: RequestInit,
+): Promise<getContributionContextResponse> => {
+  const res = await fetch(getGetContributionContextUrl(slug), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getContributionContextResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getContributionContextResponse;
+};
+
+export type submitContributionResponse201 = {
+  data: ContributionCreated;
+  status: 201;
+};
+
+export type submitContributionResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type submitContributionResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type submitContributionResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type submitContributionResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type submitContributionResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type submitContributionResponse429 = {
+  data: ApiError;
+  status: 429;
+};
+
+export type submitContributionResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type submitContributionResponseSuccess =
+  submitContributionResponse201 & {
+    headers: Headers;
+  };
+export type submitContributionResponseError = (
+  | submitContributionResponse400
+  | submitContributionResponse401
+  | submitContributionResponse403
+  | submitContributionResponse404
+  | submitContributionResponse409
+  | submitContributionResponse429
+  | submitContributionResponse500
+) & {
+  headers: Headers;
+};
+
+export type submitContributionResponse =
+  submitContributionResponseSuccess | submitContributionResponseError;
+
+export const getSubmitContributionUrl = () => {
+  return `/api/contributions`;
+};
+
+export const submitContribution = async (
+  submitContributionBody: SubmitContribution,
+  options?: RequestInit,
+): Promise<submitContributionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getSubmitContributionUrl(), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(submitContributionBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: submitContributionResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as submitContributionResponse;
+};
+
+export type listMyContributionsResponse200 = {
+  data: ContributionList;
+  status: 200;
+};
+
+export type listMyContributionsResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type listMyContributionsResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type listMyContributionsResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type listMyContributionsResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type listMyContributionsResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type listMyContributionsResponse429 = {
+  data: ApiError;
+  status: 429;
+};
+
+export type listMyContributionsResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type listMyContributionsResponseSuccess =
+  listMyContributionsResponse200 & {
+    headers: Headers;
+  };
+export type listMyContributionsResponseError = (
+  | listMyContributionsResponse400
+  | listMyContributionsResponse401
+  | listMyContributionsResponse403
+  | listMyContributionsResponse404
+  | listMyContributionsResponse409
+  | listMyContributionsResponse429
+  | listMyContributionsResponse500
+) & {
+  headers: Headers;
+};
+
+export type listMyContributionsResponse =
+  listMyContributionsResponseSuccess | listMyContributionsResponseError;
+
+export const getListMyContributionsUrl = (
+  params?: ListMyContributionsParams,
+) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/me/contributions?${stringifiedParams}`
+    : `/api/me/contributions`;
+};
+
+export const listMyContributions = async (
+  params?: ListMyContributionsParams,
+  options?: RequestInit,
+): Promise<listMyContributionsResponse> => {
+  const res = await fetch(getListMyContributionsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listMyContributionsResponse["data"] = body
+    ? JSON.parse(body)
+    : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listMyContributionsResponse;
+};
+
+export type getMyContributionResponse200 = {
+  data: ContributionDetail;
+  status: 200;
+};
+
+export type getMyContributionResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type getMyContributionResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type getMyContributionResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type getMyContributionResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type getMyContributionResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type getMyContributionResponse429 = {
+  data: ApiError;
+  status: 429;
+};
+
+export type getMyContributionResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type getMyContributionResponseSuccess = getMyContributionResponse200 & {
+  headers: Headers;
+};
+export type getMyContributionResponseError = (
+  | getMyContributionResponse400
+  | getMyContributionResponse401
+  | getMyContributionResponse403
+  | getMyContributionResponse404
+  | getMyContributionResponse409
+  | getMyContributionResponse429
+  | getMyContributionResponse500
+) & {
+  headers: Headers;
+};
+
+export type getMyContributionResponse =
+  getMyContributionResponseSuccess | getMyContributionResponseError;
+
+export const getGetMyContributionUrl = (contributionId: string) => {
+  return `/api/me/contributions/${contributionId}`;
+};
+
+export const getMyContribution = async (
+  contributionId: string,
+  options?: RequestInit,
+): Promise<getMyContributionResponse> => {
+  const res = await fetch(getGetMyContributionUrl(contributionId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getMyContributionResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getMyContributionResponse;
+};
+
+export type withdrawContributionResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type withdrawContributionResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type withdrawContributionResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type withdrawContributionResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type withdrawContributionResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type withdrawContributionResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type withdrawContributionResponse429 = {
+  data: ApiError;
+  status: 429;
+};
+
+export type withdrawContributionResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type withdrawContributionResponseSuccess =
+  withdrawContributionResponse204 & {
+    headers: Headers;
+  };
+export type withdrawContributionResponseError = (
+  | withdrawContributionResponse400
+  | withdrawContributionResponse401
+  | withdrawContributionResponse403
+  | withdrawContributionResponse404
+  | withdrawContributionResponse409
+  | withdrawContributionResponse429
+  | withdrawContributionResponse500
+) & {
+  headers: Headers;
+};
+
+export type withdrawContributionResponse =
+  withdrawContributionResponseSuccess | withdrawContributionResponseError;
+
+export const getWithdrawContributionUrl = (contributionId: string) => {
+  return `/api/me/contributions/${contributionId}/withdraw`;
+};
+
+export const withdrawContribution = async (
+  contributionId: string,
+  options?: RequestInit,
+): Promise<withdrawContributionResponse> => {
+  const res = await fetch(getWithdrawContributionUrl(contributionId), {
+    ...options,
+    method: "POST",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: withdrawContributionResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as withdrawContributionResponse;
 };

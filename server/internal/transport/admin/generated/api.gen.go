@@ -15,20 +15,26 @@ import (
 
 // Defines values for ApiErrorCode.
 const (
-	ADMINFORBIDDEN          ApiErrorCode = "ADMIN_FORBIDDEN"
-	ADMININVALIDCREDENTIALS ApiErrorCode = "ADMIN_INVALID_CREDENTIALS"
-	ADMINSESSIONNOTFOUND    ApiErrorCode = "ADMIN_SESSION_NOT_FOUND"
-	ADMINUNAUTHENTICATED    ApiErrorCode = "ADMIN_UNAUTHENTICATED"
-	AUTHRATELIMITED         ApiErrorCode = "AUTH_RATE_LIMITED"
-	CSRFINVALID             ApiErrorCode = "CSRF_INVALID"
-	CURATIONCONFLICT        ApiErrorCode = "CURATION_CONFLICT"
-	CURATIONINUSE           ApiErrorCode = "CURATION_IN_USE"
-	CURATIONNOTFOUND        ApiErrorCode = "CURATION_NOT_FOUND"
-	CURATIONRELATIONCYCLE   ApiErrorCode = "CURATION_RELATION_CYCLE"
-	INTERNALERROR           ApiErrorCode = "INTERNAL_ERROR"
-	ORIGINFORBIDDEN         ApiErrorCode = "ORIGIN_FORBIDDEN"
-	RESOURCEVERSIONCONFLICT ApiErrorCode = "RESOURCE_VERSION_CONFLICT"
-	VALIDATIONERROR         ApiErrorCode = "VALIDATION_ERROR"
+	ADMINFORBIDDEN                   ApiErrorCode = "ADMIN_FORBIDDEN"
+	ADMININVALIDCREDENTIALS          ApiErrorCode = "ADMIN_INVALID_CREDENTIALS"
+	ADMINSESSIONNOTFOUND             ApiErrorCode = "ADMIN_SESSION_NOT_FOUND"
+	ADMINUNAUTHENTICATED             ApiErrorCode = "ADMIN_UNAUTHENTICATED"
+	AUTHRATELIMITED                  ApiErrorCode = "AUTH_RATE_LIMITED"
+	CONTRIBUTIONCONFLICT             ApiErrorCode = "CONTRIBUTION_CONFLICT"
+	CONTRIBUTIONFORBIDDEN            ApiErrorCode = "CONTRIBUTION_FORBIDDEN"
+	CONTRIBUTIONLIMITED              ApiErrorCode = "CONTRIBUTION_LIMITED"
+	CONTRIBUTIONNOTFOUND             ApiErrorCode = "CONTRIBUTION_NOT_FOUND"
+	CONTRIBUTIONREQUESTCONFLICT      ApiErrorCode = "CONTRIBUTION_REQUEST_CONFLICT"
+	CONTRIBUTIONVERIFICATIONREQUIRED ApiErrorCode = "CONTRIBUTION_VERIFICATION_REQUIRED"
+	CSRFINVALID                      ApiErrorCode = "CSRF_INVALID"
+	CURATIONCONFLICT                 ApiErrorCode = "CURATION_CONFLICT"
+	CURATIONINUSE                    ApiErrorCode = "CURATION_IN_USE"
+	CURATIONNOTFOUND                 ApiErrorCode = "CURATION_NOT_FOUND"
+	CURATIONRELATIONCYCLE            ApiErrorCode = "CURATION_RELATION_CYCLE"
+	INTERNALERROR                    ApiErrorCode = "INTERNAL_ERROR"
+	ORIGINFORBIDDEN                  ApiErrorCode = "ORIGIN_FORBIDDEN"
+	RESOURCEVERSIONCONFLICT          ApiErrorCode = "RESOURCE_VERSION_CONFLICT"
+	VALIDATIONERROR                  ApiErrorCode = "VALIDATION_ERROR"
 )
 
 // Valid indicates whether the value is a known member of the ApiErrorCode enum.
@@ -43,6 +49,18 @@ func (e ApiErrorCode) Valid() bool {
 	case ADMINUNAUTHENTICATED:
 		return true
 	case AUTHRATELIMITED:
+		return true
+	case CONTRIBUTIONCONFLICT:
+		return true
+	case CONTRIBUTIONFORBIDDEN:
+		return true
+	case CONTRIBUTIONLIMITED:
+		return true
+	case CONTRIBUTIONNOTFOUND:
+		return true
+	case CONTRIBUTIONREQUESTCONFLICT:
+		return true
+	case CONTRIBUTIONVERIFICATIONREQUIRED:
 		return true
 	case CSRFINVALID:
 		return true
@@ -96,19 +114,196 @@ func (e AvailabilityState) Valid() bool {
 
 // Defines values for ContentRating.
 const (
-	Explicit ContentRating = "explicit"
-	General  ContentRating = "general"
-	Mature   ContentRating = "mature"
+	ContentRatingExplicit ContentRating = "explicit"
+	ContentRatingGeneral  ContentRating = "general"
+	ContentRatingMature   ContentRating = "mature"
 )
 
 // Valid indicates whether the value is a known member of the ContentRating enum.
 func (e ContentRating) Valid() bool {
 	switch e {
-	case Explicit:
+	case ContentRatingExplicit:
 		return true
-	case General:
+	case ContentRatingGeneral:
 		return true
-	case Mature:
+	case ContentRatingMature:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionContentContentRating.
+const (
+	ContributionContentContentRatingExplicit ContributionContentContentRating = "explicit"
+	ContributionContentContentRatingGeneral  ContributionContentContentRating = "general"
+	ContributionContentContentRatingMature   ContributionContentContentRating = "mature"
+)
+
+// Valid indicates whether the value is a known member of the ContributionContentContentRating enum.
+func (e ContributionContentContentRating) Valid() bool {
+	switch e {
+	case ContributionContentContentRatingExplicit:
+		return true
+	case ContributionContentContentRatingGeneral:
+		return true
+	case ContributionContentContentRatingMature:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionContentLifecycle.
+const (
+	ContributionContentLifecycleActive       ContributionContentLifecycle = "active"
+	ContributionContentLifecycleArchived     ContributionContentLifecycle = "archived"
+	ContributionContentLifecycleDelisted     ContributionContentLifecycle = "delisted"
+	ContributionContentLifecycleDiscontinued ContributionContentLifecycle = "discontinued"
+	ContributionContentLifecycleInactive     ContributionContentLifecycle = "inactive"
+	ContributionContentLifecycleUnknown      ContributionContentLifecycle = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the ContributionContentLifecycle enum.
+func (e ContributionContentLifecycle) Valid() bool {
+	switch e {
+	case ContributionContentLifecycleActive:
+		return true
+	case ContributionContentLifecycleArchived:
+		return true
+	case ContributionContentLifecycleDelisted:
+		return true
+	case ContributionContentLifecycleDiscontinued:
+		return true
+	case ContributionContentLifecycleInactive:
+		return true
+	case ContributionContentLifecycleUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionEventEventType.
+const (
+	ContributionEventEventTypeAccepted  ContributionEventEventType = "accepted"
+	ContributionEventEventTypeRejected  ContributionEventEventType = "rejected"
+	ContributionEventEventTypeSubmitted ContributionEventEventType = "submitted"
+	ContributionEventEventTypeWithdrawn ContributionEventEventType = "withdrawn"
+)
+
+// Valid indicates whether the value is a known member of the ContributionEventEventType enum.
+func (e ContributionEventEventType) Valid() bool {
+	switch e {
+	case ContributionEventEventTypeAccepted:
+		return true
+	case ContributionEventEventTypeRejected:
+		return true
+	case ContributionEventEventTypeSubmitted:
+		return true
+	case ContributionEventEventTypeWithdrawn:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionKind.
+const (
+	ContributionKindCreateResource ContributionKind = "create_resource"
+	ContributionKindUpdateResource ContributionKind = "update_resource"
+)
+
+// Valid indicates whether the value is a known member of the ContributionKind enum.
+func (e ContributionKind) Valid() bool {
+	switch e {
+	case ContributionKindCreateResource:
+		return true
+	case ContributionKindUpdateResource:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionSourceAvailabilityState.
+const (
+	ContributionSourceAvailabilityStateActive      ContributionSourceAvailabilityState = "active"
+	ContributionSourceAvailabilityStateBroken      ContributionSourceAvailabilityState = "broken"
+	ContributionSourceAvailabilityStateRemoved     ContributionSourceAvailabilityState = "removed"
+	ContributionSourceAvailabilityStateRestricted  ContributionSourceAvailabilityState = "restricted"
+	ContributionSourceAvailabilityStateUnavailable ContributionSourceAvailabilityState = "unavailable"
+)
+
+// Valid indicates whether the value is a known member of the ContributionSourceAvailabilityState enum.
+func (e ContributionSourceAvailabilityState) Valid() bool {
+	switch e {
+	case ContributionSourceAvailabilityStateActive:
+		return true
+	case ContributionSourceAvailabilityStateBroken:
+		return true
+	case ContributionSourceAvailabilityStateRemoved:
+		return true
+	case ContributionSourceAvailabilityStateRestricted:
+		return true
+	case ContributionSourceAvailabilityStateUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionSourceSourceType.
+const (
+	ContributionSourceSourceTypeArchive   ContributionSourceSourceType = "archive"
+	ContributionSourceSourceTypeCommunity ContributionSourceSourceType = "community"
+	ContributionSourceSourceTypeExternal  ContributionSourceSourceType = "external"
+	ContributionSourceSourceTypeMirror    ContributionSourceSourceType = "mirror"
+	ContributionSourceSourceTypeOfficial  ContributionSourceSourceType = "official"
+	ContributionSourceSourceTypeStore     ContributionSourceSourceType = "store"
+	ContributionSourceSourceTypeUnknown   ContributionSourceSourceType = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the ContributionSourceSourceType enum.
+func (e ContributionSourceSourceType) Valid() bool {
+	switch e {
+	case ContributionSourceSourceTypeArchive:
+		return true
+	case ContributionSourceSourceTypeCommunity:
+		return true
+	case ContributionSourceSourceTypeExternal:
+		return true
+	case ContributionSourceSourceTypeMirror:
+		return true
+	case ContributionSourceSourceTypeOfficial:
+		return true
+	case ContributionSourceSourceTypeStore:
+		return true
+	case ContributionSourceSourceTypeUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionStatus.
+const (
+	ContributionStatusAccepted  ContributionStatus = "accepted"
+	ContributionStatusPending   ContributionStatus = "pending"
+	ContributionStatusRejected  ContributionStatus = "rejected"
+	ContributionStatusWithdrawn ContributionStatus = "withdrawn"
+)
+
+// Valid indicates whether the value is a known member of the ContributionStatus enum.
+func (e ContributionStatus) Valid() bool {
+	switch e {
+	case ContributionStatusAccepted:
+		return true
+	case ContributionStatusPending:
+		return true
+	case ContributionStatusRejected:
+		return true
+	case ContributionStatusWithdrawn:
 		return true
 	default:
 		return false
@@ -391,6 +586,13 @@ func (e TaxonomyState) Valid() bool {
 	}
 }
 
+// AcceptContribution defines model for AcceptContribution.
+type AcceptContribution struct {
+	Content      ContributionContent `json:"content"`
+	InternalNote *string             `json:"internal_note,omitempty"`
+	Message      *string             `json:"message,omitempty"`
+}
+
 // AddRelation defines model for AddRelation.
 type AddRelation struct {
 	RelationType     RelationType `json:"relation_type"`
@@ -419,6 +621,96 @@ type AvailabilityState string
 
 // ContentRating defines model for ContentRating.
 type ContentRating string
+
+// ContributionContent defines model for ContributionContent.
+type ContributionContent struct {
+	CategoryId    string                           `json:"category_id"`
+	ContentRating ContributionContentContentRating `json:"content_rating"`
+	DefaultLocale string                           `json:"default_locale"`
+	Description   *string                          `json:"description"`
+	Lifecycle     ContributionContentLifecycle     `json:"lifecycle"`
+	Name          string                           `json:"name"`
+	Slug          *string                          `json:"slug,omitempty"`
+	Source        *ContributionSource              `json:"source,omitempty"`
+	Summary       *string                          `json:"summary"`
+}
+
+// ContributionContentContentRating defines model for ContributionContent.ContentRating.
+type ContributionContentContentRating string
+
+// ContributionContentLifecycle defines model for ContributionContent.Lifecycle.
+type ContributionContentLifecycle string
+
+// ContributionDetail defines model for ContributionDetail.
+type ContributionDetail struct {
+	Accepted         *ContributionContent `json:"accepted,omitempty"`
+	AuthorId         string               `json:"author_id"`
+	Base             *ContributionContent `json:"base,omitempty"`
+	BaseVersion      *int64               `json:"base_version,omitempty"`
+	Conflict         bool                 `json:"conflict"`
+	CreatedAt        time.Time            `json:"created_at"`
+	Current          *ContributionContent `json:"current,omitempty"`
+	DecidedAt        *time.Time           `json:"decided_at,omitempty"`
+	History          []ContributionEvent  `json:"history"`
+	Id               string               `json:"id"`
+	Kind             ContributionKind     `json:"kind"`
+	PreviousId       *string              `json:"previous_id,omitempty"`
+	Proposed         ContributionContent  `json:"proposed"`
+	Reason           string               `json:"reason"`
+	ResultResourceId *string              `json:"result_resource_id,omitempty"`
+	SelfReview       bool                 `json:"self_review"`
+	Status           ContributionStatus   `json:"status"`
+	TargetResourceId *string              `json:"target_resource_id,omitempty"`
+}
+
+// ContributionEvent defines model for ContributionEvent.
+type ContributionEvent struct {
+	ActorId      string                     `json:"actor_id"`
+	EventType    ContributionEventEventType `json:"event_type"`
+	InternalNote *string                    `json:"internal_note"`
+	Message      *string                    `json:"message"`
+	OccurredAt   time.Time                  `json:"occurred_at"`
+}
+
+// ContributionEventEventType defines model for ContributionEvent.EventType.
+type ContributionEventEventType string
+
+// ContributionKind defines model for ContributionKind.
+type ContributionKind string
+
+// ContributionList defines model for ContributionList.
+type ContributionList struct {
+	HasNext  bool                  `json:"has_next"`
+	Items    []ContributionSummary `json:"items"`
+	Page     int64                 `json:"page"`
+	PageSize int                   `json:"page_size"`
+}
+
+// ContributionSource defines model for ContributionSource.
+type ContributionSource struct {
+	AvailabilityState ContributionSourceAvailabilityState `json:"availability_state"`
+	Label             *string                             `json:"label"`
+	SourceType        ContributionSourceSourceType        `json:"source_type"`
+	Url               string                              `json:"url"`
+}
+
+// ContributionSourceAvailabilityState defines model for ContributionSource.AvailabilityState.
+type ContributionSourceAvailabilityState string
+
+// ContributionSourceSourceType defines model for ContributionSource.SourceType.
+type ContributionSourceSourceType string
+
+// ContributionStatus defines model for ContributionStatus.
+type ContributionStatus string
+
+// ContributionSummary defines model for ContributionSummary.
+type ContributionSummary struct {
+	CreatedAt time.Time          `json:"created_at"`
+	Id        string             `json:"id"`
+	Kind      ContributionKind   `json:"kind"`
+	Name      string             `json:"name"`
+	Status    ContributionStatus `json:"status"`
+}
 
 // CreateResource defines model for CreateResource.
 type CreateResource struct {
@@ -525,6 +817,12 @@ type ReadyStatus string
 // Reauthentication defines model for Reauthentication.
 type Reauthentication struct {
 	Password *string `json:"password,omitempty"`
+}
+
+// RejectContribution defines model for RejectContribution.
+type RejectContribution struct {
+	InternalNote *string `json:"internal_note,omitempty"`
+	Message      string  `json:"message"`
 }
 
 // Relation defines model for Relation.
@@ -755,6 +1053,24 @@ type PutCategoryLocalizationParams struct {
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
 }
 
+// ListContributionsParams defines parameters for ListContributions.
+type ListContributionsParams struct {
+	Page     *int64              `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *int                `form:"page_size,omitempty" json:"page_size,omitempty"`
+	Status   *ContributionStatus `form:"status,omitempty" json:"status,omitempty"`
+	Kind     *ContributionKind   `form:"kind,omitempty" json:"kind,omitempty"`
+}
+
+// AcceptContributionParams defines parameters for AcceptContribution.
+type AcceptContributionParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// RejectContributionParams defines parameters for RejectContribution.
+type RejectContributionParams struct {
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
 // RevokeOtherSessionsParams defines parameters for RevokeOtherSessions.
 type RevokeOtherSessionsParams struct {
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
@@ -891,6 +1207,12 @@ type PatchCategoryJSONRequestBody = PatchTaxonomy
 // PutCategoryLocalizationJSONRequestBody defines body for PutCategoryLocalization for application/json ContentType.
 type PutCategoryLocalizationJSONRequestBody = TaxonomyLocalizationInput
 
+// AcceptContributionJSONRequestBody defines body for AcceptContribution for application/json ContentType.
+type AcceptContributionJSONRequestBody = AcceptContribution
+
+// RejectContributionJSONRequestBody defines body for RejectContribution for application/json ContentType.
+type RejectContributionJSONRequestBody = RejectContribution
+
 // CreateResourceJSONRequestBody defines body for CreateResource for application/json ContentType.
 type CreateResourceJSONRequestBody = CreateResource
 
@@ -965,6 +1287,18 @@ type ServerInterface interface {
 
 	// (PUT /categories/{category_id}/localizations/{locale})
 	PutCategoryLocalization(c fiber.Ctx, categoryId string, locale string, params PutCategoryLocalizationParams) error
+
+	// (GET /contributions)
+	ListContributions(c fiber.Ctx, params ListContributionsParams) error
+
+	// (GET /contributions/{contribution_id})
+	GetContribution(c fiber.Ctx, contributionId string) error
+
+	// (POST /contributions/{contribution_id}/accept)
+	AcceptContribution(c fiber.Ctx, contributionId string, params AcceptContributionParams) error
+
+	// (POST /contributions/{contribution_id}/reject)
+	RejectContribution(c fiber.Ctx, contributionId string, params RejectContributionParams) error
 
 	// (GET /health/live)
 	GetLive(c fiber.Ctx) error
@@ -1493,6 +1827,199 @@ func (siw *ServerInterfaceWrapper) PutCategoryLocalization(c fiber.Ctx) error {
 
 	handler := func(c fiber.Ctx) error {
 		return siw.Handler.PutCategoryLocalization(c, categoryId, locale, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// ListContributions operation middleware
+func (siw *ServerInterfaceWrapper) ListContributions(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListContributionsParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", query, &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page_size" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page_size", query, &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page_size: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", query, &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter status: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "kind" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "kind", query, &params.Kind, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter kind: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.ListContributions(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// GetContribution operation middleware
+func (siw *ServerInterfaceWrapper) GetContribution(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "contribution_id" -------------
+	var contributionId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "contribution_id", c.Params("contribution_id"), &contributionId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter contribution_id: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.GetContribution(c, contributionId)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// AcceptContribution operation middleware
+func (siw *ServerInterfaceWrapper) AcceptContribution(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "contribution_id" -------------
+	var contributionId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "contribution_id", c.Params("contribution_id"), &contributionId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter contribution_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params AcceptContributionParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.AcceptContribution(c, contributionId, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// RejectContribution operation middleware
+func (siw *ServerInterfaceWrapper) RejectContribution(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "contribution_id" -------------
+	var contributionId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "contribution_id", c.Params("contribution_id"), &contributionId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter contribution_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params RejectContributionParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.RejectContribution(c, contributionId, params)
 	}
 
 	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
@@ -3067,5 +3594,13 @@ func RegisterHandlersWithOptions(router fiber.Router, si ServerInterface, option
 	router.Delete(options.BaseURL+"/tags/:tag_id/localizations/:locale", wrapper.DeleteTagLocalization)
 
 	router.Put(options.BaseURL+"/tags/:tag_id/localizations/:locale", wrapper.PutTagLocalization)
+
+	router.Get(options.BaseURL+"/contributions", wrapper.ListContributions)
+
+	router.Get(options.BaseURL+"/contributions/:contribution_id", wrapper.GetContribution)
+
+	router.Post(options.BaseURL+"/contributions/:contribution_id/accept", wrapper.AcceptContribution)
+
+	router.Post(options.BaseURL+"/contributions/:contribution_id/reject", wrapper.RejectContribution)
 
 }

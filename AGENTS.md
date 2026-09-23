@@ -5,6 +5,7 @@ established infrastructure; P0-1A/B/C/D add identity, local authentication, sess
 security, account recovery, explicit Google/GitHub linking and isolated Admin auth.
 MAIL-0 adds Resend; P0-2A adds Resource/Taxonomy schema and domain primitives.
 P0-2B adds anonymous Resource reads and Astro SSR; P0-2C adds Admin curation.
+P0-3A (roadmap 1.1) adds typed Resource proposals and atomic Editorial review.
 
 ## Start here
 
@@ -69,6 +70,14 @@ are pattern references only and never override this repository.
 - Resource pages are Astro SSR without islands. Only server helpers read
   `API_INTERNAL_ORIGIN`; no credentials are forwarded. Markdown.astro is the sole
   audited sanitized HTML sink. Errors are no-store/noindex; success uses short shared cache.
+- P0-3A adds migration 7 only; migrations 1–6 and Resource Core grants remain immutable.
+  Contribution writes lock the current User, revalidate sessions/capabilities and
+  serialize quotas or proposal decisions. Acceptance joins `curation.ApplyReviewedTx`
+  with snapshots/history/audit in one transaction, never commits canonical writes first.
+  New Resources become drafts; existing edits require strict submitted-version CAS.
+  Originals are immutable. Author DTOs expose only supplied fields, safe messages and
+  currently public links; never canonical-only baseline fields or internal notes.
+  Reviewers cannot decide their own proposals. No automatic rebase/merge/retry, jobs or Redis keys.
 - Auth owns transactions and the challenge-mail interface. Raw challenge tokens
   never enter jobs; mail delivers once after commit to Resend or private local capture.
   Production requires explicit Resend config; provider payloads/errors stay private.

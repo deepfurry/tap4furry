@@ -259,7 +259,7 @@ func Run(ctx context.Context, admin, public *fiber.App, owner *pgxpool.Pool, ope
 		return err
 	}
 	var version int
-	if err := owner.QueryRow(ctx, "SELECT version_id FROM app.goose_db_version ORDER BY id DESC LIMIT 1").Scan(&version); err != nil || version != 6 {
+	if err := owner.QueryRow(ctx, "SELECT version_id FROM app.goose_db_version ORDER BY id DESC LIMIT 1").Scan(&version); err != nil || version != 7 {
 		return errors.New("Goose version preservation failed")
 	}
 	return nil

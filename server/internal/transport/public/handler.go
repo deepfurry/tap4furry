@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/deepfurry/tap4furry/server/internal/auth"
+	"github.com/deepfurry/tap4furry/server/internal/contribution"
 	"github.com/deepfurry/tap4furry/server/internal/identity"
 	"github.com/deepfurry/tap4furry/server/internal/transport/health"
 	"github.com/deepfurry/tap4furry/server/internal/transport/public/generated"
@@ -14,11 +15,12 @@ import (
 )
 
 type Handler struct {
-	health    *health.Checker
-	auth      *auth.App
-	identity  *identity.App
-	options   Options
-	resources *pgxpool.Pool
+	health        *health.Checker
+	auth          *auth.App
+	identity      *identity.App
+	options       Options
+	resources     *pgxpool.Pool
+	contributions *contribution.App
 }
 type Options struct {
 	Environment, PublicOrigin, CSRFSecret string
@@ -29,7 +31,10 @@ var _ generated.ServerInterface = (*Handler)(nil)
 
 func Register(router fiber.Router, checker *health.Checker, authentication *auth.App, identities *identity.App, options Options) {
 	h := &Handler{health: checker, auth: authentication, identity: identities, options: options, resources: options.ResourcePool}
-	for _, path := range []string{"/auth", "/me", "/users", "/resources", "/categories", "/tags"} {
+	if options.ResourcePool != nil {
+		h.contributions = contribution.New(options.ResourcePool, options.CSRFSecret)
+	}
+	for _, path := range []string{"/auth", "/me", "/users", "/resources", "/categories", "/tags", "/contributions"} {
 		router.Use(path, func(c fiber.Ctx) error {
 			deadline := 5 * time.Second
 			if strings.HasPrefix(c.Path(), "/auth/oauth/") {
@@ -51,6 +56,8 @@ func Register(router fiber.Router, checker *health.Checker, authentication *auth
 	for _, path := range []string{"/auth/logout", "/me/profile", "/auth/email/verification/request", "/auth/password/change", "/auth/reauthenticate", "/me/sessions", "/me/auth-methods"} {
 		router.Use(path, h.csrfGuard)
 	}
+	router.Use("/contributions", h.contributionBoundary, h.originGuard, h.csrfGuard)
+	router.Use("/me/contributions", h.contributionBoundary, h.csrfGuard)
 	generated.RegisterHandlers(router, h)
 }
 func (*Handler) GetLive(c fiber.Ctx) error { return c.JSON(generated.Live{Status: "alive"}) }

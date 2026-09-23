@@ -15,29 +15,36 @@ import (
 
 // Defines values for ApiErrorCode.
 const (
-	AUTHACCOUNTDISABLED        ApiErrorCode = "AUTH_ACCOUNT_DISABLED"
-	AUTHACCOUNTLINKREQUIRED    ApiErrorCode = "AUTH_ACCOUNT_LINK_REQUIRED"
-	AUTHCHALLENGEINVALID       ApiErrorCode = "AUTH_CHALLENGE_INVALID"
-	AUTHEMAILALREADYREGISTERED ApiErrorCode = "AUTH_EMAIL_ALREADY_REGISTERED"
-	AUTHINVALIDCREDENTIALS     ApiErrorCode = "AUTH_INVALID_CREDENTIALS"
-	AUTHLASTMETHOD             ApiErrorCode = "AUTH_LAST_METHOD"
-	AUTHPROVIDERALREADYLINKED  ApiErrorCode = "AUTH_PROVIDER_ALREADY_LINKED"
-	AUTHPROVIDERINVALID        ApiErrorCode = "AUTH_PROVIDER_INVALID"
-	AUTHPROVIDERNOTLINKED      ApiErrorCode = "AUTH_PROVIDER_NOT_LINKED"
-	AUTHPROVIDERUNAVAILABLE    ApiErrorCode = "AUTH_PROVIDER_UNAVAILABLE"
-	AUTHRATELIMITED            ApiErrorCode = "AUTH_RATE_LIMITED"
-	AUTHREAUTHFAILED           ApiErrorCode = "AUTH_REAUTH_FAILED"
-	AUTHREAUTHREQUIRED         ApiErrorCode = "AUTH_REAUTH_REQUIRED"
-	AUTHSESSIONNOTFOUND        ApiErrorCode = "AUTH_SESSION_NOT_FOUND"
-	AUTHUNAUTHENTICATED        ApiErrorCode = "AUTH_UNAUTHENTICATED"
-	CSRFINVALID                ApiErrorCode = "CSRF_INVALID"
-	INTERNALERROR              ApiErrorCode = "INTERNAL_ERROR"
-	MAILUNAVAILABLE            ApiErrorCode = "MAIL_UNAVAILABLE"
-	ORIGINFORBIDDEN            ApiErrorCode = "ORIGIN_FORBIDDEN"
-	PROFILEHANDLEUNAVAILABLE   ApiErrorCode = "PROFILE_HANDLE_UNAVAILABLE"
-	PROFILENOTFOUND            ApiErrorCode = "PROFILE_NOT_FOUND"
-	RESOURCENOTFOUND           ApiErrorCode = "RESOURCE_NOT_FOUND"
-	VALIDATIONERROR            ApiErrorCode = "VALIDATION_ERROR"
+	AUTHACCOUNTDISABLED              ApiErrorCode = "AUTH_ACCOUNT_DISABLED"
+	AUTHACCOUNTLINKREQUIRED          ApiErrorCode = "AUTH_ACCOUNT_LINK_REQUIRED"
+	AUTHCHALLENGEINVALID             ApiErrorCode = "AUTH_CHALLENGE_INVALID"
+	AUTHEMAILALREADYREGISTERED       ApiErrorCode = "AUTH_EMAIL_ALREADY_REGISTERED"
+	AUTHINVALIDCREDENTIALS           ApiErrorCode = "AUTH_INVALID_CREDENTIALS"
+	AUTHLASTMETHOD                   ApiErrorCode = "AUTH_LAST_METHOD"
+	AUTHPROVIDERALREADYLINKED        ApiErrorCode = "AUTH_PROVIDER_ALREADY_LINKED"
+	AUTHPROVIDERINVALID              ApiErrorCode = "AUTH_PROVIDER_INVALID"
+	AUTHPROVIDERNOTLINKED            ApiErrorCode = "AUTH_PROVIDER_NOT_LINKED"
+	AUTHPROVIDERUNAVAILABLE          ApiErrorCode = "AUTH_PROVIDER_UNAVAILABLE"
+	AUTHRATELIMITED                  ApiErrorCode = "AUTH_RATE_LIMITED"
+	AUTHREAUTHFAILED                 ApiErrorCode = "AUTH_REAUTH_FAILED"
+	AUTHREAUTHREQUIRED               ApiErrorCode = "AUTH_REAUTH_REQUIRED"
+	AUTHSESSIONNOTFOUND              ApiErrorCode = "AUTH_SESSION_NOT_FOUND"
+	AUTHUNAUTHENTICATED              ApiErrorCode = "AUTH_UNAUTHENTICATED"
+	CONTRIBUTIONCONFLICT             ApiErrorCode = "CONTRIBUTION_CONFLICT"
+	CONTRIBUTIONFORBIDDEN            ApiErrorCode = "CONTRIBUTION_FORBIDDEN"
+	CONTRIBUTIONLIMITED              ApiErrorCode = "CONTRIBUTION_LIMITED"
+	CONTRIBUTIONNOTFOUND             ApiErrorCode = "CONTRIBUTION_NOT_FOUND"
+	CONTRIBUTIONREQUESTCONFLICT      ApiErrorCode = "CONTRIBUTION_REQUEST_CONFLICT"
+	CONTRIBUTIONVERIFICATIONREQUIRED ApiErrorCode = "CONTRIBUTION_VERIFICATION_REQUIRED"
+	CSRFINVALID                      ApiErrorCode = "CSRF_INVALID"
+	INTERNALERROR                    ApiErrorCode = "INTERNAL_ERROR"
+	MAILUNAVAILABLE                  ApiErrorCode = "MAIL_UNAVAILABLE"
+	ORIGINFORBIDDEN                  ApiErrorCode = "ORIGIN_FORBIDDEN"
+	PROFILEHANDLEUNAVAILABLE         ApiErrorCode = "PROFILE_HANDLE_UNAVAILABLE"
+	PROFILENOTFOUND                  ApiErrorCode = "PROFILE_NOT_FOUND"
+	RESOURCENOTFOUND                 ApiErrorCode = "RESOURCE_NOT_FOUND"
+	RESOURCEVERSIONCONFLICT          ApiErrorCode = "RESOURCE_VERSION_CONFLICT"
+	VALIDATIONERROR                  ApiErrorCode = "VALIDATION_ERROR"
 )
 
 // Valid indicates whether the value is a known member of the ApiErrorCode enum.
@@ -73,6 +80,18 @@ func (e ApiErrorCode) Valid() bool {
 		return true
 	case AUTHUNAUTHENTICATED:
 		return true
+	case CONTRIBUTIONCONFLICT:
+		return true
+	case CONTRIBUTIONFORBIDDEN:
+		return true
+	case CONTRIBUTIONLIMITED:
+		return true
+	case CONTRIBUTIONNOTFOUND:
+		return true
+	case CONTRIBUTIONREQUESTCONFLICT:
+		return true
+	case CONTRIBUTIONVERIFICATIONREQUIRED:
+		return true
 	case CSRFINVALID:
 		return true
 	case INTERNALERROR:
@@ -87,7 +106,321 @@ func (e ApiErrorCode) Valid() bool {
 		return true
 	case RESOURCENOTFOUND:
 		return true
+	case RESOURCEVERSIONCONFLICT:
+		return true
 	case VALIDATIONERROR:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionContentContentRating.
+const (
+	ContributionContentContentRatingExplicit ContributionContentContentRating = "explicit"
+	ContributionContentContentRatingGeneral  ContributionContentContentRating = "general"
+	ContributionContentContentRatingMature   ContributionContentContentRating = "mature"
+)
+
+// Valid indicates whether the value is a known member of the ContributionContentContentRating enum.
+func (e ContributionContentContentRating) Valid() bool {
+	switch e {
+	case ContributionContentContentRatingExplicit:
+		return true
+	case ContributionContentContentRatingGeneral:
+		return true
+	case ContributionContentContentRatingMature:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionContentLifecycle.
+const (
+	ContributionContentLifecycleActive       ContributionContentLifecycle = "active"
+	ContributionContentLifecycleArchived     ContributionContentLifecycle = "archived"
+	ContributionContentLifecycleDelisted     ContributionContentLifecycle = "delisted"
+	ContributionContentLifecycleDiscontinued ContributionContentLifecycle = "discontinued"
+	ContributionContentLifecycleInactive     ContributionContentLifecycle = "inactive"
+	ContributionContentLifecycleUnknown      ContributionContentLifecycle = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the ContributionContentLifecycle enum.
+func (e ContributionContentLifecycle) Valid() bool {
+	switch e {
+	case ContributionContentLifecycleActive:
+		return true
+	case ContributionContentLifecycleArchived:
+		return true
+	case ContributionContentLifecycleDelisted:
+		return true
+	case ContributionContentLifecycleDiscontinued:
+		return true
+	case ContributionContentLifecycleInactive:
+		return true
+	case ContributionContentLifecycleUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionEventEventType.
+const (
+	ContributionEventEventTypeAccepted  ContributionEventEventType = "accepted"
+	ContributionEventEventTypeRejected  ContributionEventEventType = "rejected"
+	ContributionEventEventTypeSubmitted ContributionEventEventType = "submitted"
+	ContributionEventEventTypeWithdrawn ContributionEventEventType = "withdrawn"
+)
+
+// Valid indicates whether the value is a known member of the ContributionEventEventType enum.
+func (e ContributionEventEventType) Valid() bool {
+	switch e {
+	case ContributionEventEventTypeAccepted:
+		return true
+	case ContributionEventEventTypeRejected:
+		return true
+	case ContributionEventEventTypeSubmitted:
+		return true
+	case ContributionEventEventTypeWithdrawn:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionKind.
+const (
+	CreateResource ContributionKind = "create_resource"
+	UpdateResource ContributionKind = "update_resource"
+)
+
+// Valid indicates whether the value is a known member of the ContributionKind enum.
+func (e ContributionKind) Valid() bool {
+	switch e {
+	case CreateResource:
+		return true
+	case UpdateResource:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionOriginalContentRating.
+const (
+	ContributionOriginalContentRatingExplicit ContributionOriginalContentRating = "explicit"
+	ContributionOriginalContentRatingGeneral  ContributionOriginalContentRating = "general"
+	ContributionOriginalContentRatingMature   ContributionOriginalContentRating = "mature"
+)
+
+// Valid indicates whether the value is a known member of the ContributionOriginalContentRating enum.
+func (e ContributionOriginalContentRating) Valid() bool {
+	switch e {
+	case ContributionOriginalContentRatingExplicit:
+		return true
+	case ContributionOriginalContentRatingGeneral:
+		return true
+	case ContributionOriginalContentRatingMature:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionOriginalLifecycle.
+const (
+	ContributionOriginalLifecycleActive       ContributionOriginalLifecycle = "active"
+	ContributionOriginalLifecycleArchived     ContributionOriginalLifecycle = "archived"
+	ContributionOriginalLifecycleDelisted     ContributionOriginalLifecycle = "delisted"
+	ContributionOriginalLifecycleDiscontinued ContributionOriginalLifecycle = "discontinued"
+	ContributionOriginalLifecycleInactive     ContributionOriginalLifecycle = "inactive"
+	ContributionOriginalLifecycleUnknown      ContributionOriginalLifecycle = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the ContributionOriginalLifecycle enum.
+func (e ContributionOriginalLifecycle) Valid() bool {
+	switch e {
+	case ContributionOriginalLifecycleActive:
+		return true
+	case ContributionOriginalLifecycleArchived:
+		return true
+	case ContributionOriginalLifecycleDelisted:
+		return true
+	case ContributionOriginalLifecycleDiscontinued:
+		return true
+	case ContributionOriginalLifecycleInactive:
+		return true
+	case ContributionOriginalLifecycleUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionPatchContentRating.
+const (
+	ContributionPatchContentRatingExplicit ContributionPatchContentRating = "explicit"
+	ContributionPatchContentRatingGeneral  ContributionPatchContentRating = "general"
+	ContributionPatchContentRatingMature   ContributionPatchContentRating = "mature"
+)
+
+// Valid indicates whether the value is a known member of the ContributionPatchContentRating enum.
+func (e ContributionPatchContentRating) Valid() bool {
+	switch e {
+	case ContributionPatchContentRatingExplicit:
+		return true
+	case ContributionPatchContentRatingGeneral:
+		return true
+	case ContributionPatchContentRatingMature:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionPatchLifecycle.
+const (
+	ContributionPatchLifecycleActive       ContributionPatchLifecycle = "active"
+	ContributionPatchLifecycleArchived     ContributionPatchLifecycle = "archived"
+	ContributionPatchLifecycleDelisted     ContributionPatchLifecycle = "delisted"
+	ContributionPatchLifecycleDiscontinued ContributionPatchLifecycle = "discontinued"
+	ContributionPatchLifecycleInactive     ContributionPatchLifecycle = "inactive"
+	ContributionPatchLifecycleUnknown      ContributionPatchLifecycle = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the ContributionPatchLifecycle enum.
+func (e ContributionPatchLifecycle) Valid() bool {
+	switch e {
+	case ContributionPatchLifecycleActive:
+		return true
+	case ContributionPatchLifecycleArchived:
+		return true
+	case ContributionPatchLifecycleDelisted:
+		return true
+	case ContributionPatchLifecycleDiscontinued:
+		return true
+	case ContributionPatchLifecycleInactive:
+		return true
+	case ContributionPatchLifecycleUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionSourceAvailabilityState.
+const (
+	ContributionSourceAvailabilityStateActive      ContributionSourceAvailabilityState = "active"
+	ContributionSourceAvailabilityStateBroken      ContributionSourceAvailabilityState = "broken"
+	ContributionSourceAvailabilityStateRemoved     ContributionSourceAvailabilityState = "removed"
+	ContributionSourceAvailabilityStateRestricted  ContributionSourceAvailabilityState = "restricted"
+	ContributionSourceAvailabilityStateUnavailable ContributionSourceAvailabilityState = "unavailable"
+)
+
+// Valid indicates whether the value is a known member of the ContributionSourceAvailabilityState enum.
+func (e ContributionSourceAvailabilityState) Valid() bool {
+	switch e {
+	case ContributionSourceAvailabilityStateActive:
+		return true
+	case ContributionSourceAvailabilityStateBroken:
+		return true
+	case ContributionSourceAvailabilityStateRemoved:
+		return true
+	case ContributionSourceAvailabilityStateRestricted:
+		return true
+	case ContributionSourceAvailabilityStateUnavailable:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionSourceSourceType.
+const (
+	ContributionSourceSourceTypeArchive   ContributionSourceSourceType = "archive"
+	ContributionSourceSourceTypeCommunity ContributionSourceSourceType = "community"
+	ContributionSourceSourceTypeExternal  ContributionSourceSourceType = "external"
+	ContributionSourceSourceTypeMirror    ContributionSourceSourceType = "mirror"
+	ContributionSourceSourceTypeOfficial  ContributionSourceSourceType = "official"
+	ContributionSourceSourceTypeStore     ContributionSourceSourceType = "store"
+	ContributionSourceSourceTypeUnknown   ContributionSourceSourceType = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the ContributionSourceSourceType enum.
+func (e ContributionSourceSourceType) Valid() bool {
+	switch e {
+	case ContributionSourceSourceTypeArchive:
+		return true
+	case ContributionSourceSourceTypeCommunity:
+		return true
+	case ContributionSourceSourceTypeExternal:
+		return true
+	case ContributionSourceSourceTypeMirror:
+		return true
+	case ContributionSourceSourceTypeOfficial:
+		return true
+	case ContributionSourceSourceTypeStore:
+		return true
+	case ContributionSourceSourceTypeUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionSourceInputSourceType.
+const (
+	ContributionSourceInputSourceTypeArchive   ContributionSourceInputSourceType = "archive"
+	ContributionSourceInputSourceTypeCommunity ContributionSourceInputSourceType = "community"
+	ContributionSourceInputSourceTypeExternal  ContributionSourceInputSourceType = "external"
+	ContributionSourceInputSourceTypeMirror    ContributionSourceInputSourceType = "mirror"
+	ContributionSourceInputSourceTypeOfficial  ContributionSourceInputSourceType = "official"
+	ContributionSourceInputSourceTypeStore     ContributionSourceInputSourceType = "store"
+	ContributionSourceInputSourceTypeUnknown   ContributionSourceInputSourceType = "unknown"
+)
+
+// Valid indicates whether the value is a known member of the ContributionSourceInputSourceType enum.
+func (e ContributionSourceInputSourceType) Valid() bool {
+	switch e {
+	case ContributionSourceInputSourceTypeArchive:
+		return true
+	case ContributionSourceInputSourceTypeCommunity:
+		return true
+	case ContributionSourceInputSourceTypeExternal:
+		return true
+	case ContributionSourceInputSourceTypeMirror:
+		return true
+	case ContributionSourceInputSourceTypeOfficial:
+		return true
+	case ContributionSourceInputSourceTypeStore:
+		return true
+	case ContributionSourceInputSourceTypeUnknown:
+		return true
+	default:
+		return false
+	}
+}
+
+// Defines values for ContributionStatus.
+const (
+	ContributionStatusAccepted  ContributionStatus = "accepted"
+	ContributionStatusPending   ContributionStatus = "pending"
+	ContributionStatusRejected  ContributionStatus = "rejected"
+	ContributionStatusWithdrawn ContributionStatus = "withdrawn"
+)
+
+// Valid indicates whether the value is a known member of the ContributionStatus enum.
+func (e ContributionStatus) Valid() bool {
+	switch e {
+	case ContributionStatusAccepted:
+		return true
+	case ContributionStatusPending:
+		return true
+	case ContributionStatusRejected:
+		return true
+	case ContributionStatusWithdrawn:
 		return true
 	default:
 		return false
@@ -201,19 +534,19 @@ func (e ReadyStatus) Valid() bool {
 
 // Defines values for ResourceContentRating.
 const (
-	Explicit ResourceContentRating = "explicit"
-	General  ResourceContentRating = "general"
-	Mature   ResourceContentRating = "mature"
+	ResourceContentRatingExplicit ResourceContentRating = "explicit"
+	ResourceContentRatingGeneral  ResourceContentRating = "general"
+	ResourceContentRatingMature   ResourceContentRating = "mature"
 )
 
 // Valid indicates whether the value is a known member of the ResourceContentRating enum.
 func (e ResourceContentRating) Valid() bool {
 	switch e {
-	case Explicit:
+	case ResourceContentRatingExplicit:
 		return true
-	case General:
+	case ResourceContentRatingGeneral:
 		return true
-	case Mature:
+	case ResourceContentRatingMature:
 		return true
 	default:
 		return false
@@ -419,6 +752,164 @@ type CategoryRef struct {
 // ChallengeToken defines model for ChallengeToken.
 type ChallengeToken struct {
 	Token *string `json:"token,omitempty"`
+}
+
+// ContributionContent defines model for ContributionContent.
+type ContributionContent struct {
+	CategoryId    string                           `json:"category_id"`
+	ContentRating ContributionContentContentRating `json:"content_rating"`
+	DefaultLocale string                           `json:"default_locale"`
+	Description   *string                          `json:"description"`
+	Lifecycle     ContributionContentLifecycle     `json:"lifecycle"`
+	Name          string                           `json:"name"`
+	Source        *ContributionSource              `json:"source,omitempty"`
+	Summary       *string                          `json:"summary"`
+}
+
+// ContributionContentContentRating defines model for ContributionContent.ContentRating.
+type ContributionContentContentRating string
+
+// ContributionContentLifecycle defines model for ContributionContent.Lifecycle.
+type ContributionContentLifecycle string
+
+// ContributionContext defines model for ContributionContext.
+type ContributionContext struct {
+	BaseRevision string              `json:"base_revision"`
+	Content      ContributionContent `json:"content"`
+	ResourceId   string              `json:"resource_id"`
+}
+
+// ContributionCreated defines model for ContributionCreated.
+type ContributionCreated struct {
+	Id string `json:"id"`
+}
+
+// ContributionDetail defines model for ContributionDetail.
+type ContributionDetail struct {
+	Accepted   *ContributionContent `json:"accepted,omitempty"`
+	CreatedAt  time.Time            `json:"created_at"`
+	DecidedAt  *time.Time           `json:"decided_at,omitempty"`
+	History    []ContributionEvent  `json:"history"`
+	Id         string               `json:"id"`
+	Kind       ContributionKind     `json:"kind"`
+	PreviousId *string              `json:"previous_id,omitempty"`
+
+	// Proposed Only fields actually supplied by the author; omitted canonical fields never appear. Null text means explicitly cleared.
+	Proposed ContributionOriginal `json:"proposed"`
+	Reason   string               `json:"reason"`
+	Result   *ContributionResult  `json:"result,omitempty"`
+	Status   ContributionStatus   `json:"status"`
+	Target   *ContributionResult  `json:"target,omitempty"`
+}
+
+// ContributionEvent defines model for ContributionEvent.
+type ContributionEvent struct {
+	EventType  ContributionEventEventType `json:"event_type"`
+	Message    *string                    `json:"message"`
+	OccurredAt time.Time                  `json:"occurred_at"`
+}
+
+// ContributionEventEventType defines model for ContributionEvent.EventType.
+type ContributionEventEventType string
+
+// ContributionKind defines model for ContributionKind.
+type ContributionKind string
+
+// ContributionLimits defines model for ContributionLimits.
+type ContributionLimits struct {
+	PendingCount      int64  `json:"pending_count"`
+	PendingLimit      int    `json:"pending_limit"`
+	Reason            string `json:"reason"`
+	Remaining24h      int64  `json:"remaining_24h"`
+	RetryAfterSeconds int    `json:"retry_after_seconds"`
+}
+
+// ContributionList defines model for ContributionList.
+type ContributionList struct {
+	HasNext  bool                  `json:"has_next"`
+	Items    []ContributionSummary `json:"items"`
+	Limits   ContributionLimits    `json:"limits"`
+	Page     int64                 `json:"page"`
+	PageSize int                   `json:"page_size"`
+}
+
+// ContributionOriginal Only fields actually supplied by the author; omitted canonical fields never appear. Null text means explicitly cleared.
+type ContributionOriginal struct {
+	CategoryId    *string                            `json:"category_id,omitempty"`
+	ContentRating *ContributionOriginalContentRating `json:"content_rating,omitempty"`
+	DefaultLocale *string                            `json:"default_locale,omitempty"`
+	Description   **string                           `json:"description,omitempty"`
+	Lifecycle     *ContributionOriginalLifecycle     `json:"lifecycle,omitempty"`
+	Name          *string                            `json:"name,omitempty"`
+	Source        *ContributionSourceInput           `json:"source,omitempty"`
+	Summary       **string                           `json:"summary,omitempty"`
+}
+
+// ContributionOriginalContentRating defines model for ContributionOriginal.ContentRating.
+type ContributionOriginalContentRating string
+
+// ContributionOriginalLifecycle defines model for ContributionOriginal.Lifecycle.
+type ContributionOriginalLifecycle string
+
+// ContributionPatch defines model for ContributionPatch.
+type ContributionPatch struct {
+	CategoryId    *string                         `json:"category_id,omitempty"`
+	ContentRating *ContributionPatchContentRating `json:"content_rating,omitempty"`
+	DefaultLocale *string                         `json:"default_locale,omitempty"`
+	Description   *string                         `json:"description,omitempty"`
+	Lifecycle     *ContributionPatchLifecycle     `json:"lifecycle,omitempty"`
+	Name          *string                         `json:"name,omitempty"`
+	Source        *ContributionSourceInput        `json:"source,omitempty"`
+	Summary       *string                         `json:"summary,omitempty"`
+}
+
+// ContributionPatchContentRating defines model for ContributionPatch.ContentRating.
+type ContributionPatchContentRating string
+
+// ContributionPatchLifecycle defines model for ContributionPatch.Lifecycle.
+type ContributionPatchLifecycle string
+
+// ContributionResult defines model for ContributionResult.
+type ContributionResult struct {
+	Id   string `json:"id"`
+	Name string `json:"name"`
+	Slug string `json:"slug"`
+}
+
+// ContributionSource defines model for ContributionSource.
+type ContributionSource struct {
+	AvailabilityState ContributionSourceAvailabilityState `json:"availability_state"`
+	Label             *string                             `json:"label"`
+	SourceType        ContributionSourceSourceType        `json:"source_type"`
+	Url               string                              `json:"url"`
+}
+
+// ContributionSourceAvailabilityState defines model for ContributionSource.AvailabilityState.
+type ContributionSourceAvailabilityState string
+
+// ContributionSourceSourceType defines model for ContributionSource.SourceType.
+type ContributionSourceSourceType string
+
+// ContributionSourceInput defines model for ContributionSourceInput.
+type ContributionSourceInput struct {
+	Label      *string                            `json:"label,omitempty"`
+	SourceType *ContributionSourceInputSourceType `json:"source_type,omitempty"`
+	Url        string                             `json:"url"`
+}
+
+// ContributionSourceInputSourceType defines model for ContributionSourceInput.SourceType.
+type ContributionSourceInputSourceType string
+
+// ContributionStatus defines model for ContributionStatus.
+type ContributionStatus string
+
+// ContributionSummary defines model for ContributionSummary.
+type ContributionSummary struct {
+	CreatedAt time.Time          `json:"created_at"`
+	Id        string             `json:"id"`
+	Kind      ContributionKind   `json:"kind"`
+	Name      string             `json:"name"`
+	Status    ContributionStatus `json:"status"`
 }
 
 // Credentials defines model for Credentials.
@@ -645,6 +1136,17 @@ type SessionList struct {
 	Sessions []Session `json:"sessions"`
 }
 
+// SubmitContribution defines model for SubmitContribution.
+type SubmitContribution struct {
+	BaseRevision     *string           `json:"base_revision,omitempty"`
+	Content          ContributionPatch `json:"content"`
+	Kind             ContributionKind  `json:"kind"`
+	PreviousId       *string           `json:"previous_id,omitempty"`
+	Reason           string            `json:"reason"`
+	RequestId        string            `json:"request_id"`
+	TargetResourceId *string           `json:"target_resource_id,omitempty"`
+}
+
 // TagItem defines model for TagItem.
 type TagItem struct {
 	Description *string `json:"description"`
@@ -726,6 +1228,12 @@ type ListCategoriesParams struct {
 	Locale *Locale `form:"locale,omitempty" json:"locale,omitempty"`
 }
 
+// SubmitContributionParams defines parameters for SubmitContribution.
+type SubmitContributionParams struct {
+	// XCSRFToken Obtain from GET /auth/csrf for the current session. Exact PUBLIC_ORIGIN is also required.
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
 // UnlinkOAuthProviderParams defines parameters for UnlinkOAuthProvider.
 type UnlinkOAuthProviderParams struct {
 	// XCSRFToken Obtain from GET /auth/csrf for the current session. Exact PUBLIC_ORIGIN is also required.
@@ -740,6 +1248,19 @@ type LinkOAuthProviderParams struct {
 
 // ReauthenticateOAuthProviderParams defines parameters for ReauthenticateOAuthProvider.
 type ReauthenticateOAuthProviderParams struct {
+	// XCSRFToken Obtain from GET /auth/csrf for the current session. Exact PUBLIC_ORIGIN is also required.
+	XCSRFToken CSRF `json:"X-CSRF-Token"`
+}
+
+// ListMyContributionsParams defines parameters for ListMyContributions.
+type ListMyContributionsParams struct {
+	Page     *int64              `form:"page,omitempty" json:"page,omitempty"`
+	PageSize *int                `form:"page_size,omitempty" json:"page_size,omitempty"`
+	Status   *ContributionStatus `form:"status,omitempty" json:"status,omitempty"`
+}
+
+// WithdrawContributionParams defines parameters for WithdrawContribution.
+type WithdrawContributionParams struct {
 	// XCSRFToken Obtain from GET /auth/csrf for the current session. Exact PUBLIC_ORIGIN is also required.
 	XCSRFToken CSRF `json:"X-CSRF-Token"`
 }
@@ -803,6 +1324,9 @@ type ReauthenticateJSONRequestBody = Reauthentication
 // RegisterJSONRequestBody defines body for Register for application/json ContentType.
 type RegisterJSONRequestBody = Credentials
 
+// SubmitContributionJSONRequestBody defines body for SubmitContribution for application/json ContentType.
+type SubmitContributionJSONRequestBody = SubmitContribution
+
 // UpdateProfileJSONRequestBody defines body for UpdateProfile for application/json ContentType.
 type UpdateProfileJSONRequestBody = ProfileUpdate
 
@@ -848,6 +1372,12 @@ type ServerInterface interface {
 	// (GET /categories)
 	ListCategories(c fiber.Ctx, params ListCategoriesParams) error
 
+	// (POST /contributions)
+	SubmitContribution(c fiber.Ctx, params SubmitContributionParams) error
+
+	// (GET /contributions/context/{slug})
+	GetContributionContext(c fiber.Ctx, slug string) error
+
 	// (GET /health/live)
 	GetLive(c fiber.Ctx) error
 
@@ -868,6 +1398,15 @@ type ServerInterface interface {
 
 	// (POST /me/auth-methods/{provider}/reauthenticate)
 	ReauthenticateOAuthProvider(c fiber.Ctx, provider Provider, params ReauthenticateOAuthProviderParams) error
+
+	// (GET /me/contributions)
+	ListMyContributions(c fiber.Ctx, params ListMyContributionsParams) error
+
+	// (GET /me/contributions/{contribution_id})
+	GetMyContribution(c fiber.Ctx, contributionId string) error
+
+	// (POST /me/contributions/{contribution_id}/withdraw)
+	WithdrawContribution(c fiber.Ctx, contributionId string, params WithdrawContributionParams) error
 
 	// (PATCH /me/profile)
 	UpdateProfile(c fiber.Ctx, params UpdateProfileParams) error
@@ -1316,6 +1855,80 @@ func (siw *ServerInterfaceWrapper) ListCategories(c fiber.Ctx) error {
 	return handler(c)
 }
 
+// SubmitContribution operation middleware
+func (siw *ServerInterfaceWrapper) SubmitContribution(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params SubmitContributionParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.SubmitContribution(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// GetContributionContext operation middleware
+func (siw *ServerInterfaceWrapper) GetContributionContext(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "slug" -------------
+	var slug string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "slug", c.Params("slug"), &slug, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter slug: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.GetContributionContext(c, slug)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
 // GetLive operation middleware
 func (siw *ServerInterfaceWrapper) GetLive(c fiber.Ctx) error {
 
@@ -1534,6 +2147,139 @@ func (siw *ServerInterfaceWrapper) ReauthenticateOAuthProvider(c fiber.Ctx) erro
 
 	handler := func(c fiber.Ctx) error {
 		return siw.Handler.ReauthenticateOAuthProvider(c, provider, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// ListMyContributions operation middleware
+func (siw *ServerInterfaceWrapper) ListMyContributions(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListMyContributionsParams
+
+	var query url.Values
+	query, err = url.ParseQuery(string(c.Request().URI().QueryString()))
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for query string: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page", query, &params.Page, runtime.BindQueryParameterOptions{Type: "integer", Format: "int64"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "page_size" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "page_size", query, &params.PageSize, runtime.BindQueryParameterOptions{Type: "integer", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter page_size: %w", err).Error())
+	}
+
+	// ------------- Optional query parameter "status" -------------
+
+	err = runtime.BindQueryParameterWithOptions("form", true, false, "status", query, &params.Status, runtime.BindQueryParameterOptions{Type: "string", Format: ""})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter status: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.ListMyContributions(c, params)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// GetMyContribution operation middleware
+func (siw *ServerInterfaceWrapper) GetMyContribution(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "contribution_id" -------------
+	var contributionId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "contribution_id", c.Params("contribution_id"), &contributionId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter contribution_id: %w", err).Error())
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.GetMyContribution(c, contributionId)
+	}
+
+	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
+		m := siw.HandlerMiddlewares[i]
+		next := handler
+		handler = func(c fiber.Ctx) error {
+			return m(c, next)
+		}
+	}
+
+	return handler(c)
+}
+
+// WithdrawContribution operation middleware
+func (siw *ServerInterfaceWrapper) WithdrawContribution(c fiber.Ctx) error {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "contribution_id" -------------
+	var contributionId string
+
+	err = runtime.BindStyledParameterWithOptions("simple", "contribution_id", c.Params("contribution_id"), &contributionId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid"})
+	if err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter contribution_id: %w", err).Error())
+	}
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params WithdrawContributionParams
+
+	headers := c.GetReqHeaders()
+
+	// ------------- Required header parameter "X-CSRF-Token" -------------
+	if valueList, found := headers[http.CanonicalHeaderKey("X-CSRF-Token")]; found {
+		var XCSRFToken CSRF
+		n := len(valueList)
+		if n != 1 {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Sprintf("Too many values for ParamName X-CSRF-Token, 1 is required, but %d found", n))
+		}
+
+		err = runtime.BindStyledParameterWithOptions("simple", "X-CSRF-Token", valueList[0], &XCSRFToken, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationHeader, Explode: false, Required: true, Type: "string", Format: ""})
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, fmt.Errorf("Invalid format for parameter X-CSRF-Token: %w", err).Error())
+		}
+
+		params.XCSRFToken = XCSRFToken
+
+	} else {
+		return fiber.NewError(fiber.StatusBadRequest, "Header parameter X-CSRF-Token is required, but not found")
+	}
+
+	handler := func(c fiber.Ctx) error {
+		return siw.Handler.WithdrawContribution(c, contributionId, params)
 	}
 
 	for i := len(siw.HandlerMiddlewares) - 1; i >= 0; i-- {
@@ -1948,5 +2694,15 @@ func RegisterHandlersWithOptions(router fiber.Router, si ServerInterface, option
 	router.Get(options.BaseURL+"/health/live", wrapper.GetLive)
 
 	router.Get(options.BaseURL+"/health/ready", wrapper.GetReady)
+
+	router.Get(options.BaseURL+"/contributions/context/:slug", wrapper.GetContributionContext)
+
+	router.Post(options.BaseURL+"/contributions", wrapper.SubmitContribution)
+
+	router.Get(options.BaseURL+"/me/contributions", wrapper.ListMyContributions)
+
+	router.Get(options.BaseURL+"/me/contributions/:contribution_id", wrapper.GetMyContribution)
+
+	router.Post(options.BaseURL+"/me/contributions/:contribution_id/withdraw", wrapper.WithdrawContribution)
 
 }

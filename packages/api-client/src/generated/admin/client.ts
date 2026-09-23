@@ -5,6 +5,204 @@
  * Separate password-only Admin authentication with current static roles. Unsafe requests require exact ADMIN_ORIGIN; session mutations also require an Admin session-bound CSRF header. Auth responses are no-store. Public sessions are never accepted.
  * OpenAPI spec version: 0.1.0
  */
+export type ContributionKind =
+  (typeof ContributionKind)[keyof typeof ContributionKind];
+
+export const ContributionKind = {
+  create_resource: "create_resource",
+  update_resource: "update_resource",
+} as const;
+
+export type ContributionStatus =
+  (typeof ContributionStatus)[keyof typeof ContributionStatus];
+
+export const ContributionStatus = {
+  pending: "pending",
+  accepted: "accepted",
+  rejected: "rejected",
+  withdrawn: "withdrawn",
+} as const;
+
+export interface ContributionSummary {
+  id: string;
+  kind: ContributionKind;
+  status: ContributionStatus;
+  /** @maxLength 160 */
+  name: string;
+  created_at: string;
+}
+
+export interface ContributionCreated {
+  id: string;
+}
+
+export type ContributionSourceSourceType =
+  (typeof ContributionSourceSourceType)[keyof typeof ContributionSourceSourceType];
+
+export const ContributionSourceSourceType = {
+  official: "official",
+  store: "store",
+  archive: "archive",
+  mirror: "mirror",
+  community: "community",
+  external: "external",
+  unknown: "unknown",
+} as const;
+
+export type ContributionSourceAvailabilityState =
+  (typeof ContributionSourceAvailabilityState)[keyof typeof ContributionSourceAvailabilityState];
+
+export const ContributionSourceAvailabilityState = {
+  active: "active",
+  unavailable: "unavailable",
+  broken: "broken",
+  removed: "removed",
+  restricted: "restricted",
+} as const;
+
+export interface ContributionSource {
+  /** @maxLength 2048 */
+  url: string;
+  /**
+   * @maxLength 80
+   * @nullable
+   */
+  label: string | null;
+  source_type: ContributionSourceSourceType;
+  availability_state: ContributionSourceAvailabilityState;
+}
+
+export type ContributionContentLifecycle =
+  (typeof ContributionContentLifecycle)[keyof typeof ContributionContentLifecycle];
+
+export const ContributionContentLifecycle = {
+  active: "active",
+  inactive: "inactive",
+  discontinued: "discontinued",
+  delisted: "delisted",
+  archived: "archived",
+  unknown: "unknown",
+} as const;
+
+export type ContributionContentContentRating =
+  (typeof ContributionContentContentRating)[keyof typeof ContributionContentContentRating];
+
+export const ContributionContentContentRating = {
+  general: "general",
+  mature: "mature",
+  explicit: "explicit",
+} as const;
+
+export interface ContributionContent {
+  /** @maxLength 64 */
+  default_locale: string;
+  category_id: string;
+  /**
+   * @minLength 1
+   * @maxLength 160
+   */
+  name: string;
+  /**
+   * @maxLength 500
+   * @nullable
+   */
+  summary: string | null;
+  /**
+   * @maxLength 50000
+   * @nullable
+   */
+  description: string | null;
+  lifecycle: ContributionContentLifecycle;
+  content_rating: ContributionContentContentRating;
+  /** @maxLength 80 */
+  slug?: string;
+  source?: ContributionSource;
+}
+
+export type ContributionEventEventType =
+  (typeof ContributionEventEventType)[keyof typeof ContributionEventEventType];
+
+export const ContributionEventEventType = {
+  submitted: "submitted",
+  accepted: "accepted",
+  rejected: "rejected",
+  withdrawn: "withdrawn",
+} as const;
+
+export interface ContributionEvent {
+  event_type: ContributionEventEventType;
+  /**
+   * @maxLength 2000
+   * @nullable
+   */
+  message: string | null;
+  occurred_at: string;
+  actor_id: string;
+  /**
+   * @maxLength 2000
+   * @nullable
+   */
+  internal_note: string | null;
+}
+
+export interface ContributionDetail {
+  id: string;
+  kind: ContributionKind;
+  status: ContributionStatus;
+  /** @maxLength 2000 */
+  reason: string;
+  previous_id?: string;
+  created_at: string;
+  decided_at?: string;
+  proposed: ContributionContent;
+  accepted?: ContributionContent;
+  author_id: string;
+  target_resource_id?: string;
+  result_resource_id?: string;
+  /** @minimum 1 */
+  base_version?: number;
+  base?: ContributionContent;
+  current?: ContributionContent;
+  conflict: boolean;
+  self_review: boolean;
+  history: ContributionEvent[];
+}
+
+export interface ContributionList {
+  items: ContributionSummary[];
+  /** @minimum 1 */
+  page: number;
+  page_size: number;
+  has_next: boolean;
+}
+
+export interface AcceptContribution {
+  content: ContributionContent;
+  /**
+   * @maxLength 2000
+   * @nullable
+   */
+  message?: string | null;
+  /**
+   * @maxLength 2000
+   * @nullable
+   */
+  internal_note?: string | null;
+}
+
+export interface RejectContribution {
+  /**
+   * @minLength 1
+   * @maxLength 2000
+   */
+  message: string;
+  /**
+   * @maxLength 2000
+   * @nullable
+   */
+  internal_note?: string | null;
+}
+
 export type PublicationState =
   (typeof PublicationState)[keyof typeof PublicationState];
 
@@ -449,6 +647,12 @@ export const ApiErrorCode = {
   CURATION_IN_USE: "CURATION_IN_USE",
   CURATION_RELATION_CYCLE: "CURATION_RELATION_CYCLE",
   INTERNAL_ERROR: "INTERNAL_ERROR",
+  CONTRIBUTION_NOT_FOUND: "CONTRIBUTION_NOT_FOUND",
+  CONTRIBUTION_FORBIDDEN: "CONTRIBUTION_FORBIDDEN",
+  CONTRIBUTION_VERIFICATION_REQUIRED: "CONTRIBUTION_VERIFICATION_REQUIRED",
+  CONTRIBUTION_CONFLICT: "CONTRIBUTION_CONFLICT",
+  CONTRIBUTION_REQUEST_CONFLICT: "CONTRIBUTION_REQUEST_CONFLICT",
+  CONTRIBUTION_LIMITED: "CONTRIBUTION_LIMITED",
 } as const;
 
 export interface ApiError {
@@ -606,6 +810,20 @@ export type SetPublicationParams = {
    * @minimum 1
    */
   expected_version: number;
+};
+
+export type ListContributionsParams = {
+  /**
+   * @minimum 1
+   */
+  page?: number;
+  /**
+   * @minimum 1
+   * @maximum 100
+   */
+  page_size?: number;
+  status?: ContributionStatus;
+  kind?: ContributionKind;
 };
 
 export type loginResponse200 = {
@@ -4044,4 +4262,400 @@ export const deleteTagLocalization = async (
     status: res.status,
     headers: res.headers,
   } as deleteTagLocalizationResponse;
+};
+
+export type listContributionsResponse200 = {
+  data: ContributionList;
+  status: 200;
+};
+
+export type listContributionsResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type listContributionsResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type listContributionsResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type listContributionsResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type listContributionsResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type listContributionsResponse429 = {
+  data: ApiError;
+  status: 429;
+};
+
+export type listContributionsResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type listContributionsResponseSuccess = listContributionsResponse200 & {
+  headers: Headers;
+};
+export type listContributionsResponseError = (
+  | listContributionsResponse400
+  | listContributionsResponse401
+  | listContributionsResponse403
+  | listContributionsResponse404
+  | listContributionsResponse409
+  | listContributionsResponse429
+  | listContributionsResponse500
+) & {
+  headers: Headers;
+};
+
+export type listContributionsResponse =
+  listContributionsResponseSuccess | listContributionsResponseError;
+
+export const getListContributionsUrl = (params?: ListContributionsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : String(value));
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/contributions?${stringifiedParams}`
+    : `/api/contributions`;
+};
+
+export const listContributions = async (
+  params?: ListContributionsParams,
+  options?: RequestInit,
+): Promise<listContributionsResponse> => {
+  const res = await fetch(getListContributionsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: listContributionsResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as listContributionsResponse;
+};
+
+export type getContributionResponse200 = {
+  data: ContributionDetail;
+  status: 200;
+};
+
+export type getContributionResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type getContributionResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type getContributionResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type getContributionResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type getContributionResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type getContributionResponse429 = {
+  data: ApiError;
+  status: 429;
+};
+
+export type getContributionResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type getContributionResponseSuccess = getContributionResponse200 & {
+  headers: Headers;
+};
+export type getContributionResponseError = (
+  | getContributionResponse400
+  | getContributionResponse401
+  | getContributionResponse403
+  | getContributionResponse404
+  | getContributionResponse409
+  | getContributionResponse429
+  | getContributionResponse500
+) & {
+  headers: Headers;
+};
+
+export type getContributionResponse =
+  getContributionResponseSuccess | getContributionResponseError;
+
+export const getGetContributionUrl = (contributionId: string) => {
+  return `/api/contributions/${contributionId}`;
+};
+
+export const getContribution = async (
+  contributionId: string,
+  options?: RequestInit,
+): Promise<getContributionResponse> => {
+  const res = await fetch(getGetContributionUrl(contributionId), {
+    ...options,
+    method: "GET",
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: getContributionResponse["data"] = body ? JSON.parse(body) : {};
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as getContributionResponse;
+};
+
+export type acceptContributionResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type acceptContributionResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type acceptContributionResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type acceptContributionResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type acceptContributionResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type acceptContributionResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type acceptContributionResponse429 = {
+  data: ApiError;
+  status: 429;
+};
+
+export type acceptContributionResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type acceptContributionResponseSuccess =
+  acceptContributionResponse204 & {
+    headers: Headers;
+  };
+export type acceptContributionResponseError = (
+  | acceptContributionResponse400
+  | acceptContributionResponse401
+  | acceptContributionResponse403
+  | acceptContributionResponse404
+  | acceptContributionResponse409
+  | acceptContributionResponse429
+  | acceptContributionResponse500
+) & {
+  headers: Headers;
+};
+
+export type acceptContributionResponse =
+  acceptContributionResponseSuccess | acceptContributionResponseError;
+
+export const getAcceptContributionUrl = (contributionId: string) => {
+  return `/api/contributions/${contributionId}/accept`;
+};
+
+export const acceptContribution = async (
+  contributionId: string,
+  acceptContributionBody: AcceptContribution,
+  options?: RequestInit,
+): Promise<acceptContributionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getAcceptContributionUrl(contributionId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(acceptContributionBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: acceptContributionResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as acceptContributionResponse;
+};
+
+export type rejectContributionResponse204 = {
+  data: void;
+  status: 204;
+};
+
+export type rejectContributionResponse400 = {
+  data: ErrorResponse;
+  status: 400;
+};
+
+export type rejectContributionResponse401 = {
+  data: ErrorResponse;
+  status: 401;
+};
+
+export type rejectContributionResponse403 = {
+  data: ErrorResponse;
+  status: 403;
+};
+
+export type rejectContributionResponse404 = {
+  data: ErrorResponse;
+  status: 404;
+};
+
+export type rejectContributionResponse409 = {
+  data: ErrorResponse;
+  status: 409;
+};
+
+export type rejectContributionResponse429 = {
+  data: ApiError;
+  status: 429;
+};
+
+export type rejectContributionResponse500 = {
+  data: ErrorResponse;
+  status: 500;
+};
+
+export type rejectContributionResponseSuccess =
+  rejectContributionResponse204 & {
+    headers: Headers;
+  };
+export type rejectContributionResponseError = (
+  | rejectContributionResponse400
+  | rejectContributionResponse401
+  | rejectContributionResponse403
+  | rejectContributionResponse404
+  | rejectContributionResponse409
+  | rejectContributionResponse429
+  | rejectContributionResponse500
+) & {
+  headers: Headers;
+};
+
+export type rejectContributionResponse =
+  rejectContributionResponseSuccess | rejectContributionResponseError;
+
+export const getRejectContributionUrl = (contributionId: string) => {
+  return `/api/contributions/${contributionId}/reject`;
+};
+
+export const rejectContribution = async (
+  contributionId: string,
+  rejectContributionBody: RejectContribution,
+  options?: RequestInit,
+): Promise<rejectContributionResponse> => {
+  const getHeaders = (
+    h?: NonNullable<RequestInit["headers"]>,
+  ): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(
+          h as Iterable<Iterable<string>>,
+          (entry) => Array.from(entry) as [string, string],
+        ),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<
+      string | readonly string[] | undefined
+    >(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+  const res = await fetch(getRejectContributionUrl(contributionId), {
+    ...options,
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...getHeaders(options?.headers),
+    },
+    body: JSON.stringify(rejectContributionBody),
+  });
+
+  const body = [204, 205, 304].includes(res.status) ? null : await res.text();
+
+  const data: rejectContributionResponse["data"] = body
+    ? JSON.parse(body)
+    : undefined;
+  return {
+    data,
+    status: res.status,
+    headers: res.headers,
+  } as rejectContributionResponse;
 };

@@ -1,0 +1,6 @@
+---
+import AccountLayout from '../../layouts/AccountLayout.astro';
+import { ContributionDetail } from '../../components/contributions/ContributionDetail';
+const id = Astro.params.id ?? '';
+---
+<AccountLayout title="Proposal details" description="Your original contribution and its review history."><ContributionDetail id={id} client:load /></AccountLayout>

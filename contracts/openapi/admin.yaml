@@ -678,6 +678,118 @@ paths:
         404: {"$ref":"#/components/responses/Error"}
         409: {"$ref":"#/components/responses/Error"}
         500: {"$ref":"#/components/responses/Error"}
+  /contributions:
+    get:
+      operationId: "listContributions"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"page","in":"query","required":false,"schema":{"type":"integer","format":"int64","minimum":1,"default":1}},{"name":"page_size","in":"query","required":false,"schema":{"type":"integer","minimum":1,"maximum":100,"default":20}},{"name":"status","in":"query","required":false,"schema":{"$ref":"#/components/schemas/ContributionStatus"}},{"name":"kind","in":"query","required":false,"schema":{"$ref":"#/components/schemas/ContributionKind"}}]
+      responses:
+        200:
+          description: "Private contribution response; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ContributionList"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        429:
+          description: "Contribution quota reached. Retry-After is omitted when waiting for review."
+          headers:
+            Retry-After:
+              schema:
+                type: "integer"
+                minimum: 1
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ApiError"}
+        500: {"$ref":"#/components/responses/Error"}
+  /contributions/{contribution_id}:
+    get:
+      operationId: "getContribution"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"contribution_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}}]
+      responses:
+        200:
+          description: "Private contribution response; Cache-Control no-store."
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ContributionDetail"}
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        429:
+          description: "Contribution quota reached. Retry-After is omitted when waiting for review."
+          headers:
+            Retry-After:
+              schema:
+                type: "integer"
+                minimum: 1
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ApiError"}
+        500: {"$ref":"#/components/responses/Error"}
+  /contributions/{contribution_id}/accept:
+    post:
+      operationId: "acceptContribution"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"contribution_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/AcceptContribution"}
+      responses:
+        204:
+          description: "Private contribution response; Cache-Control no-store."
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        429:
+          description: "Contribution quota reached. Retry-After is omitted when waiting for review."
+          headers:
+            Retry-After:
+              schema:
+                type: "integer"
+                minimum: 1
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ApiError"}
+        500: {"$ref":"#/components/responses/Error"}
+  /contributions/{contribution_id}/reject:
+    post:
+      operationId: "rejectContribution"
+      security: [{"AdminSession":[]}]
+      parameters: [{"name":"contribution_id","in":"path","required":true,"schema":{"type":"string","format":"uuid","x-go-type":"string"}},{"$ref":"#/components/parameters/CSRF"}]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: {"$ref":"#/components/schemas/RejectContribution"}
+      responses:
+        204:
+          description: "Private contribution response; Cache-Control no-store."
+        400: {"$ref":"#/components/responses/Error"}
+        401: {"$ref":"#/components/responses/Error"}
+        403: {"$ref":"#/components/responses/Error"}
+        404: {"$ref":"#/components/responses/Error"}
+        409: {"$ref":"#/components/responses/Error"}
+        429:
+          description: "Contribution quota reached. Retry-After is omitted when waiting for review."
+          headers:
+            Retry-After:
+              schema:
+                type: "integer"
+                minimum: 1
+          content:
+            application/json:
+              schema: {"$ref":"#/components/schemas/ApiError"}
+        500: {"$ref":"#/components/responses/Error"}
 components:
   securitySchemes:
     AdminSession:
@@ -706,6 +818,208 @@ components:
         application/json:
           schema: {$ref: '#/components/schemas/ApiError'}
   schemas:
+    ContributionKind:
+      type: "string"
+      enum: ["create_resource","update_resource"]
+    ContributionStatus:
+      type: "string"
+      enum: ["pending","accepted","rejected","withdrawn"]
+    ContributionSummary:
+      type: "object"
+      additionalProperties: false
+      required: ["id","kind","status","name","created_at"]
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        kind: {"$ref":"#/components/schemas/ContributionKind"}
+        status: {"$ref":"#/components/schemas/ContributionStatus"}
+        name:
+          type: "string"
+          maxLength: 160
+        created_at:
+          type: "string"
+          format: "date-time"
+    ContributionCreated:
+      type: "object"
+      additionalProperties: false
+      required: ["id"]
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+    ContributionSource:
+      type: "object"
+      additionalProperties: false
+      required: ["url","label","source_type","availability_state"]
+      properties:
+        url:
+          type: "string"
+          maxLength: 2048
+          format: "uri"
+        label:
+          type: "string"
+          maxLength: 80
+          nullable: true
+        source_type:
+          type: "string"
+          enum: ["official","store","archive","mirror","community","external","unknown"]
+        availability_state:
+          type: "string"
+          enum: ["active","unavailable","broken","removed","restricted"]
+    ContributionContent:
+      type: "object"
+      additionalProperties: false
+      required: ["default_locale","category_id","name","summary","description","lifecycle","content_rating"]
+      properties:
+        default_locale:
+          type: "string"
+          maxLength: 64
+        category_id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        name:
+          type: "string"
+          maxLength: 160
+          minLength: 1
+        summary:
+          type: "string"
+          maxLength: 500
+          nullable: true
+        description:
+          type: "string"
+          maxLength: 50000
+          nullable: true
+        lifecycle:
+          type: "string"
+          enum: ["active","inactive","discontinued","delisted","archived","unknown"]
+        content_rating:
+          type: "string"
+          enum: ["general","mature","explicit"]
+        slug:
+          type: "string"
+          maxLength: 80
+        source: {"$ref":"#/components/schemas/ContributionSource"}
+    ContributionEvent:
+      type: "object"
+      additionalProperties: false
+      required: ["event_type","message","occurred_at","actor_id","internal_note"]
+      properties:
+        event_type:
+          type: "string"
+          enum: ["submitted","accepted","rejected","withdrawn"]
+        message:
+          type: "string"
+          maxLength: 2000
+          nullable: true
+        occurred_at:
+          type: "string"
+          format: "date-time"
+        actor_id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        internal_note:
+          type: "string"
+          maxLength: 2000
+          nullable: true
+    ContributionDetail:
+      type: "object"
+      additionalProperties: false
+      required: ["id","kind","status","reason","created_at","proposed","history","author_id","conflict","self_review"]
+      properties:
+        id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        kind: {"$ref":"#/components/schemas/ContributionKind"}
+        status: {"$ref":"#/components/schemas/ContributionStatus"}
+        reason:
+          type: "string"
+          maxLength: 2000
+        previous_id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        created_at:
+          type: "string"
+          format: "date-time"
+        decided_at:
+          type: "string"
+          format: "date-time"
+        proposed: {"$ref":"#/components/schemas/ContributionContent"}
+        accepted: {"$ref":"#/components/schemas/ContributionContent"}
+        author_id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        target_resource_id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        result_resource_id:
+          type: "string"
+          format: "uuid"
+          x-go-type: "string"
+        base_version:
+          type: "integer"
+          format: "int64"
+          minimum: 1
+        base: {"$ref":"#/components/schemas/ContributionContent"}
+        current: {"$ref":"#/components/schemas/ContributionContent"}
+        conflict:
+          type: "boolean"
+        self_review:
+          type: "boolean"
+        history:
+          type: "array"
+          items: {"$ref":"#/components/schemas/ContributionEvent"}
+    ContributionList:
+      type: "object"
+      additionalProperties: false
+      required: ["items","page","page_size","has_next"]
+      properties:
+        items:
+          type: "array"
+          items: {"$ref":"#/components/schemas/ContributionSummary"}
+        page:
+          type: "integer"
+          format: "int64"
+          minimum: 1
+        page_size:
+          type: "integer"
+        has_next:
+          type: "boolean"
+    AcceptContribution:
+      type: "object"
+      additionalProperties: false
+      required: ["content"]
+      properties:
+        content: {"$ref":"#/components/schemas/ContributionContent"}
+        message:
+          type: "string"
+          maxLength: 2000
+          nullable: true
+        internal_note:
+          type: "string"
+          maxLength: 2000
+          nullable: true
+    RejectContribution:
+      type: "object"
+      additionalProperties: false
+      required: ["message"]
+      properties:
+        message:
+          type: "string"
+          maxLength: 2000
+          minLength: 1
+        internal_note:
+          type: "string"
+          maxLength: 2000
+          nullable: true
     PublicationState:
       type: "string"
       enum: ["draft","pending","published","restricted","removed"]
@@ -1233,7 +1547,7 @@ components:
       properties:
         code:
           type: string
-          enum: [VALIDATION_ERROR, ADMIN_INVALID_CREDENTIALS, ADMIN_UNAUTHENTICATED, ADMIN_FORBIDDEN, ADMIN_SESSION_NOT_FOUND, ORIGIN_FORBIDDEN, CSRF_INVALID, AUTH_RATE_LIMITED, CURATION_NOT_FOUND, RESOURCE_VERSION_CONFLICT, CURATION_CONFLICT, CURATION_IN_USE, CURATION_RELATION_CYCLE, INTERNAL_ERROR]
+          enum: [VALIDATION_ERROR, ADMIN_INVALID_CREDENTIALS, ADMIN_UNAUTHENTICATED, ADMIN_FORBIDDEN, ADMIN_SESSION_NOT_FOUND, ORIGIN_FORBIDDEN, CSRF_INVALID, AUTH_RATE_LIMITED, CURATION_NOT_FOUND, RESOURCE_VERSION_CONFLICT, CURATION_CONFLICT, CURATION_IN_USE, CURATION_RELATION_CYCLE, INTERNAL_ERROR, CONTRIBUTION_NOT_FOUND, CONTRIBUTION_FORBIDDEN, CONTRIBUTION_VERIFICATION_REQUIRED, CONTRIBUTION_CONFLICT, CONTRIBUTION_REQUEST_CONFLICT, CONTRIBUTION_LIMITED]
         message: {type: string}
     Live:
       type: object

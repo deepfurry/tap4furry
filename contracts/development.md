@@ -34,6 +34,12 @@ temporary account and Resource graph. Its fixture roles progress Moderator→Edi
 to validate read-only, ordinary curation and governance. Runtime never gets role
 mutation rights; product role changes do not change PostgreSQL grants.
 
+P0-3A extends the same Admin smoke with two temporary verified author accounts,
+real Public submission, revised review, draft publication, correction CAS and private
+history. New-table grants are checked column by column; fixture cleanup is owner-only
+and limited to generated IDs. Use `pnpm migrate:dev` for migration 7 up only after
+disposable 7→6→5→7 acceptance. Never run Down against shared development.
+
 `ADMIN_CSRF_SECRET` is separate from Public `CSRF_SECRET`; API/Admin share
 `AUTH_THROTTLE_SECRET`. Production requires explicit private values of at least
 32 bytes; development/test have public defaults. Existing private files stay intact.
